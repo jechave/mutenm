@@ -38,7 +38,7 @@ Install packages `mutenm` (this package) and `jefuns` (miscelaneous functions, s
 # install.packages("devtools")
 
 devtools::install_github("jechave/jefuns")
-devtools::install_github("jechave/penm")
+devtools::install_github("jechave/mutenm")
 ```
 # Getting started
 
@@ -48,7 +48,7 @@ Before using the package, it needs to be loaded. To run this file, also load the
 library(tidyverse)  
 library(patchwork)  
 library(jefuns)
-library(penm)
+library(mutenm)
 ```
 
 
@@ -155,75 +155,6 @@ p_de2 <- plot_matrix(log10(de2ij), row_name = "mode", value_name = "log10(de2)")
   ggtitle("energy") + theme(legend.position = "none")
 p_df2 <- plot_matrix(log10(df2ij), row_name = "mode", value_name = "log10(df2)") +  
   ggtitle("force") + theme(legend.position = "none")
-
-p_dr2 + p_de2 + p_df2 
-```
-  
-                            
-
-
-## Double-site mutation-response scanning
-
-Double mutation-response scanning produces a so-called "compensation matrix". 
-This matrix can be obtained using `admrs()` (analytical method), or `sdmrs()` (simulation method).
-An element `d[i,j]` of the matrix obtained represents the maximum compensation due to mutations at `j` of an original mutation at `i`. If `option = "mean_max"`is used, the average over `i` is returned. If `option = `max_max`, then the maximum over mutations at `i` is returned.
-
-```{r}
-# Calculate analytical double mutation-response matrix for deformations (response = "dr2")
-
-D_analytical <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "dr2")
-
-# Calculate simulation mutation-response matrix for deformations (response = "dr2")
-
-D_simulation <- sdmrs(wt, nmut = 5, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "dr2", seed = 1024)
-
-# Plot both matrices side by side
-
-p_analytical <- plot_matrix(log10(D_analytical), value_name = "log10(Dij)") + 
-  ggtitle("analytical")
-
-p_simulation <- plot_matrix(log10(D_simulation), value_name = "log10(Dij)") + 
-  ggtitle("simulation")
-
-p_analytical + p_simulation 
-```
-### Compensation matrices averaged or maximized over initial mutation
-
-Site `j` (columns of the compensaton matrix) are candidate "rescue" sites, therefore the compensation matrix looks for the maximum over possible mutations. Site `i` is the originally mutated site. To eliminate the *specific* mutation at `i`, there are two ways: maximize (i.e. pick the mutation at `i` that is most easily compensated by a mutation at `j`) or average. These two options are implemented:
-
-```{r}
-# Calculate analytical mutation-response matrix for deformations (response = "dr2")
-
-Dij_mean_max <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "dr2")
-Dij_max_max <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "max_max", response = "dr2")
-
-# Plot matrices 
-
-p_mean_max <- plot_matrix(log10(Dij_mean_max), value_name = "log10(Dij)") +  ggtitle("mean_max") 
-p_max_max <- plot_matrix(log10(Dij_max_max), value_name = "log10(Dij)") +  ggtitle("max_max") 
-
-p_mean_max + p_max_max
-```
-
-### Compensation matrices for structure, energy, and force
-
-As above, three compensation matrices can be calculated.
-
-```{r}
-# Calculate analytical mutation-response matrix for deformations (response = "dr2")
-
-dr2ij <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "dr2")
-de2ij <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "de2")
-df2ij <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "df2")
-
-# Plot matrices 
-
-p_dr2 <- plot_matrix(log10(dr2ij), value_name = "log10(dr2)") +  ggtitle("structure") +
-  theme(legend.position = "none")
-p_de2 <- plot_matrix(log10(de2ij), value_name = "log10(de2)") +  ggtitle("energy") +
-  theme(legend.position = "none")
-p_df2 <- plot_matrix(log10(df2ij), value_name = "log10(df2)") +  ggtitle("force") +
-  theme(legend.position = "none")
 
 p_dr2 + p_de2 + p_df2 
 ```

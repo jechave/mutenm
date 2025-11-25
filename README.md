@@ -1,35 +1,33 @@
-penm package
+mutenm package
 ================
 Julian Echave
 26/09/2022
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-The `penm` package contains functions to build Elastic Network Models
-(ENM) of proteins and to perturb them; `penm` stands for Perturbing
+The `mutenm` package contains functions to build Elastic Network Models
+(ENM) of proteins and to perturb them; `mutenm` stands for Mutating
 Elastic Network Models.
 
 # Overview
 
 In short:
 
--   `bio3d::read.pdb()`: Set up a **pdb** protein object.
--   `set_enm()`: Set up a `penm` **prot** object, containing protein and
-    its ENM info.
--   `amrs()`and `smrs()`: perform single-mutation scans to calculate
-    mutation-response matrices.
--   `admrs()`and `sdmrs()`: perform double-mutation scans to calculate
-    compensation matrices.
+- `bio3d::read.pdb()`: Set up a **pdb** protein object.
+- `set_enm()`: Set up a `mutenm` **prot** object, containing protein and
+  its ENM info.
+- `amrs()`and `smrs()`: perform single-mutation scans to calculate
+  mutation-response matrices.
 
 # Installation
 
-Install packages `penm` (this package) and `jefuns` (miscelaneous
-functions, some of which `penm` uses).
+Install packages `mutenm` (this package) and `jefuns` (miscelaneous
+functions, some of which `mutenm` uses).
 
     # install.packages("devtools")
 
     devtools::install_github("jechave/jefuns")
-    devtools::install_github("jechave/penm")
+    devtools::install_github("jechave/mutenm")
 
 # Getting started
 
@@ -38,17 +36,26 @@ load the following packages: `tidyverse`, `patchwork`, and `jefuns`.
 
 ``` r
 library(tidyverse)  
-#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-#> ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
-#> ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-#> ✔ tidyr   1.2.1      ✔ stringr 1.4.0 
-#> ✔ readr   2.1.2      ✔ forcats 0.5.1
+#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+#> ✔ dplyr     1.1.4     ✔ readr     2.1.4
+#> ✔ forcats   1.0.0     ✔ stringr   1.5.1
+#> ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+#> ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+#> ✔ purrr     1.0.2     
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
+#> ✖ readr::edition_get()   masks testthat::edition_get()
+#> ✖ tidyr::expand()        masks mutenm::expand()
+#> ✖ dplyr::filter()        masks mutenm::filter(), stats::filter()
+#> ✖ purrr::is_null()       masks testthat::is_null()
+#> ✖ dplyr::lag()           masks stats::lag()
+#> ✖ readr::local_edition() masks testthat::local_edition()
+#> ✖ dplyr::matches()       masks tidyr::matches(), testthat::matches()
+#> ✖ tidyr::pack()          masks mutenm::pack()
+#> ✖ tidyr::unpack()        masks mutenm::unpack()
+#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 library(patchwork)  
 library(jefuns)
-library(penm)
+library(mutenm)
 ```
 
 ## Set up the ENM for a protein
@@ -60,17 +67,13 @@ full ENM analysis.
 ``` r
 pdb <-  bio3d::read.pdb("data-raw/2XWRa.pdb") # read a pdb file
 #>    PDB has ALT records, taking A only, rm.alt=TRUE
-wt <- set_enm(pdb, node = "calpha", model = "anm", d_max = 10.5, frustrated = FALSE)
+wt <- set_enm(pdb, node = "calpha", model = "anm", d_max = 10.5)
 ```
 
 `wt` created here by `set_enm()` is an object of class *prot*. In this
-example, network nodes are placed at
-![C\_\alpha](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;C_%5Calpha "C_\alpha")
-coordinates, the model used is Bahar’s Anisotropic Network Model
-(`model = "anm"`) with a cut-off distance to define contacts of
-`d_max = 10.5`. `frustrated` indicates whether to add frustrations to
-the model (it defaults to `FALSE`, it may be ommited from the list of
-arguments).
+example, network nodes are placed at $C_\alpha$ coordinates, the model
+used is Bahar’s Anisotropic Network Model (`model = "anm"`) with a
+cut-off distance to define contacts of `d_max = 10.5`.
 
 The object `wt` created above is a list that contains several
 components:
@@ -78,11 +81,10 @@ components:
 ``` r
 str(wt) # show structure of the object created
 #> List of 6
-#>  $ param:List of 4
-#>   ..$ node      : chr "calpha"
-#>   ..$ model     : chr "anm"
-#>   ..$ d_max     : num 10.5
-#>   ..$ frustrated: logi FALSE
+#>  $ param:List of 3
+#>   ..$ node : chr "calpha"
+#>   ..$ model: chr "anm"
+#>   ..$ d_max: num 10.5
 #>  $ nodes:List of 5
 #>   ..$ nsites  : int 199
 #>   ..$ site    : int [1:199] 1 2 3 4 5 6 7 8 9 10 ...
@@ -108,19 +110,18 @@ str(wt) # show structure of the object created
 #>  - attr(*, "class")= chr [1:2] "prot" "list"
 ```
 
--   `wt$param` is a list of model parameters
--   `wt$nodes` has information on number of sites, site-indexes,
-    B-factors, and cartesian coordinates of the nodes
--   `wt$graph` is a graph representation of the elastic network (used
-    internally)
--   `wt$eij` is a matrix of unit vectors directed along contacts (used
-    internally)
--   `wt$kmat` is the network’s matrix (also called the Hessian,
-    Laplacian, or Kirchhoff matrix)
--   `wt$nma` has various properties obtained from a so called
-    “normal-mode analysis”: mode index, eigenvalues (`evalue`), matrix
-    of eigenvectors (`umat`), and the ENM’s variance covariance matrix
-    (`cmat`).
+- `wt$param` is a list of model parameters
+- `wt$nodes` has information on number of sites, site-indexes,
+  B-factors, and cartesian coordinates of the nodes
+- `wt$graph` is a graph representation of the elastic network (used
+  internally)
+- `wt$eij` is a matrix of unit vectors directed along contacts (used
+  internally)
+- `wt$kmat` is the network’s matrix (also called the Hessian, Laplacian,
+  or Kirchhoff matrix)
+- `wt$nma` has various properties obtained from a so called “normal-mode
+  analysis”: mode index, eigenvalues (`evalue`), matrix of eigenvectors
+  (`umat`), and the ENM’s variance covariance matrix (`cmat`).
 
 ## Single-site mutation-response scanning
 
@@ -156,16 +157,16 @@ p_analytical + p_simulation
 
 There are three possible responses that can be calculated:
 
--   `response = "dr2"` (structural deformations): Matrix element
-    `m[i,j]` represents the square distance between site `i` of the
-    wild-type protein and site `i` of the mutant, averaged over
-    mutations at site `j`.
--   `response = "de2"` (deformation energy): `m[i,j]` is the mechanical
-    energy needed to movoe site `i` back to its unperturbed position,
-    averaged over mutations at site `j`).
--   `response = "df2"` (force): `m[i,j]` is the square-length of the
-    mechanical force vector acting on site `i`, averaged over mutations
-    at site `j`).
+- `response = "dr2"` (structural deformations): Matrix element `m[i,j]`
+  represents the square distance between site `i` of the wild-type
+  protein and site `i` of the mutant, averaged over mutations at site
+  `j`.
+- `response = "de2"` (deformation energy): `m[i,j]` is the mechanical
+  energy needed to movoe site `i` back to its unperturbed position,
+  averaged over mutations at site `j`).
+- `response = "df2"` (force): `m[i,j]` is the square-length of the
+  mechanical force vector acting on site `i`, averaged over mutations at
+  site `j`).
 
 ``` r
 # Calculate analytical mutation-response matrix for deformations (response = "dr2")
@@ -215,84 +216,3 @@ p_dr2 + p_de2 + p_df2
 ```
 
 ![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
-
-## Double-site mutation-response scanning
-
-Double mutation-response scanning produces a so-called “compensation
-matrix”. This matrix can be obtained using `admrs()` (analytical
-method), or `sdmrs()` (simulation method). An element `d[i,j]` of the
-matrix obtained represents the maximum compensation due to mutations at
-`j` of an original mutation at `i`. If `option = "mean_max"`is used, the
-average over `i` is returned. If
-`option =`max_max`, then the maximum over mutations at`i\` is returned.
-
-``` r
-# Calculate analytical double mutation-response matrix for deformations (response = "dr2")
-
-D_analytical <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "dr2")
-
-# Calculate simulation mutation-response matrix for deformations (response = "dr2")
-
-D_simulation <- sdmrs(wt, nmut = 5, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "dr2", seed = 1024)
-
-# Plot both matrices side by side
-
-p_analytical <- plot_matrix(log10(D_analytical), value_name = "log10(Dij)") + 
-  ggtitle("analytical")
-
-p_simulation <- plot_matrix(log10(D_simulation), value_name = "log10(Dij)") + 
-  ggtitle("simulation")
-
-p_analytical + p_simulation 
-```
-
-![](man/figures/README-unnamed-chunk-8-1.png)<!-- --> \### Compensation
-matrices averaged or maximized over initial mutation
-
-Site `j` (columns of the compensaton matrix) are candidate “rescue”
-sites, therefore the compensation matrix looks for the maximum over
-possible mutations. Site `i` is the originally mutated site. To
-eliminate the *specific* mutation at `i`, there are two ways: maximize
-(i.e. pick the mutation at `i` that is most easily compensated by a
-mutation at `j`) or average. These two options are implemented:
-
-``` r
-# Calculate analytical mutation-response matrix for deformations (response = "dr2")
-
-Dij_mean_max <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "dr2")
-Dij_max_max <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "max_max", response = "dr2")
-
-# Plot matrices 
-
-p_mean_max <- plot_matrix(log10(Dij_mean_max), value_name = "log10(Dij)") +  ggtitle("mean_max") 
-p_max_max <- plot_matrix(log10(Dij_max_max), value_name = "log10(Dij)") +  ggtitle("max_max") 
-
-p_mean_max + p_max_max
-```
-
-![](man/figures/README-unnamed-chunk-9-1.png)<!-- -->
-
-### Compensation matrices for structure, energy, and force
-
-As above, three compensation matrices can be calculated.
-
-``` r
-# Calculate analytical mutation-response matrix for deformations (response = "dr2")
-
-dr2ij <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "dr2")
-de2ij <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "de2")
-df2ij <- admrs(wt, mut_dl_sigma = 0.3, mut_sd_min = 1, option = "mean_max", response = "df2")
-
-# Plot matrices 
-
-p_dr2 <- plot_matrix(log10(dr2ij), value_name = "log10(dr2)") +  ggtitle("structure") +
-  theme(legend.position = "none")
-p_de2 <- plot_matrix(log10(de2ij), value_name = "log10(de2)") +  ggtitle("energy") +
-  theme(legend.position = "none")
-p_df2 <- plot_matrix(log10(df2ij), value_name = "log10(df2)") +  ggtitle("force") +
-  theme(legend.position = "none")
-
-p_dr2 + p_de2 + p_df2 
-```
-
-![](man/figures/README-unnamed-chunk-10-1.png)<!-- -->
