@@ -51,12 +51,6 @@ Rscript -e "devtools::document()"
 
 4. **Response Types**: `dr2`, `de2`, `df2`
 
-### To be removed during trimming
-
-- `sclfenm` mutation model
-- Models: "hnm0", "reach"
-- `amrs_ddg`, `smrs_ddg`, `amrs_ddgact`, `smrs_ddgact`
-
 ### Data Flow
 
 1. PDB file → `bio3d::read.pdb()` → pdb object
