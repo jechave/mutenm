@@ -44,9 +44,9 @@ devtools::install_github("jechave/mutenm")
 
 Before using the package, it needs to be loaded. To run this file, also load the following packages: `tidyverse`, `patchwork`,   and `jefuns`.
 
-```{r}
-library(tidyverse)  
-library(patchwork)  
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(patchwork)
 library(jefuns)
 library(mutenm)
 ```
@@ -57,8 +57,8 @@ library(mutenm)
 First, read a pdb file using `bio3d::read.pdb` to generate a `pdb` object for a protein.
 Then, create the `prot` object, that contains the full ENM analysis.
 
-```{r}
-pdb <-  bio3d::read.pdb("data-raw/2XWRa.pdb") # read a pdb file
+```{r, message = FALSE, warning = FALSE, results = 'hide'}
+pdb <- bio3d::read.pdb("data-raw/2XWRa.pdb") # read a pdb file
 wt <- set_enm(pdb, node = "calpha", model = "anm", d_max = 10.5)
 ```
 

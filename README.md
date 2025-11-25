@@ -35,25 +35,8 @@ Before using the package, it needs to be loaded. To run this file, also
 load the following packages: `tidyverse`, `patchwork`, and `jefuns`.
 
 ``` r
-library(tidyverse)  
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.4     ✔ readr     2.1.4
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.1
-#> ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-#> ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-#> ✔ purrr     1.0.2     
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ readr::edition_get()   masks testthat::edition_get()
-#> ✖ tidyr::expand()        masks mutenm::expand()
-#> ✖ dplyr::filter()        masks mutenm::filter(), stats::filter()
-#> ✖ purrr::is_null()       masks testthat::is_null()
-#> ✖ dplyr::lag()           masks stats::lag()
-#> ✖ readr::local_edition() masks testthat::local_edition()
-#> ✖ dplyr::matches()       masks tidyr::matches(), testthat::matches()
-#> ✖ tidyr::pack()          masks mutenm::pack()
-#> ✖ tidyr::unpack()        masks mutenm::unpack()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-library(patchwork)  
+library(tidyverse)
+library(patchwork)
 library(jefuns)
 library(mutenm)
 ```
@@ -65,8 +48,7 @@ object for a protein. Then, create the `prot` object, that contains the
 full ENM analysis.
 
 ``` r
-pdb <-  bio3d::read.pdb("data-raw/2XWRa.pdb") # read a pdb file
-#>    PDB has ALT records, taking A only, rm.alt=TRUE
+pdb <- bio3d::read.pdb("data-raw/2XWRa.pdb") # read a pdb file
 wt <- set_enm(pdb, node = "calpha", model = "anm", d_max = 10.5)
 ```
 
