@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^cache$
+^to_do$
+^LICENSE\.md$
+^data-raw$
+^doc$
+^Readme\.Rmd$
+^docs$
+^Rmd$
+^images$

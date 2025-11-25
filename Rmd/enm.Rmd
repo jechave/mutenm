@@ -1,0 +1,118 @@
+---
+title: "Test enm functions"
+author: "Julian Echave"
+date: "4/25/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Load libraries and functions
+
+```{r}
+# load libraries
+library(tidyverse)
+library(ggridges)
+library(cowplot)
+library(bio3d)
+library(penm)
+library(jefuns)
+library(here)
+
+source(here("Rmd/enm_plot.R"))
+
+```
+
+
+# Read and perform ENM NMA of wild-type protein
+
+
+## Set up Elastic Network Model
+
+```{r}
+## read pdb filec
+pdb_file <- here("data-raw/2acy_A.pdb")
+pdb <- read.pdb(pdb_file)
+
+# set up the protein's enm
+
+prot <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5, frustrated = FALSE)
+                
+str(prot)
+```
+
+# Test *enm_plot.R* functions
+
+## Site plots
+
+### MSF determinants
+
+```{r}
+plot_grid(
+   plot_msf_vs_cn(prot),
+   plot_bfactor_vs_msf(prot),
+   plot_msf_vs_mlms(prot))
+```
+
+
+### Site profiles
+
+```{r}
+plot_site_profiles(prot)
+```
+
+## Mode plots
+
+```{r}
+plot_Kn(prot)
+```
+
+### Mode energy
+
+```{r}
+plot_grid(
+   plot_eigenvalue_vs_mode(prot),
+   plot_eigenvalue_spectrum(prot)
+)
+```
+### Mode MSF
+
+```{r}
+plot_grid(
+   plot_msf_vs_mode(prot),
+   plot_msf_mode_spectrum(prot)
+)
+```
+
+
+##  Site by mode 
+
+```{r}
+plot_modes(prot)
+```
+
+```{r}
+plot_umat2(prot)
+```
+```{r}
+plot_grid(
+   plot_msf_site_mode(prot),
+   plot_rmsf_site_mode(prot),
+   ncol = 1
+)
+```
+
+## Site by site matrices
+
+```{r}
+plot_grid(
+   plot_rho_matrix(prot),
+   plot_reduced_cmat(prot),
+   plot_reduced_kmat(prot),
+   ncol = 2
+)
+
+
+```
+

@@ -1,0 +1,391 @@
+---
+title: "Test penm modeule of penm package"
+author: "Julian Echave"
+date: "4/25/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load libraries and functions
+
+```{r}
+# load libraries
+library(here)
+library(tidyverse)
+library(ggridges)
+library(cowplot)
+library(patchwork)
+library(bio3d)
+library(penm)
+library(jefuns)
+```
+
+
+## Check pdb file and read wt coordinates
+
+```{r}
+pdb_file <- here("data-raw/2acy_A.pdb")
+pdb <- read.pdb(pdb_file)
+
+# wt <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5, frustrated = FALSE) 
+
+# wt <- set_enm(pdb, node = "ca", model = "anm", d_max = 10.5, frustrated = FALSE) 
+wt <- set_enm(pdb, node = "ca", model = "hnm", d_max = 10.5, frustrated = FALSE) 
+
+str(wt)
+```
+
+
+
+
+```{r}
+
+mut_lfenm <- get_mutant_site(wt, site_mut = 80, mutation = 1,  mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 2)
+mut_sclfenm <- get_mutant_site(wt, site_mut = 80, mutation = 1, mut_model = "sclfenm",  mut_dl_sigma = 0.3, mut_sd_min = 2)
+
+df <- tibble(protein = c("wt", "mut_lfenm", "mut_sclfenm"),
+             v_min = c(
+               enm_v_min(wt), 
+               enm_v_min(mut_lfenm), 
+               enm_v_min(mut_sclfenm)),
+             g_entropy = c(
+               enm_g_entropy(wt, beta_boltzmann()),
+               enm_g_entropy(mut_lfenm, beta_boltzmann()),
+               enm_g_entropy(mut_sclfenm, beta_boltzmann()))
+             )
+df
+             
+
+```
+
+## Compare graphs
+
+```{r}
+tibble( 
+  site = get_site(wt),
+  cn_wt = cn_graph(get_graph(wt)),
+  cn_lfenm = cn_graph(get_graph(mut_lfenm)),
+  cn_sclfenm = cn_graph(get_graph(mut_sclfenm))) %>% 
+  mutate(
+    dcn_lfenm = cn_lfenm - cn_wt,
+    dcn_sclfenm = cn_sclfenm - cn_wt
+  ) %>% 
+  pivot_longer(
+    cols = starts_with("dcn_"),
+    names_to = "case",
+    values_to = "dcn"
+  ) %>% 
+  ggplot(aes(site, dcn, color = case)) +
+  geom_line()
+
+
+```
+```{r}
+site = get_site(wt)
+msf_wt <- get_msf_site(wt)
+msf_lfenm <- get_msf_site(mut_lfenm)
+msf_sclfenm <- get_msf_site(mut_sclfenm)
+
+dat <- tibble(site, msf_wt, msf_lfenm, msf_sclfenm) %>% 
+  mutate(
+    dmsf_wt = 0,
+    dmsf_lfenm = msf_lfenm - msf_wt,
+    dmsf_sclfenm = msf_sclfenm - msf_wt
+  )
+
+p1 <- dat %>% 
+  pivot_longer(
+    cols = starts_with("msf_"),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  ggplot(aes(site, value, color = case)) +
+  geom_line()
+
+p2 <- dat %>% 
+  pivot_longer(
+    cols = starts_with("dmsf_"),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  ggplot(aes(site, value, color = case)) +
+  geom_line()
+
+p1 / p2
+
+```
+
+## site-dependent ensemble changes
+```{r}
+nsites <- get_nsites(wt)
+
+mut <- mut_sclfenm
+
+dat <- tibble(site = get_site(wt),
+              dmsfi = delta_motion_dmsfi(wt, mut),
+              dhi = delta_motion_dhi(wt, mut),
+              rwsipi = delta_motion_rwsipi(wt, mut),
+              dbhati = delta_motion_dbhati(wt, mut)
+              )
+dat
+```
+
+```{r}
+cor(dat[, -1])
+
+```
+```{r}
+dat %>% 
+  pivot_longer(
+    cols = c(dhi, rwsipi, dbhati, dmsfi),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  ggplot(aes(site, value)) +
+  geom_line() +
+  facet_wrap(~case, scales = "free_y", ncol = 1)
+
+```
+## Compare mode by mode
+
+```{r}
+mut <- mut_sclfenm
+
+dat <- tibble(mode = get_mode(wt),
+              msf_wt = get_msf_mode(wt),
+              msf_mut = get_msf_mode(mut),
+              dmsfn = delta_motion_dmsfn(wt, mut),
+              dhn = delta_motion_dhn(wt, mut),
+              rwsipn = delta_motion_rwsipn(wt, mut),
+              nhn = delta_motion_nhn(wt, mut))
+
+dat %>% 
+  pivot_longer(
+    cols = c(dmsfn, dhn, rwsipn, nhn),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  ggplot(aes(mode, value )) +
+  geom_line() +
+  facet_wrap(~case, scales = "free_y", ncol = 1)
+
+dat %>% 
+  pivot_longer(
+    cols = c(dmsfn, dhn, rwsipn, nhn),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  ggplot(aes(msf_wt, value )) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~case, scales = "free_y")
+
+
+```
+
+
+## Site by site ensemble responde matrices
+
+```{r}
+nmut = 10
+mutants <- generate_mutants(wt, nmut, mut_model = "sclfenm", mut_dl_sigma = 0.3, mut_sd_min = 2, seed = 1024)
+
+dat <- mrs_motion_dmsfij(mutants)  %>% 
+  inner_join(mrs_motion_dhij(mutants)) %>% 
+  inner_join(mrs_motion_rwsipij(mutants)) %>%  
+  inner_join(mrs_motion_dbhatij(mutants))
+
+dat %>% 
+  pivot_longer(
+    cols = c(dmsfij, dhij, rwsipij, dbhatij),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  ggplot(aes(i, j, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient2() +
+  facet_wrap(~case, scales = "free")
+
+
+dat %>% 
+  pivot_longer(
+    cols = c(dmsfij, dhij, rwsipij, dbhatij),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  group_by(j, case) %>% 
+  summarise(value = mean(value)) %>% 
+  ggplot(aes(j, value)) +
+  geom_line() +
+  facet_wrap(~case, scales = "free_y", ncol = 1)
+
+dat %>% 
+  pivot_longer(
+    cols = c(dmsfij, dhij, rwsipij, dbhatij),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  group_by(i, case) %>% 
+  summarise(value = mean(value)) %>% 
+  ggplot(aes(i, value)) +
+  geom_line() +
+  facet_wrap(~case, scales = "free_y")
+
+
+
+
+```
+## Mode by site ensemble response matrices
+
+```{r}
+nmut = 1
+if(FALSE) mutants <- generate_mutants(wt, nmut, mut_model = "sclfenm", mut_dl_sigma = 0.3, mut_sd_min = 2, seed = 1024)
+
+dat <- mrs_motion_dmsfnj(mutants)  %>% 
+  inner_join(mrs_motion_dhnj(mutants)) %>% 
+  inner_join(mrs_motion_rwsipnj(mutants)) %>%  
+  inner_join(mrs_motion_nhnj(mutants))
+
+dat %>% 
+  pivot_longer(
+    cols = c(dmsfnj, dhnj, rwsipnj, nhnj),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  ggplot(aes(n, j, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient2() +
+  facet_wrap(~case, scales = "free")
+
+
+dat %>% 
+  pivot_longer(
+    cols = c(dmsfnj, dhnj, rwsipnj, nhnj),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  group_by(j, case) %>% 
+  summarise(value = mean(value)) %>% 
+  ggplot(aes(j, value)) +
+  geom_line() +
+  facet_wrap(~case, scales = "free_y", ncol = 1)
+
+dat %>% 
+  pivot_longer(
+    cols = c(dmsfnj, dhnj, rwsipnj, nhnj),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  group_by(n, case) %>% 
+  summarise(value = mean(value)) %>% 
+  ggplot(aes(n, value)) +
+  geom_line() +
+  facet_wrap(~case, scales = "free_y")
+```
+
+
+## Effects of selection
+
+```{r}
+dat_consurf <- read_csv(here("data-raw", "2acy.consurf.csv")) 
+
+dat_weights <- dat_consurf %>% 
+  transmute(j = pos, pgap = (1 - nongap/nseq), wj_consurf = exp(entropy), zrate,
+            wj_jc = rep(1, get_nsites(wt)),
+            cn = get_cn(wt),
+            wj_cn = max(cn) - cn + 1)
+
+dat_weights %>% 
+  pivot_longer(
+    cols = c(pgap, zrate, wj_consurf, wj_jc, wj_cn),
+    names_to = "case",
+    values_to ="value"
+  ) %>% 
+  ggplot(aes(cn, value)) +
+  geom_point() +
+  geom_smooth() +
+  ggpubr::stat_cor() +
+  facet_wrap(~case, scales = "free_y")
+
+
+  
+
+
+
+
+```
+```{r}
+dat2 <- inner_join(dat, dat_weights)
+dat2 %>% 
+  pivot_longer(
+    cols = c(dhnj, nhnj),
+    names_to = "measure",
+    values_to = "measure_value"
+  ) %>% 
+  group_by(n,  measure) %>% 
+  summarise(
+    measure_mean_jc = sum(wj_jc * measure_value) / sum(wj_jc),
+    measure_mean_cn = sum(cn * measure_value) / sum(cn),
+    measure_mean_cnm1 = sum(1/cn * measure_value) / sum(1/cn),
+  ) %>% 
+  pivot_longer(
+    cols = c(starts_with("measure_mean")),
+    names_to = "case",
+    values_to = "value"
+  ) %>% 
+  ggplot(aes(n, value, color = case)) +
+  geom_line() +
+  facet_wrap(~case+measure, scales = "free_y", ncol = 2)
+
+    
+
+```
+```{r}
+j0 <-  1
+dat  %>% 
+  inner_join(dat2) %>% 
+  mutate(rate_cut = cut(zrate, 5)) %>% 
+  ggplot(aes(n, nhnj)) +
+  geom_point(size = .3, alpha = .2) +
+  facet_wrap(~ rate_cut)
+
+```
+```{r}
+dat %>% 
+  mutate(ncut = cut(n, 10)) %>% 
+  ggplot(aes(j, nhnj, color = ncut, group = n)) +
+  geom_line() +
+  scale_color_viridis_d() +
+  facet_wrap(~ncut)
+
+```
+```{r}
+dat %>% 
+  filter(n %in% c(1,2,3,101,102, 103, 239, 240,241, 280,281, 282)) %>% 
+  ggplot(aes(j, nhnj, color = factor(n))) +
+  geom_line() +
+  scale_color_viridis_d() +
+  facet_wrap(~n, ncol = 3)
+
+dat %>% 
+  mutate(u2nj = as.vector(get_umat2(wt))) %>% 
+  filter(n %in% c(1,2,3,101,102, 103, 239, 240,241, 280,281, 282)) %>% 
+  ggplot(aes(j, u2nj, color = factor(n))) +
+  geom_line() +
+  scale_color_viridis_d() +
+  facet_wrap(~n, ncol = 3)
+
+dat %>% 
+  mutate(u2nj = as.vector(get_umat2(wt))) %>% 
+  filter(n %in% c(1,2,3,101,102, 103, 239, 240,241, 280,281, 282)) %>% 
+  ggplot(aes(u2nj, nhnj)) +
+  geom_point(size = .3) +
+  geom_smooth() +
+  facet_wrap(~factor(n), ncol = 3, scales = "free") +
+  NULL
+
+```
+
