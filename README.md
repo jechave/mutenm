@@ -1,7 +1,6 @@
 mutenm package
 ================
 Julian Echave
-26/09/2022
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 

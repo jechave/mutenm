@@ -1,9 +1,7 @@
 ---
 title: "mutenm package"
 author: "Julian Echave"
-date: "26/09/2022"
-output:  github_document
-
+output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
