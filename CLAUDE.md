@@ -74,3 +74,12 @@ Rscript -e "devtools::document()"
 
 Tests in `tests/testthat/` with reference data in `tests/data/`.
 Run `Rscript -e "devtools::test()"` after changes.
+
+## Important: Keeping CLAUDE.md in Sync
+
+When making changes to the package, always update this file in the same commit:
+- Adding or removing exported functions: Update the Architecture section
+- Changing function signatures or API: Update relevant documentation
+- Removing functionality during trimming: Remove references from all sections
+
+This ensures CLAUDE.md stays accurate and useful for future development sessions.
