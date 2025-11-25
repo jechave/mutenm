@@ -37,10 +37,8 @@ responses <- amrs_ddg(wt, mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 
 }
 \seealso{
 Other mutscan functions: 
-\code{\link{admrs}()},
 \code{\link{amrs_ddgact}()},
 \code{\link{amrs}()},
-\code{\link{sdmrs}()},
 \code{\link{smrs_ddgact}()},
 \code{\link{smrs_ddg}()},
 \code{\link{smrs}()}
