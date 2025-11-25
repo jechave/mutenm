@@ -10,9 +10,9 @@ library(here)
 library(tictoc)
 library(Matrix)
 
-load(here("data/wt.rda"))
-load(here("data/admrs_output_mean_max.rda"))
-load(here("data/admrs_output_max_max.rda"))
+load(here("tests/data/wt.rda"))
+load(here("tests/data/admrs_output_mean_max.rda"))
+load(here("tests/data/admrs_output_max_max.rda"))
 
 # Test analytic dmrs
 
@@ -31,8 +31,8 @@ test_that("admrs with option max_max  is ok", {
 
 # Test sdmrs (simulation-based dmrs)
 
-load(here("data/sdmrs_output_mean_max.rda"))
-load(here("data/sdmrs_output_max_max.rda"))
+load(here("tests/data/sdmrs_output_mean_max.rda"))
+load(here("tests/data/sdmrs_output_max_max.rda"))
 
 
 sdmrs_output_mean_max_test <- sdmrs(wt, nmut = 5, mut_dl_sigma = 0.3, mut_sd_min = 1, seed = 1234, option = "mean_max")

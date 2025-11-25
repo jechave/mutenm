@@ -4,10 +4,10 @@ library(jefuns)
 library(bio3d)
 
 
-load(here("data/pdb_2acy_A.rda"))
-load(here("data/wt.rda"))
-load(here("data/mut_lf.rda"))
-load(here("data/mut_qf.rda"))
+load(here("tests/data/pdb_2acy_A.rda"))
+load(here("tests/data/wt.rda"))
+load(here("tests/data/mut_lf.rda"))
+load(here("tests/data/mut_qf.rda"))
 
 
 test_that("set_enm gets wt ok", {

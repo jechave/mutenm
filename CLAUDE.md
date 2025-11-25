@@ -4,112 +4,76 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Package Overview
 
-The `penm` package (Perturbing Elastic Network Models) is an R package for building and analyzing Elastic Network Models (ENMs) of proteins. It performs mutation scanning and calculates mutation-response matrices for protein structure analysis.
+The `mutenm` package (Mutate Elastic Network Models) is an R package for building Elastic Network Models (ENMs) of proteins and calculating mutation-response matrices using the LFENM perturbation model.
+
+**Note:** This is a development version being trimmed from the full `penm` package to create a minimal, focused release.
 
 ## Development Commands
 
 ### Building and Installing
 ```bash
-# Install the package and its dependencies
 R CMD INSTALL .
-
-# Build and check the package
 R CMD build .
-R CMD check penm_*.tar.gz
+R CMD check mutenm_*.tar.gz
 
-# Install using devtools (recommended for development)
+# Using devtools (recommended)
 Rscript -e "devtools::install()"
-Rscript -e "devtools::build()"
 Rscript -e "devtools::check()"
 ```
 
 ### Testing
 ```bash
-# Run all tests
 Rscript -e "devtools::test()"
-
-# Run specific test file
 Rscript -e "testthat::test_file('tests/testthat/test_enm.R')"
 ```
 
 ### Documentation
 ```bash
-# Generate documentation from roxygen2 comments
 Rscript -e "devtools::document()"
-
-# Build package documentation
-Rscript -e "pkgdown::build_site()"
 ```
 
 ## Architecture
 
-### Core Components
+### Core Components (to keep in minimal release)
 
 1. **ENM Creation (`R/enm.R`)**
-   - `set_enm()`: Main function that creates a `prot` object containing ENM structure
-   - Creates a protein object with components: param, nodes, graph, eij, kmat, nma
-   - Supports different models: "anm", "ming_wall", "hnm", "hnm0", "pfanm", "reach"
-   - Node types: "ca" (alpha carbons) or "sc" (side chains)
+   - `set_enm()`: Creates a `prot` object containing ENM structure
+   - Target models for v1.0: "anm", "ming_wall", "pfanm", "hnm"
+   - Node types: "ca", "cb", "sc"
 
 2. **Mutation Perturbation (`R/penm.R`)**
-   - `get_mutant_site()`: Core mutation function supporting two models:
-     - `lfenm`: Linear Force ENM model (fast, approximate)
-     - `sclfenm`: Self-Consistent LFENM (recalculates full ENM)
-   - Mutations perturb edge lengths based on sequence distance
+   - `get_mutant_site()`: Core mutation function
+   - Target for v1.0: `lfenm` model only
 
-3. **Mutation Scanning Analysis**
-   - **Analytical methods** (`R/mutscan_amrs.R`, `R/mutscan_admrs.R`):
-     - `amrs()`: Single-site mutation response scanning
-     - `admrs()`: Double-site mutation response (compensation matrices)
-     - `amrs_ddg()`: Analytical stability change (ΔΔG) profiles
-     - `amrs_ddgact()`: Analytical activation energy change profiles
-   - **Simulation methods** (`R/mutscan_smrs.R`, `R/mutscan_sdmrs.R`):
-     - `smrs()`: Monte Carlo simulation of mutation responses
-     - `sdmrs()`: Simulation-based double mutation scanning
-     - `smrs_ddg()`: Simulation-based stability change profiles
-     - `smrs_ddgact()`: Simulation-based activation energy profiles
+3. **Mutation Response Scanning**
+   - `amrs()`: Analytical single-site mutation response
+   - `smrs()`: Simulation-based single-site mutation response
+   - `admrs()`: Analytical double-site mutation response
+   - `sdmrs()`: Simulation-based double-site mutation response
 
-4. **Response Calculations**
-   - Three response types calculated:
-     - `dr2`: Structural deformations (displacement)
-     - `de2`: Deformation energy
-     - `df2`: Mechanical force
-   - Responses can be calculated by site or by normal mode
+4. **Response Types**: `dr2`, `de2`, `df2`
+
+### To be removed during trimming
+
+- `sclfenm` mutation model
+- Models: "hnm0", "reach"
+- `frustrated = TRUE` functionality
+- `amrs_ddg`, `smrs_ddg`, `amrs_ddgact`, `smrs_ddgact`
 
 ### Data Flow
 
 1. PDB file → `bio3d::read.pdb()` → pdb object
-2. pdb object → `set_enm()` → prot object (contains ENM)
-3. prot object → mutation scanning functions → response matrices
-4. Response matrices → analysis/visualization
+2. pdb object → `set_enm()` → prot object
+3. prot object → scanning functions → response matrices
 
 ### Key Dependencies
 
-- **bio3d**: PDB file reading and structural analysis
-- **jefuns**: Utility functions (sister package)
+- **bio3d**: PDB file reading
+- **jefuns**: Utility functions
 - **Matrix**: Sparse matrix operations
 - **pracma**: Numerical analysis
-- Standard tidyverse packages for data manipulation
 
-### Testing Structure
+### Testing
 
-Tests are in `tests/testthat/` with pre-computed reference data in `tests/data/`:
-- `test_enm.R`: Core ENM creation tests
-- `test_penm.R`: Mutation perturbation tests
-- `test_penm_sc.R`: Side-chain specific tests
-- `test_mrs_all.R`: Mutation response scanning tests
-- `test_dmrs.R`: Double mutation response tests
-
-Test data can be refreshed using scripts in `tests/R/`:
-- `refresh_test_enm_data.R`
-- `refresh_test_penm_data.R`
-- `refresh_test_penm_sc_data.R`
-- `refresh_test_mrs_data.R`
-- `refresh_test_dmrs_data.R`
-
-### Important Parameters
-
-- `d_max`: Distance cutoff for defining network contacts (typically 10.5 Å for Cα, 12.5 Å for side chains)
-- `mut_dl_sigma`: Standard deviation for edge length perturbations (typically 0.3)
-- `mut_sd_min`: Minimum sequence distance for mutation (typically 1-2)
-- `frustrated`: Whether to include frustrations in the model (typically FALSE)
+Tests in `tests/testthat/` with reference data in `tests/data/`.
+Run `Rscript -e "devtools::test()"` after changes.
