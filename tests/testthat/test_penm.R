@@ -11,7 +11,7 @@ load(here("tests/data/mut_qf.rda"))
 
 
 test_that("set_enm gets wt ok", {
-  expect_equal(set_enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5, frustrated = FALSE), wt)
+  expect_equal(set_enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5), wt)
 })
 
 test_that("get_mutant_site gets mut_lf", {

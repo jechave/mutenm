@@ -26,7 +26,7 @@
 #' @examples
 #' \dontrun{
 #' pdb <- bio3d::read.pdb("2acy")
-#' wt <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5, frustrated = FALSE)
+#' wt <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
 #' mrs_matrix <- smrs(wt, nmut = 10, mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 1, response = "dr2", seed = 1024)
 #' }
 #'
@@ -89,7 +89,7 @@ smrs <- function(wt, nmut, mut_dl_sigma, mut_sd_min, option = "site", response =
 #' @examples
 #' \dontrun{
 #' pdb <- bio3d::read.pdb("2acy")
-#' wt <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5, frustrated = FALSE)
+#' wt <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
 #' responses <- smrs_all(wt, nmut = 10, mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 1, seed = 1024)
 #' }
 #'

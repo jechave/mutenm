@@ -55,16 +55,6 @@ get_enm_model <- function(prot)  prot$param$model
 #'
 get_d_max <- function(prot) prot$param$d_max
 
-#' Get ENM parameter frustrated
-#'
-#' @param prot is a prot object
-#' @return frustrated, the parameter that defines whether the ENM is frustrated fully relaxed
-#'
-#'
-#' @noRd
-#'
-get_frustrated <- function(prot)  prot$param$frustrated
-
 
 #' @rdname get_prot_property
 #'

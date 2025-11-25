@@ -48,8 +48,6 @@ Rscript -e "devtools::document()"
 3. **Mutation Response Scanning**
    - `amrs()`: Analytical single-site mutation response
    - `smrs()`: Simulation-based single-site mutation response
-   - `admrs()`: Analytical double-site mutation response
-   - `sdmrs()`: Simulation-based double-site mutation response
 
 4. **Response Types**: `dr2`, `de2`, `df2`
 
@@ -57,7 +55,6 @@ Rscript -e "devtools::document()"
 
 - `sclfenm` mutation model
 - Models: "hnm0", "reach"
-- `frustrated = TRUE` functionality
 - `amrs_ddg`, `smrs_ddg`, `amrs_ddgact`, `smrs_ddgact`
 
 ### Data Flow

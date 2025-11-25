@@ -4,7 +4,7 @@
 \alias{set_enm}
 \title{Set up 'prot' object}
 \usage{
-set_enm(pdb, node, model, d_max, frustrated)
+set_enm(pdb, node, model, d_max)
 }
 \arguments{
 \item{pdb}{pdb object obtained using bio3d::read.pdb}
@@ -14,8 +14,6 @@ set_enm(pdb, node, model, d_max, frustrated)
 \item{model}{parameter specifying model type: "anm", "ming_wall", "hnm", "hnm0", "pfanm", "reach"}
 
 \item{d_max}{distance cutoff used to define enm contacts}
-
-\item{frustrated}{logical value indicating whether to include frustrations in calculation of kmat}
 }
 \value{
 an object of class `prot`, which is a list `lst(param, node, graph, eij, kmat, nma)`
@@ -26,8 +24,8 @@ an object of class `prot`, which is a list `lst(param, node, graph, eij, kmat, n
 \examples{
 \dontrun{
 pdb <- bio3d::read.pdb("2acy")
-set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5, frustrated = FALSE)
-set_enm(pdb, node = "sc", model = "anm", d_max = 12.5, frustrated = TRUE)
-set_enm(pdb, node = "cb", model = "anm", d_max = 12.0, frustrated = FALSE)
+set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+set_enm(pdb, node = "sc", model = "anm", d_max = 12.5)
+set_enm(pdb, node = "cb", model = "anm", d_max = 12.0)
 }
 }

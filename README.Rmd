@@ -1,5 +1,5 @@
 ---
-title: "penm package"
+title: "mutenm package"
 author: "Julian Echave"
 date: "26/09/2022"
 output:  github_document
@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-The `penm` package contains functions to build Elastic Network Models (ENM) of 
-proteins and to perturb them; 
-`penm` stands for Perturbing Elastic Network Models.
+The `mutenm` package contains functions to build Elastic Network Models (ENM) of
+proteins and to perturb them;
+`mutenm` stands for Mutating Elastic Network Models.
 
 
 # Overview
@@ -27,13 +27,12 @@ proteins and to perturb them;
 In short:
 
 * `bio3d::read.pdb()`: Set up a __pdb__ protein object.
-* `set_enm()`:  Set up a `penm` __prot__ object, containing protein and its ENM info.
+* `set_enm()`:  Set up a `mutenm` __prot__ object, containing protein and its ENM info.
 * `amrs()`and `smrs()`:   perform single-mutation scans to calculate mutation-response matrices.
-* `admrs()`and `sdmrs()`:   perform double-mutation scans to calculate compensation matrices.
 
 
 # Installation
-Install packages `penm` (this package) and `jefuns` (miscelaneous functions, some of which `penm` uses).
+Install packages `mutenm` (this package) and `jefuns` (miscelaneous functions, some of which `mutenm` uses).
 
 ```
 # install.packages("devtools")
@@ -60,11 +59,11 @@ Then, create the `prot` object, that contains the full ENM analysis.
 
 ```{r}
 pdb <-  bio3d::read.pdb("data-raw/2XWRa.pdb") # read a pdb file
-wt <- set_enm(pdb, node = "calpha", model = "anm", d_max = 10.5, frustrated = FALSE)
+wt <- set_enm(pdb, node = "calpha", model = "anm", d_max = 10.5)
 ```
 
 `wt` created here by `set_enm()` is an object of class _prot_. 
-In this example, network nodes are placed at $C_\alpha$ coordinates, the model used is Bahar's Anisotropic Network Model (`model = "anm"`) with a cut-off distance to define contacts of `d_max = 10.5`. `frustrated` indicates whether to add frustrations to the model (it defaults to `FALSE`, it may be ommited from the list of arguments).
+In this example, network nodes are placed at $C_\alpha$ coordinates, the model used is Bahar's Anisotropic Network Model (`model = "anm"`) with a cut-off distance to define contacts of `d_max = 10.5`.
 
 The  object `wt` created above is a list that contains several components:
 

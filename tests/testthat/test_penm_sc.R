@@ -11,7 +11,7 @@ load(here("tests/data/mut_sc_lf.rda"))
 
 
 test_that("set_enm gets wt_sc ok", {
-  expect_equal(set_enm(pdb_2acy_A, node = "sc", model = "ming_wall", d_max = 10.5, frustrated = FALSE),
+  expect_equal(set_enm(pdb_2acy_A, node = "sc", model = "ming_wall", d_max = 10.5),
                wt_sc)
 })
 

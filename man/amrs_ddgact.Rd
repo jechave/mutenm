@@ -31,7 +31,7 @@ For details see \doi{10.7717/peerj.11330}
 \examples{
 \dontrun{
 pdb <- bio3d::read.pdb("2acy")
-wt <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5, frustrated = FALSE)
+wt <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
 pdb_site_active <- c(10,14,21)
 responses <- amrs_ddgact(wt, pdb_site_active,  mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 1)
 }

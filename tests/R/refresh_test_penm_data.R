@@ -12,7 +12,7 @@ library(here)
 ## ----------------------------------------------------------------------------------------------------------------------
 load(here("data/pdb_2acy_A.rda"))
 
-wt <- set_enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5, frustrated = FALSE)
+wt <- set_enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5)
 usethis::use_data(wt,  overwrite = TRUE)
 
 ## ----------------------------------------------------------------------------------------------------------------------
