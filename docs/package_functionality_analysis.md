@@ -67,26 +67,22 @@ Core function for introducing mutations and calculating structural responses.
 
 ## 3. Mutation Response Scanning
 
-### 3.1 Simulation Method: `smrs(wt, nmut, mut_dl_sigma, mut_sd_min, option, response, seed)`
+### 3.1 `mrs_all(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)`
 
-Calculates mutation-response matrices using Monte Carlo simulation.
+Calculates mutation-response matrices by generating mutants and comparing each with wild-type.
 
 **Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `wt` | prot | - | Wild-type protein |
+| `nmut` | integer | - | Number of mutations per site to simulate |
+| `mut_model` | character | `"lfenm"` | Mutation model |
 | `mut_dl_sigma` | numeric | - | Perturbation magnitude (Å) |
 | `mut_sd_min` | integer | - | Minimum sequence distance |
-| `option` | character | `"site"` | `"site"` (N×N matrix) or `"mode"` (M×N matrix) |
-| `response` | character | `"dr2"` | Response type: `"dr2"`, `"de2"`, `"df2"`, `"stress"` |
+| `seed` | integer | - | Random seed |
 
-**Additional Parameters:**
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `nmut` | integer | - | Number of mutations per site to simulate |
-| `seed` | integer | 1024 | Random seed |
+**Returns:** List with response matrices (structural and motion) and profiles.
 
 ---
 
@@ -100,7 +96,7 @@ Calculates mutation-response matrices using Monte Carlo simulation.
 | `de2` | `<½ k_i (δr_i)²>` | Deformation energy at site i |
 | `df2` | `<f_i²>` | Squared force magnitude at site i |
 
-### 4.2 Energy Responses (from `smrs_all`)
+### 4.2 Energy Responses (from `mrs_all`)
 
 | Response | Description |
 |----------|-------------|
@@ -144,26 +140,7 @@ These take a tibble of mutants from `generate_mutants()`:
 
 ## 6. Stability Prediction (ΔΔG)
 
-### 6.1 `smrs_ddg(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)`
-
-Calculates stability change profile using simulation.
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `wt` | prot | Wild-type protein |
-| `nmut` | integer | Number of mutations per site to simulate |
-| `mut_model` | character | Must be `"lfenm"` (currently) |
-| `mut_dl_sigma` | numeric | Perturbation magnitude |
-| `mut_sd_min` | integer | Minimum sequence distance |
-| `seed` | integer | Random seed |
-
-**Returns:** Tibble with columns: `site`, `pdb_site`, `ddg`
-
-**Calculation:** `ΔΔG = ΔV_s - ΔE_def = ½Σ(dvsij - de2ij)`
-
-### 6.2 Direct energy functions
+### 6.1 Pairwise energy functions
 
 | Function | Description |
 |----------|-------------|
@@ -175,27 +152,7 @@ Calculates stability change profile using simulation.
 
 ## 7. Activation Energy (ΔΔG‡)
 
-### 7.1 `smrs_ddgact(wt, pdb_site_active, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)`
-
-Calculates activation energy change profile using simulation.
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `wt` | prot | Wild-type protein |
-| `pdb_site_active` | integer vector | PDB residue numbers defining the active site |
-| `nmut` | integer | Number of mutations per site to simulate |
-| `mut_model` | character | Mutation model |
-| `mut_dl_sigma` | numeric | Perturbation magnitude |
-| `mut_sd_min` | integer | Minimum sequence distance |
-| `seed` | integer | Random seed |
-
-**Returns:** Tibble with columns: `site`, `pdb_site`, `is_active`, `ddgact`
-
-**Calculation:** Energy needed to deform mutant's active site back to wild-type conformation.
-
-### 7.2 Direct activation energy functions
+### 7.1 Pairwise activation energy functions
 
 | Function | Description |
 |----------|-------------|
@@ -215,14 +172,13 @@ Calculates activation energy change profile using simulation.
 - **Other node types:** `"sc"` (side chains), `"cb"` (beta carbons)
 - **Other ENM models:** `"ming_wall"`, `"pfanm"`, `"hnm"`, `"hnm0"`, `"reach"`
 - **sclfenm mutation model**
-- **Scanning methods:** `smrs()`, `mrs_all()`
+- **Scanning methods:** `mrs_all()`
 - **Structural responses:** `dr2`, `de2`, `df2`
 - **Energy responses:** `dvs`, `dvm`
 - **Dynamics/motion responses:** `dmsf`, `dh`, `dbhat`, `rwsip`
 - **Motion response matrices:** `mrs_motion_*` functions
-- **Stability functions:** `smrs_ddg()`, `ddg_tds()`
-- **Activation energy functions:** `smrs_ddgact()`, `ddgact_dv()`, `ddgact_tds()`
-- **Comprehensive scanning:** `smrs_all()`, `mrs_all()`
+- **Stability functions:** `ddg_tds()`
+- **Activation energy functions:** `ddgact_dv()`, `ddgact_tds()`
 - **`mut_sd_min` parameter explanation:** sequence distance filtering for edges
 
 ---

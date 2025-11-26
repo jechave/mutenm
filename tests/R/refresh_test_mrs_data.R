@@ -17,8 +17,6 @@ load(here("data/wt.rda"))
 mrs_all_output <- mrs_all(wt, nmut = 5, mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 1, seed = 1234)
 usethis::use_data(mrs_all_output,  overwrite = TRUE)
 
-smrs_all_output <- smrs_all(wt, nmut = 5, mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 1, seed = 1234)
-usethis::use_data(smrs_all_output,  overwrite = TRUE)
 
 
 

@@ -11,7 +11,7 @@ This document describes both external package dependencies and internal code dep
 | Package | Purpose | Used In |
 |---------|---------|---------|
 | `bio3d` | PDB file reading, atom selection | `enm_utils_nodes.R` |
-| `Matrix` | Sparse matrix operations for efficiency | `mutscan_smrs.R` |
+| `Matrix` | Sparse matrix operations for efficiency | `mrs_structure.R` |
 | `pracma` | Cross product (`pracma::cross`) | `enm_utils_nodes.R` (qb.levitt) |
 | `dplyr` | Data manipulation (filter, mutate, group_by, etc.) | Throughout |
 | `tibble` | Tibble data structures (tibble, as_tibble, lst) | Throughout |
@@ -20,7 +20,7 @@ This document describes both external package dependencies and internal code dep
 | `magrittr` | Pipe operator (`%>%`) | Throughout |
 | `stats` | Random number generation (rnorm) | `penm.R` |
 | `matrixStats` | (Listed but not actively used in code) | - |
-| `jefuns` | `matrix_to_tibble`, `plot_matrix` | `mutscan_smrs.R` |
+| `jefuns` | `matrix_to_tibble`, `plot_matrix` | `mrs_structure.R` |
 
 ### 1.2 From bio3d (imported functions)
 
@@ -41,8 +41,8 @@ This document describes both external package dependencies and internal code dep
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         USER-FACING API                              │
 ├─────────────────────────────────────────────────────────────────────┤
-│  set_enm()          smrs()         mrs_all()      smrs_ddg()         │
-│  (enm.R)        (mutscan_smrs.R) (mrs_structure.R) (mutscan_smrs_ddg.R)│
+│  set_enm()          mrs_all()      ddg_dv()       ddgact_dv()        │
+│  (enm.R)        (mrs_structure.R) (delta_energy.R) (delta_energy.R)   │
 ├─────────────────────────────────────────────────────────────────────┤
 │                    INTERMEDIATE FUNCTIONS                            │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -138,32 +138,7 @@ get_mutant_site(wt, site_mut, mutation, mut_model, mut_dl_sigma, mut_sd_min, see
                             └── set_enm_nma()
 ```
 
-### 3.3 Simulation Scanning (smrs)
-
-```
-smrs(wt, nmut, mut_dl_sigma, mut_sd_min, option, response, seed)
-    │
-    ├── generate_perturbations(wt, nmut, mut_dl_sigma, mut_sd_min, seed)
-    │       ├── generate_delta_lij()  (for each site, each mutation)
-    │       └── calculate_force()
-    │       → returns: dlmat[edge, site, mutation], fmat[3N, site, mutation]
-    │
-    ├── [option == "site"]
-    │       ├── calculate_dr2ij_smrs() → calculate_s2ij(fmat, cmat)
-    │       ├── calculate_de2ij_smrs() → calculate_s2ij(fmat, cmat_sqrt)
-    │       ├── calculate_df2ij_smrs() → calculate_s2ij(fmat, identity)
-    │       └── calculate_dvsij_smrs()
-    │
-    └── [option == "mode"]
-            └── calculate_*nj_smrs() → calculate_fnmat() + averaging
-
-calculate_s2ij(fmat, amat)
-    │
-    └── Uses Matrix() for sparse multiplication
-        Returns averaged response matrix
-```
-
-### 3.4 Slow Simulation Method (mrs_all)
+### 3.3 Mutation Response Scanning (mrs_all)
 
 ```
 mrs_all(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)
@@ -181,12 +156,11 @@ mrs_all(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)
                     └── delta_structure_dvsi_same_topology(wt, mut)
 ```
 
-### 3.5 DDG Calculations
+### 3.4 DDG Calculations
 
 ```
-smrs_ddg(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)
-    │
-    └── Uses smrs to calculate de2ij and dvsij, then ddg = Σ(dvsij - de2ij) / 2
+ddg_dv(wt, mut)      → enm_v_min(mut) - enm_v_min(wt)
+ddgact_dv(wt, mut, pdb_site_active) → activation energy difference
 ```
 
 ---
@@ -197,23 +171,23 @@ These are used throughout the package to access prot object components:
 
 | Getter | Returns | Used By |
 |--------|---------|---------|
-| `get_enm_param(prot)` | `prot$param` | mrs_all, smrs_all |
+| `get_enm_param(prot)` | `prot$param` | mrs_all |
 | `get_enm_node(prot)` | `prot$param$node` | set_enm_nodes |
 | `get_enm_model(prot)` | `prot$param$model` | set_enm_graph |
 | `get_d_max(prot)` | `prot$param$d_max` | set_enm_graph, get_cn |
 | `get_nsites(prot)` | `prot$nodes$nsites` | Throughout |
-| `get_site(prot)` | `prot$nodes$site` | generate_mutants, smrs_ddg |
-| `get_pdb_site(prot)` | `prot$nodes$pdb_site` | smrs_ddg, active_site_indexes |
+| `get_site(prot)` | `prot$nodes$site` | generate_mutants |
+| `get_pdb_site(prot)` | `prot$nodes$pdb_site` | active_site_indexes |
 | `get_bfactor(prot)` | `prot$nodes$bfactor` | - |
 | `get_xyz(prot)` | `prot$nodes$xyz` | Multiple |
-| `get_graph(prot)` | `prot$graph` | penm.R, mutscan_*.R |
-| `get_eij(prot)` | `prot$eij` | penm.R, mutscan_smrs.R |
+| `get_graph(prot)` | `prot$graph` | penm.R, mrs_structure.R |
+| `get_eij(prot)` | `prot$eij` | penm.R |
 | `get_kmat(prot)` | `prot$kmat` | delta_structure_df2i |
-| `get_mode(prot)` | `prot$nma$mode` | mutscan_smrs.R |
+| `get_mode(prot)` | `prot$nma$mode` | mrs_structure.R |
 | `get_evalue(prot)` | `prot$nma$evalue` | Multiple |
-| `get_umat(prot)` | `prot$nma$umat` | mutscan_smrs.R, get_cmat_sqrt |
-| `get_cmat(prot)` | `prot$nma$cmat` | penm.R, mutscan_smrs.R |
-| `get_nmodes(prot)` | `max(prot$nma$mode)` | mutscan_smrs.R |
+| `get_umat(prot)` | `prot$nma$umat` | mrs_structure.R, get_cmat_sqrt |
+| `get_cmat(prot)` | `prot$nma$cmat` | penm.R, mrs_structure.R |
+| `get_nmodes(prot)` | `max(prot$nma$mode)` | mrs_structure.R |
 
 ---
 
@@ -301,9 +275,6 @@ These are used throughout the package to access prot object components:
 | `enm_utils_nodes.R` | Node coordinate calculation | (internal) |
 | `enm_utils_kij_functions.R` | Spring constant models | (internal) |
 | `penm.R` | Mutation perturbation | `get_mutant_site` |
-| `mutscan_smrs.R` | Simulation scanning | `smrs`, `smrs_all` |
-| `mutscan_smrs_ddg.R` | Simulation ΔΔG | `smrs_ddg` |
-| `mutscan_smrs_ddgact.R` | Simulation ΔΔG‡ | `smrs_ddgact` |
 | `mutscan_utils.R` | Matrix sqrt helpers | (internal) |
 | `mrs_generate_mutants.R` | Generate mutant tibble | `generate_mutants` |
 | `mrs_structure.R` | Wrapper for mrs_all | `mrs_all` |

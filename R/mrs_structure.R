@@ -1,11 +1,10 @@
 # Wrapper
 
 
-#' Calculate all response matrices and profiles, slow simulation-based method
+#' Calculate all response matrices and profiles
 #'
 #' This method calculates many mutants, compares wt with each mutant, then averages.
-#' It is slower than smrs.
-#' However, this approach can be extended to calculate "dynamical" responses (bhat, etc)
+#' This approach can calculate both structural and dynamical responses (bhat, etc)
 #'
 #' @param wt is the wild-type protein to mutate
 #' @param nmut is the number of mutations per site to introduce
