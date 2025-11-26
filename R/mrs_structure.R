@@ -4,7 +4,7 @@
 #' Calculate all response matrices and profiles, slow simulation-based method
 #'
 #' This method calculates many mutants, compares wt with each mutant, then averages.
-#' It is slower than smrs and much slower than amrs.
+#' It is slower than smrs.
 #' However, this approach can be extended to calculate "dynamical" responses (bhat, etc)
 #'
 #' @param wt is the wild-type protein to mutate

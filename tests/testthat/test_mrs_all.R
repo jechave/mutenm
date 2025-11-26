@@ -1,5 +1,5 @@
 ## ----------------------------------------------------------------------------------------------------------------------
-# Test analytic Double Mutational Response Scanning function `amrs`
+# Test Mutation Response Scanning functions
 
 # load libraries
 library(tidyverse)
@@ -23,12 +23,6 @@ smrs_all_output_test <- smrs_all(wt, nmut = 5, mut_model = "lfenm", mut_dl_sigma
 test_that("smrs with option mean_max is ok", {
   expect_equal(smrs_all_output_test, smrs_all_output)
 })
-
-load(here("tests/data/amrs_all_output.rda"))
-amrs_all_output_test <- amrs_all(wt, mut_dl_sigma = 0.3, mut_sd_min = 1)
-test_that("amrs with option mean_max is ok", {
-  expect_equal(amrs_all_output_test, amrs_all_output)
-  })
 
 
 

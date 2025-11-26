@@ -67,9 +67,9 @@ Core function for introducing mutations and calculating structural responses.
 
 ## 3. Mutation Response Scanning
 
-### 3.1 Analytical Method: `amrs(wt, mut_dl_sigma, mut_sd_min, option, response)`
+### 3.1 Simulation Method: `smrs(wt, nmut, mut_dl_sigma, mut_sd_min, option, response, seed)`
 
-Calculates mutation-response matrices using closed-form analytical formulas.
+Calculates mutation-response matrices using Monte Carlo simulation.
 
 **Parameters:**
 
@@ -80,12 +80,6 @@ Calculates mutation-response matrices using closed-form analytical formulas.
 | `mut_sd_min` | integer | - | Minimum sequence distance |
 | `option` | character | `"site"` | `"site"` (N×N matrix) or `"mode"` (M×N matrix) |
 | `response` | character | `"dr2"` | Response type: `"dr2"`, `"de2"`, `"df2"`, `"stress"` |
-
-**Returns:** Matrix where columns are mutated sites, rows are responding sites or modes.
-
-### 3.2 Simulation Method: `smrs(wt, nmut, mut_dl_sigma, mut_sd_min, option, response, seed)`
-
-Calculates mutation-response matrices using Monte Carlo simulation.
 
 **Additional Parameters:**
 
@@ -106,7 +100,7 @@ Calculates mutation-response matrices using Monte Carlo simulation.
 | `de2` | `<½ k_i (δr_i)²>` | Deformation energy at site i |
 | `df2` | `<f_i²>` | Squared force magnitude at site i |
 
-### 4.2 Energy Responses (from `amrs_all`/`smrs_all`)
+### 4.2 Energy Responses (from `smrs_all`)
 
 | Response | Description |
 |----------|-------------|
@@ -150,18 +144,20 @@ These take a tibble of mutants from `generate_mutants()`:
 
 ## 6. Stability Prediction (ΔΔG)
 
-### 6.1 `amrs_ddg(wt, mut_model, mut_dl_sigma, mut_sd_min)`
+### 6.1 `smrs_ddg(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)`
 
-Calculates stability change profile analytically.
+Calculates stability change profile using simulation.
 
 **Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `wt` | prot | Wild-type protein |
+| `nmut` | integer | Number of mutations per site to simulate |
 | `mut_model` | character | Must be `"lfenm"` (currently) |
 | `mut_dl_sigma` | numeric | Perturbation magnitude |
 | `mut_sd_min` | integer | Minimum sequence distance |
+| `seed` | integer | Random seed |
 
 **Returns:** Tibble with columns: `site`, `pdb_site`, `ddg`
 
@@ -179,15 +175,21 @@ Calculates stability change profile analytically.
 
 ## 7. Activation Energy (ΔΔG‡)
 
-### 7.1 `amrs_ddgact(wt, pdb_site_active, mut_model, mut_dl_sigma, mut_sd_min)`
+### 7.1 `smrs_ddgact(wt, pdb_site_active, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)`
 
-Calculates activation energy change profile.
+Calculates activation energy change profile using simulation.
 
-**Additional Parameters:**
+**Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
+| `wt` | prot | Wild-type protein |
 | `pdb_site_active` | integer vector | PDB residue numbers defining the active site |
+| `nmut` | integer | Number of mutations per site to simulate |
+| `mut_model` | character | Mutation model |
+| `mut_dl_sigma` | numeric | Perturbation magnitude |
+| `mut_sd_min` | integer | Minimum sequence distance |
+| `seed` | integer | Random seed |
 
 **Returns:** Tibble with columns: `site`, `pdb_site`, `is_active`, `ddgact`
 
@@ -206,20 +208,21 @@ Calculates activation energy change profile.
 
 ### Covered in README:
 - Basic `set_enm()` with `node="calpha"`, `model="anm"`
-- `amrs()` and `smrs()` for single-site scanning
-- Structural responses: `dr2`, `de2`, `df2`
-- `option="site"` and `option="mode"`
+- `get_mutant_site()` for creating single mutants
+- `ddg_dv()` for stability comparison
 
 ### NOT Covered in README:
 - **Other node types:** `"sc"` (side chains), `"cb"` (beta carbons)
 - **Other ENM models:** `"ming_wall"`, `"pfanm"`, `"hnm"`, `"hnm0"`, `"reach"`
 - **sclfenm mutation model**
+- **Scanning methods:** `smrs()`, `mrs_all()`
+- **Structural responses:** `dr2`, `de2`, `df2`
 - **Energy responses:** `dvs`, `dvm`
 - **Dynamics/motion responses:** `dmsf`, `dh`, `dbhat`, `rwsip`
 - **Motion response matrices:** `mrs_motion_*` functions
-- **Stability functions:** `amrs_ddg()`, `ddg_dv()`, `ddg_tds()`
-- **Activation energy functions:** `amrs_ddgact()`, `ddgact_dv()`, `ddgact_tds()`
-- **Comprehensive scanning:** `amrs_all()`, `smrs_all()`
+- **Stability functions:** `smrs_ddg()`, `ddg_tds()`
+- **Activation energy functions:** `smrs_ddgact()`, `ddgact_dv()`, `ddgact_tds()`
+- **Comprehensive scanning:** `smrs_all()`, `mrs_all()`
 - **`mut_sd_min` parameter explanation:** sequence distance filtering for edges
 
 ---

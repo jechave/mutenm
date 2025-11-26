@@ -1,4 +1,4 @@
-# Refresh data to use in test_amrs.R
+# Refresh data to use in test_mrs_all.R
 
 ## ----------------------------------------------------------------------------------------------------------------------
 # load libraries
@@ -19,9 +19,6 @@ usethis::use_data(mrs_all_output,  overwrite = TRUE)
 
 smrs_all_output <- smrs_all(wt, nmut = 5, mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 1, seed = 1234)
 usethis::use_data(smrs_all_output,  overwrite = TRUE)
-
-amrs_all_output <- amrs_all(wt, mut_dl_sigma = 0.3, mut_sd_min = 1)
-usethis::use_data(amrs_all_output,  overwrite = TRUE)
 
 
 

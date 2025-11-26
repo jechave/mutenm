@@ -52,9 +52,6 @@ responses <- smrs_ddgact(wt, pdb_site_active, nmut = 10, mut_model = "lfenm", mu
 }
 \seealso{
 Other mutscan functions: 
-\code{\link{amrs_ddgact}()},
-\code{\link{amrs_ddg}()},
-\code{\link{amrs}()},
 \code{\link{smrs_ddg}()},
 \code{\link{smrs}()}
 }

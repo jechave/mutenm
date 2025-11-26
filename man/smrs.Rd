@@ -54,9 +54,6 @@ mrs_matrix <- smrs(wt, nmut = 10, mut_model = "lfenm", mut_dl_sigma = 0.3, mut_s
 }
 \seealso{
 Other mutscan functions: 
-\code{\link{amrs_ddgact}()},
-\code{\link{amrs_ddg}()},
-\code{\link{amrs}()},
 \code{\link{smrs_ddgact}()},
 \code{\link{smrs_ddg}()}
 }
