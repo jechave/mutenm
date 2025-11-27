@@ -11,16 +11,15 @@ This document describes both external package dependencies and internal code dep
 | Package | Purpose | Used In |
 |---------|---------|---------|
 | `bio3d` | PDB file reading, atom selection | `enm_utils_nodes.R` |
-| `Matrix` | Sparse matrix operations for efficiency | `mrs_structure.R` |
+| `Matrix` | Sparse matrix operations for efficiency | `mutscan_utils.R` |
 | `pracma` | Cross product (`pracma::cross`) | `enm_utils_nodes.R` (qb.levitt) |
 | `dplyr` | Data manipulation (filter, mutate, group_by, etc.) | Throughout |
 | `tibble` | Tibble data structures (tibble, as_tibble, lst) | Throughout |
-| `tidyr` | Data reshaping (unnest, expand_grid) | Mutation scanning |
-| `purrr` | Functional programming (map, map2, pmap) | Mutation scanning |
+| `tidyr` | Data reshaping (pivot_longer) | `mrs.R` |
+| `purrr` | Functional programming (map, map2, pmap) | Throughout |
 | `magrittr` | Pipe operator (`%>%`) | Throughout |
 | `stats` | Random number generation (rnorm) | `penm.R` |
-| `matrixStats` | (Listed but not actively used in code) | - |
-| `jefuns` | `matrix_to_tibble`, `plot_matrix` | `mrs_structure.R` |
+| `jefuns` | `matrix_to_tibble`, `plot_matrix` | Analysis functions |
 
 ### 1.2 From bio3d (imported functions)
 
@@ -41,23 +40,18 @@ This document describes both external package dependencies and internal code dep
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         USER-FACING API                              │
 ├─────────────────────────────────────────────────────────────────────┤
-│  set_enm()          mrs_all()      ddg_dv()       ddgact_dv()        │
-│  (enm.R)        (mrs_structure.R) (delta_energy.R) (delta_energy.R)   │
+│  set_enm()          mrs()           ddg_dv()       ddgact_dv()       │
+│  (enm.R)           (mrs.R)      (delta_energy.R) (delta_energy.R)    │
 ├─────────────────────────────────────────────────────────────────────┤
 │                    INTERMEDIATE FUNCTIONS                            │
 ├─────────────────────────────────────────────────────────────────────┤
-│  get_mutant_site()     generate_mutants()    mrs_all()              │
-│  (penm.R)           (mrs_generate_mutants.R) (mrs_structure.R)      │
+│  get_mutant_site()                                                   │
+│  (penm.R)                                                            │
 ├─────────────────────────────────────────────────────────────────────┤
 │              COMPARISON FUNCTIONS (wt vs mut)                        │
 ├─────────────────────────────────────────────────────────────────────┤
 │  delta_structure_*()    delta_motion_*()      delta_energy_*()      │
 │  (delta_structure_*.R)  (delta_motion_*.R)    (delta_energy.R)      │
-├─────────────────────────────────────────────────────────────────────┤
-│                    RESPONSE MATRIX BUILDERS                          │
-├─────────────────────────────────────────────────────────────────────┤
-│  mrs_structure_*()      mrs_motion_*()                              │
-│  (mrs_structure_*.R)    (mrs_motion_*.R)                            │
 ├─────────────────────────────────────────────────────────────────────┤
 │                       GETTERS & UTILITIES                            │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -138,22 +132,31 @@ get_mutant_site(wt, site_mut, mutation, mut_model, mut_dl_sigma, mut_sd_min, see
                             └── set_enm_nma()
 ```
 
-### 3.3 Mutation Response Scanning (mrs_all)
+### 3.3 Mutation Response Scanning (mrs)
 
 ```
-mrs_all(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)
+mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
     │
-    ├── generate_mutants(wt, nmut, mut_model, ...)
-    │       └── calls get_mutant_site() for each (site, mutation) pair
-    │       → returns tibble with columns: wt, j, mutation, mut
+    ├── Validate responses
     │
-    └── mrs_structure_*ij(mutants)
-            │
-            └── For each mutant:
-                    ├── delta_structure_dr2i(wt, mut)
-                    ├── delta_structure_de2i(wt, mut, kmat_sqrt)
-                    ├── delta_structure_df2i(wt, mut)
-                    └── delta_structure_dvsi_same_topology(wt, mut)
+    ├── For each site j:
+    │       └── For each mutation m:
+    │               ├── get_mutant_site(wt, j, m, ...)
+    │               │
+    │               ├── Calculate requested responses:
+    │               │       ├── delta_structure_dr2i(wt, mut)
+    │               │       ├── delta_structure_dr2n(wt, mut)
+    │               │       ├── delta_motion_dmsfi(wt, mut)
+    │               │       ├── delta_motion_dmsfn(wt, mut)
+    │               │       ├── ddg_dv(wt, mut)
+    │               │       ├── ddg_tds(wt, mut)
+    │               │       ├── delta_energy_dvs(wt, mut)
+    │               │       ├── ddgact_dv(wt, mut)
+    │               │       └── ddgact_tds(wt, mut)
+    │               │
+    │               └── Discard mutant (rm(mut))
+    │
+    └── Return tibbles with averaged responses
 ```
 
 ### 3.4 DDG Calculations
@@ -171,23 +174,23 @@ These are used throughout the package to access prot object components:
 
 | Getter | Returns | Used By |
 |--------|---------|---------|
-| `get_enm_param(prot)` | `prot$param` | mrs_all |
+| `get_enm_param(prot)` | `prot$param` | mrs |
 | `get_enm_node(prot)` | `prot$param$node` | set_enm_nodes |
 | `get_enm_model(prot)` | `prot$param$model` | set_enm_graph |
 | `get_d_max(prot)` | `prot$param$d_max` | set_enm_graph, get_cn |
 | `get_nsites(prot)` | `prot$nodes$nsites` | Throughout |
-| `get_site(prot)` | `prot$nodes$site` | generate_mutants |
+| `get_site(prot)` | `prot$nodes$site` | mrs |
 | `get_pdb_site(prot)` | `prot$nodes$pdb_site` | active_site_indexes |
 | `get_bfactor(prot)` | `prot$nodes$bfactor` | - |
 | `get_xyz(prot)` | `prot$nodes$xyz` | Multiple |
-| `get_graph(prot)` | `prot$graph` | penm.R, mrs_structure.R |
+| `get_graph(prot)` | `prot$graph` | penm.R |
 | `get_eij(prot)` | `prot$eij` | penm.R |
-| `get_kmat(prot)` | `prot$kmat` | delta_structure_df2i |
-| `get_mode(prot)` | `prot$nma$mode` | mrs_structure.R |
+| `get_kmat(prot)` | `prot$kmat` | delta functions |
+| `get_mode(prot)` | `prot$nma$mode` | - |
 | `get_evalue(prot)` | `prot$nma$evalue` | Multiple |
-| `get_umat(prot)` | `prot$nma$umat` | mrs_structure.R, get_cmat_sqrt |
-| `get_cmat(prot)` | `prot$nma$cmat` | penm.R, mrs_structure.R |
-| `get_nmodes(prot)` | `max(prot$nma$mode)` | mrs_structure.R |
+| `get_umat(prot)` | `prot$nma$umat` | delta functions |
+| `get_cmat(prot)` | `prot$nma$cmat` | penm.R |
+| `get_nmodes(prot)` | `max(prot$nma$mode)` | mrs |
 
 ---
 
@@ -276,21 +279,15 @@ These are used throughout the package to access prot object components:
 | `enm_utils_kij_functions.R` | Spring constant models | (internal) |
 | `penm.R` | Mutation perturbation | `get_mutant_site` |
 | `mutscan_utils.R` | Matrix sqrt helpers | (internal) |
-| `mrs_generate_mutants.R` | Generate mutant tibble | `generate_mutants` |
-| `mrs_structure.R` | Wrapper for mrs_all | `mrs_all` |
-| `mrs_structure_by_site.R` | Structure response matrices | `mrs_structure_*ij` |
-| `mrs_structure_by_mode.R` | Mode-space structure | `mrs_structure_*nj` |
-| `mrs_motion_by_site.R` | Dynamics response matrices | `mrs_motion_*ij` |
-| `mrs_motion_by_mode.R` | Mode-space dynamics | `mrs_motion_*nj` |
-| `delta_structure_by_site.R` | wt-mut structure comparison | `delta_structure_*i` |
-| `delta_structure_by_mode.R` | Mode-space comparison | `delta_structure_*n` |
-| `delta_motion_by_site.R` | wt-mut dynamics comparison | `delta_motion_*i` |
-| `delta_motion_by_mode.R` | Mode-space dynamics | `delta_motion_*n` |
+| `mrs.R` | Mutation response scanning | `mrs` |
+| `delta_structure_by_site.R` | Structure response (per site) | `delta_structure_dr2i` |
+| `delta_structure_by_mode.R` | Structure response (per mode) | `delta_structure_dr2n` |
+| `delta_motion_by_site.R` | Dynamics response (per site) | `delta_motion_dmsfi` |
+| `delta_motion_by_mode.R` | Dynamics response (per mode) | `delta_motion_dmsfn` |
 | `delta_energy.R` | Energy differences | `ddg_*`, `delta_energy_*` |
 | `utils.R` | General utilities | (internal) |
 | `penm-imports.R` | Package imports | - |
 | `mutenm-package.R` | Package documentation | - |
-| `defunct_functions.R` | Deprecated functions | - |
 
 ---
 

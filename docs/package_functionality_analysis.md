@@ -67,9 +67,9 @@ Core function for introducing mutations and calculating structural responses.
 
 ## 3. Mutation Response Scanning
 
-### 3.1 `mrs_all(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, seed)`
+### `mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)`
 
-Calculates mutation-response matrices by generating mutants and comparing each with wild-type.
+Memory-efficient function for calculating mutation-response matrices. Uses process-and-discard approach: generates one mutant at a time, calculates responses, discards immediately.
 
 **Parameters:**
 
@@ -78,63 +78,76 @@ Calculates mutation-response matrices by generating mutants and comparing each w
 | `wt` | prot | - | Wild-type protein |
 | `nmut` | integer | - | Number of mutations per site to simulate |
 | `mut_model` | character | `"lfenm"` | Mutation model |
-| `mut_dl_sigma` | numeric | - | Perturbation magnitude (Å) |
-| `mut_sd_min` | integer | - | Minimum sequence distance |
-| `seed` | integer | - | Random seed |
+| `mut_dl_sigma` | numeric | 0.3 | Perturbation magnitude (Å) |
+| `mut_sd_min` | integer | 2 | Minimum sequence distance |
+| `responses` | character | `"dr2ij"` | Vector of responses to calculate |
+| `seed` | integer | NULL | Random seed |
 
-**Returns:** List with response matrices (structural and motion) and profiles.
+**Available responses:**
+
+| Response | Type | Description | Requires |
+|----------|------|-------------|----------|
+| `dr2ij` | site matrix (N×N) | Squared displacement at site i due to mutation at j | lfenm or sclfenm |
+| `dr2nj` | mode matrix (M×N) | Squared displacement in mode n due to mutation at j | lfenm or sclfenm |
+| `dmsfij` | site matrix (N×N) | MSF change at site i due to mutation at j | sclfenm |
+| `dmsfnj` | mode matrix (M×N) | MSF change in mode n due to mutation at j | sclfenm |
+| `ddg_dv` | profile (N) | Minimum energy change for mutations at j | lfenm or sclfenm |
+| `ddg_tds` | profile (N) | Entropic free energy change for mutations at j | lfenm or sclfenm |
+| `dvs` | profile (N) | Stress energy change for mutations at j | lfenm or sclfenm |
+| `ddgact_dv` | profile (N) | Activation energy change (energy part) | lfenm or sclfenm |
+| `ddgact_tds` | profile (N) | Activation energy change (entropy part) | lfenm or sclfenm |
+
+**Returns:** List with:
+- Requested site matrices as tibbles: `i`, `j`, `<response>`
+- Requested mode matrices as tibbles: `n`, `j`, `<response>`
+- Requested scalar profiles as tibbles: `j`, `<response>`
+- `$params` — ENM and mutation parameters for reproducibility
 
 ---
 
 ## 4. Response Types
 
-### 4.1 Structural Responses
+### 4.1 Structural Responses (available via `mrs()`)
 
 | Response | Matrix Element `M[i,j]` | Description |
 |----------|-------------------------|-------------|
-| `dr2` | `<(r_i^mut - r_i^wt)²>` | Mean squared displacement of site i, averaged over mutations at j |
-| `de2` | `<½ k_i (δr_i)²>` | Deformation energy at site i |
-| `df2` | `<f_i²>` | Squared force magnitude at site i |
+| `dr2ij` | `<(r_i^mut - r_i^wt)²>` | Mean squared displacement of site i, averaged over mutations at j |
+| `dr2nj` | `<(q_n^mut - q_n^wt)²>` | Mean squared displacement in mode n, averaged over mutations at j |
 
-### 4.2 Energy Responses (from `mrs_all`)
+### 4.2 Motion Responses (require sclfenm, available via `mrs()`)
+
+| Response | Matrix Element | Description |
+|----------|----------------|-------------|
+| `dmsfij` | `<ΔMSF_i>_j` | MSF change at site i due to mutations at j |
+| `dmsfnj` | `<ΔMSF_n>_j` | MSF change in mode n due to mutations at j |
+
+### 4.3 Energy Profiles (available via `mrs()`)
 
 | Response | Description |
 |----------|-------------|
-| `dvsij` | Stress energy: `½ Σ k_ij × δl_ij²` at site i due to mutation at j |
-| `dvmij` | Mode energy: `dvsij - de2ij` |
-
-### 4.3 Profiles (sums over matrices)
-
-| Profile | Calculation | Meaning |
-|---------|-------------|---------|
-| `dr2j`, `de2j`, `df2j`, `dvsj`, `dvmj` | Sum over i | **Influence**: total effect of mutating site j |
-| `dr2i`, `de2i`, `df2i`, `dvsi`, `dvmi` | Mean over j | **Sensitivity**: average response of site i |
+| `ddg_dv` | Minimum energy change (per mutation site) |
+| `ddg_tds` | Entropic free energy change (per mutation site) |
+| `dvs` | Stress energy change (per mutation site) |
 
 ---
 
-## 5. Dynamics/Motion Responses
+## 5. Pairwise Comparison Functions
 
-These require `sclfenm` model (full ENM recalculation) to compare wt vs mutant ensembles.
+These functions compare a single wild-type/mutant pair. Used internally by `mrs()`.
 
-### 5.1 Single-pair comparisons (`delta_motion_*` functions)
+### 5.1 Structural comparisons (`delta_structure_*`)
 
 | Function | Returns | Description |
 |----------|---------|-------------|
-| `delta_motion_dmsfi(wt, mut)` | vector[i] | Change in mean-square fluctuations: `MSF_i^mut - MSF_i^wt` |
-| `delta_motion_dhi(wt, mut)` | vector[i] | Change in site entropy |
-| `delta_motion_dbhati(wt, mut)` | vector[i] | Bhattacharyya distance between site distributions |
-| `delta_motion_rwsipi(wt, mut)` | vector[i] | Root-weighted square inner product (ensemble similarity) |
+| `delta_structure_dr2i(wt, mut)` | vector[i] | Squared displacement per site |
+| `delta_structure_dr2n(wt, mut)` | vector[n] | Squared displacement per mode |
 
-### 5.2 Motion response matrices (`mrs_motion_*` functions)
+### 5.2 Motion comparisons (`delta_motion_*`)
 
-These take a tibble of mutants from `generate_mutants()`:
-
-| Function | Matrix Element | Description |
-|----------|----------------|-------------|
-| `mrs_motion_dmsfij(mutants)` | `<ΔMSF_i>_j` | MSF change at i, averaged over mutations at j |
-| `mrs_motion_dhij(mutants)` | `<Δh_i>_j` | Entropy change at i |
-| `mrs_motion_dbhatij(mutants)` | `<d_bhat(i)>_j` | Bhattacharyya distance at i |
-| `mrs_motion_rwsipij(mutants)` | `<rwsip_i>_j` | RWSIP similarity at i |
+| Function | Returns | Description |
+|----------|---------|-------------|
+| `delta_motion_dmsfi(wt, mut)` | vector[i] | MSF change per site |
+| `delta_motion_dmsfn(wt, mut)` | vector[n] | MSF change per mode |
 
 ---
 
@@ -161,29 +174,7 @@ These take a tibble of mutants from `generate_mutants()`:
 
 ---
 
-## 8. Summary: What's in README vs What's Not
-
-### Covered in README:
-- Basic `set_enm()` with `node="calpha"`, `model="anm"`
-- `get_mutant_site()` for creating single mutants
-- `ddg_dv()` for stability comparison
-
-### NOT Covered in README:
-- **Other node types:** `"sc"` (side chains), `"cb"` (beta carbons)
-- **Other ENM models:** `"ming_wall"`, `"pfanm"`, `"hnm"`, `"hnm0"`, `"reach"`
-- **sclfenm mutation model**
-- **Scanning methods:** `mrs_all()`
-- **Structural responses:** `dr2`, `de2`, `df2`
-- **Energy responses:** `dvs`, `dvm`
-- **Dynamics/motion responses:** `dmsf`, `dh`, `dbhat`, `rwsip`
-- **Motion response matrices:** `mrs_motion_*` functions
-- **Stability functions:** `ddg_tds()`
-- **Activation energy functions:** `ddgact_dv()`, `ddgact_tds()`
-- **`mut_sd_min` parameter explanation:** sequence distance filtering for edges
-
----
-
-## 9. Key Equations
+## 8. Key Equations
 
 ### Linear Response
 ```
