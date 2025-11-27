@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Context Files
+
+Before starting work, read:
+- `docs/package_functionality_analysis.md` — what the package can do
+- `docs/package_dependencies.md` — code structure and dependencies
+
 ## Package Overview
 
 The `mutenm` package (Mutate Elastic Network Models) is an R package for building Elastic Network Models (ENMs) of proteins and calculating mutation-response matrices using the LFENM perturbation model.
@@ -48,8 +54,7 @@ Components are being evaluated during the trimming process. See the R/ directory
 
 - **bio3d**: PDB file reading
 - **jefuns**: Utility functions
-- **Matrix**: Sparse matrix operations
-- **pracma**: Numerical analysis
+- **pracma**: Numerical analysis (cross product)
 
 ### Testing
 
