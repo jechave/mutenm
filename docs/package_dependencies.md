@@ -11,15 +11,13 @@ This document describes both external package dependencies and internal code dep
 | Package | Purpose | Used In |
 |---------|---------|---------|
 | `bio3d` | PDB file reading, atom selection | `enm_utils_nodes.R` |
-| `Matrix` | Sparse matrix operations for efficiency | `mutscan_utils.R` |
 | `pracma` | Cross product (`pracma::cross`) | `enm_utils_nodes.R` (qb.levitt) |
 | `dplyr` | Data manipulation (filter, mutate, group_by, etc.) | Throughout |
 | `tibble` | Tibble data structures (tibble, as_tibble, lst) | Throughout |
-| `tidyr` | Data reshaping (pivot_longer) | `mrs.R` |
-| `purrr` | Functional programming (map, map2, pmap) | Throughout |
+| `tidyr` | Data reshaping (pivot_longer, expand_grid, unnest) | `mrs.R`, `enm.R` |
 | `magrittr` | Pipe operator (`%>%`) | Throughout |
 | `stats` | Random number generation (rnorm) | `penm.R` |
-| `jefuns` | `matrix_to_tibble`, `plot_matrix` | Analysis functions |
+| `jefuns` | `beta_boltzmann()` for thermodynamic calculations | `delta_energy.R`, `enm_energy_activation.R` |
 
 ### 1.2 From bio3d (imported functions)
 
@@ -40,8 +38,8 @@ This document describes both external package dependencies and internal code dep
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         USER-FACING API                              │
 ├─────────────────────────────────────────────────────────────────────┤
-│  set_enm()          mrs()           ddg_dv()       ddgact_dv()       │
-│  (enm.R)           (mrs.R)      (delta_energy.R) (delta_energy.R)    │
+│  set_enm()              mrs()                                        │
+│  (enm.R)               (mrs.R)                                       │
 ├─────────────────────────────────────────────────────────────────────┤
 │                    INTERMEDIATE FUNCTIONS                            │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -50,13 +48,14 @@ This document describes both external package dependencies and internal code dep
 ├─────────────────────────────────────────────────────────────────────┤
 │              COMPARISON FUNCTIONS (wt vs mut)                        │
 ├─────────────────────────────────────────────────────────────────────┤
-│  delta_structure_*()    delta_motion_*()      delta_energy_*()      │
-│  (delta_structure_*.R)  (delta_motion_*.R)    (delta_energy.R)      │
+│  delta_structure_dr2i()    delta_motion_dmsfi()    ddg_dv()         │
+│  delta_structure_dr2n()    delta_motion_dmsfn()    ddg_tds()        │
+│                                                     delta_energy_*() │
 ├─────────────────────────────────────────────────────────────────────┤
-│                       GETTERS & UTILITIES                            │
+│                       GETTERS & ANALYSIS                             │
 ├─────────────────────────────────────────────────────────────────────┤
 │  get_*() (enm_getters.R)    get_*() (enm_analysis.R)                │
-│  utils.R                     mutscan_utils.R                         │
+│  utils.R                                                             │
 ├─────────────────────────────────────────────────────────────────────┤
 │                    ENM BUILDING BLOCKS                               │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -159,31 +158,38 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
     └── Return tibbles with averaged responses
 ```
 
-### 3.4 DDG Calculations
+### 3.4 Energy Calculations
 
 ```
 ddg_dv(wt, mut)      → enm_v_min(mut) - enm_v_min(wt)
-ddgact_dv(wt, mut, pdb_site_active) → activation energy difference
+ddg_tds(wt, mut)     → enm_g_entropy(mut) - enm_g_entropy(wt)
+ddgact_dv(wt, mut)   → dgact_dv(mut) - dgact_dv(wt)
+ddgact_tds(wt, mut)  → dgact_tds(mut) - dgact_tds(wt)
 ```
 
 ---
 
-## 4. Getter Functions (enm_getters.R)
+## 4. Getter Functions
 
-These are used throughout the package to access prot object components:
+### 4.1 Exported Getters (enm_getters.R)
 
 | Getter | Returns | Used By |
 |--------|---------|---------|
 | `get_enm_param(prot)` | `prot$param` | mrs |
-| `get_enm_node(prot)` | `prot$param$node` | set_enm_nodes |
-| `get_enm_model(prot)` | `prot$param$model` | set_enm_graph |
-| `get_d_max(prot)` | `prot$param$d_max` | set_enm_graph, get_cn |
 | `get_nsites(prot)` | `prot$nodes$nsites` | Throughout |
 | `get_site(prot)` | `prot$nodes$site` | mrs |
 | `get_pdb_site(prot)` | `prot$nodes$pdb_site` | active_site_indexes |
 | `get_bfactor(prot)` | `prot$nodes$bfactor` | - |
 | `get_xyz(prot)` | `prot$nodes$xyz` | Multiple |
-| `get_graph(prot)` | `prot$graph` | penm.R |
+
+### 4.2 Internal Getters (enm_getters.R)
+
+| Getter | Returns | Used By |
+|--------|---------|---------|
+| `get_enm_node(prot)` | `prot$param$node` | set_enm_nodes |
+| `get_enm_model(prot)` | `prot$param$model` | set_enm_graph |
+| `get_d_max(prot)` | `prot$param$d_max` | set_enm_graph, get_cn |
+| `get_graph(prot)` | `prot$graph` | penm.R, enm_analysis.R |
 | `get_eij(prot)` | `prot$eij` | penm.R |
 | `get_kmat(prot)` | `prot$kmat` | delta functions |
 | `get_mode(prot)` | `prot$nma$mode` | - |
@@ -213,29 +219,23 @@ These are used throughout the package to access prot object components:
 
 ---
 
-## 6. Utility Functions (utils.R)
+## 6. Utility Functions (utils.R, internal)
 
 | Function | Used By |
 |----------|---------|
 | `my_as_xyz(r)` | Throughout (converts vector to 3×N matrix) |
 | `wcn_xyz(xyz)` | `get_wcn()` |
 | `cn_xyz(xyz, d_max)` | `get_cn()` |
-| `cn_graph(graph)` | - |
 | `reduce_matrix(m)` | `get_reduced_cmat()`, `get_reduced_kmat()` |
 | `dactive.xyz(xyz, site_active)` | `get_dactive()` |
 | `xyz_indices_site(site)` | `active_site_indexes()` |
 | `my_quad_form(x, m, y)` | `dgact_dv()` |
-| `tr(m)` | `dbhat()`, `rwsip()`, `dh()` |
-| `logdet(m)` | `dbhat()` |
-| `dbhat(ca, cb)` | `delta_motion_dbhati()` |
-| `rwsip(ca, cb)` | `delta_motion_rwsipi()` |
-| `dh(ca, cb)` | `delta_motion_dhi()` |
 
 ---
 
 ## 7. Energy Functions
 
-### enm_energy.R
+### 7.1 enm_energy.R
 
 | Function | Depends On |
 |----------|------------|
@@ -244,7 +244,7 @@ These are used throughout the package to access prot object components:
 | `v_dij(dij, v0ij, kij, lij)` | (internal) |
 | `enm_g_entropy_mode(energy, beta)` | (internal) |
 
-### enm_energy_activation.R
+### 7.2 enm_energy_activation.R
 
 | Function | Depends On |
 |----------|------------|
@@ -254,7 +254,7 @@ These are used throughout the package to access prot object components:
 | `kmat_asite(prot, pdb_site_active)` | `active_site_indexes()`, `get_cmat()`, `solve()` |
 | `dxyz_asite(prot, ideal, pdb_site_active)` | `active_site_indexes()`, `get_xyz()` |
 
-### delta_energy.R
+### 7.3 delta_energy.R
 
 | Function | Depends On |
 |----------|------------|
@@ -271,20 +271,19 @@ These are used throughout the package to access prot object components:
 | File | Purpose | Exports |
 |------|---------|---------|
 | `enm.R` | ENM construction | `set_enm` |
-| `enm_getters.R` | Access prot components | `get_*` (multiple) |
-| `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_msf_*`, etc. |
+| `enm_getters.R` | Access prot components | `get_enm_param`, `get_nsites`, `get_site`, `get_pdb_site`, `get_bfactor`, `get_xyz` |
+| `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `get_msf_site`, `get_msf_mode`, `get_mlms`, `get_stress`, `get_rho_matrix`, `get_reduced_cmat`, `get_reduced_kmat`, `get_msf_site_mode`, `get_umat2` |
 | `enm_energy.R` | ENM energies | `enm_v_min`, `enm_g_entropy` |
 | `enm_energy_activation.R` | Activation energies | `dgact_dv`, `dgact_tds` |
 | `enm_utils_nodes.R` | Node coordinate calculation | (internal) |
 | `enm_utils_kij_functions.R` | Spring constant models | (internal) |
-| `penm.R` | Mutation perturbation | `get_mutant_site` |
-| `mutscan_utils.R` | Matrix sqrt helpers | (internal) |
+| `penm.R` | Mutation perturbation | `get_mutant_site` (internal but used by mrs) |
 | `mrs.R` | Mutation response scanning | `mrs` |
 | `delta_structure_by_site.R` | Structure response (per site) | `delta_structure_dr2i` |
 | `delta_structure_by_mode.R` | Structure response (per mode) | `delta_structure_dr2n` |
 | `delta_motion_by_site.R` | Dynamics response (per site) | `delta_motion_dmsfi` |
 | `delta_motion_by_mode.R` | Dynamics response (per mode) | `delta_motion_dmsfn` |
-| `delta_energy.R` | Energy differences | `ddg_*`, `delta_energy_*` |
+| `delta_energy.R` | Energy differences | `ddg_dv`, `ddg_tds`, `delta_energy_dvs`, `ddgact_dv`, `ddgact_tds` |
 | `utils.R` | General utilities | (internal) |
 | `penm-imports.R` | Package imports | - |
 | `mutenm-package.R` | Package documentation | - |

@@ -36,7 +36,7 @@ Creates a `prot` object containing the Elastic Network Model.
 
 ### `get_mutant_site(wt, site_mut, mutation, mut_model, mut_dl_sigma, mut_sd_min, seed)`
 
-Core function for introducing mutations and calculating structural responses.
+Core function for introducing mutations and calculating structural responses. (Internal, called by `mrs()`)
 
 **Parameters:**
 
@@ -105,44 +105,18 @@ Memory-efficient function for calculating mutation-response matrices. Uses proce
 
 ---
 
-## 4. Response Types
-
-### 4.1 Structural Responses (available via `mrs()`)
-
-| Response | Matrix Element `M[i,j]` | Description |
-|----------|-------------------------|-------------|
-| `dr2ij` | `<(r_i^mut - r_i^wt)²>` | Mean squared displacement of site i, averaged over mutations at j |
-| `dr2nj` | `<(q_n^mut - q_n^wt)²>` | Mean squared displacement in mode n, averaged over mutations at j |
-
-### 4.2 Motion Responses (require sclfenm, available via `mrs()`)
-
-| Response | Matrix Element | Description |
-|----------|----------------|-------------|
-| `dmsfij` | `<ΔMSF_i>_j` | MSF change at site i due to mutations at j |
-| `dmsfnj` | `<ΔMSF_n>_j` | MSF change in mode n due to mutations at j |
-
-### 4.3 Energy Profiles (available via `mrs()`)
-
-| Response | Description |
-|----------|-------------|
-| `ddg_dv` | Minimum energy change (per mutation site) |
-| `ddg_tds` | Entropic free energy change (per mutation site) |
-| `dvs` | Stress energy change (per mutation site) |
-
----
-
-## 5. Pairwise Comparison Functions
+## 4. Pairwise Comparison Functions
 
 These functions compare a single wild-type/mutant pair. Used internally by `mrs()`.
 
-### 5.1 Structural comparisons (`delta_structure_*`)
+### 4.1 Structural comparisons
 
 | Function | Returns | Description |
 |----------|---------|-------------|
 | `delta_structure_dr2i(wt, mut)` | vector[i] | Squared displacement per site |
 | `delta_structure_dr2n(wt, mut)` | vector[n] | Squared displacement per mode |
 
-### 5.2 Motion comparisons (`delta_motion_*`)
+### 4.2 Motion comparisons
 
 | Function | Returns | Description |
 |----------|---------|-------------|
@@ -151,9 +125,16 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 
 ---
 
-## 6. Stability Prediction (ΔΔG)
+## 5. Energy Functions
 
-### 6.1 Pairwise energy functions
+### 5.1 ENM energy calculations
+
+| Function | Description |
+|----------|-------------|
+| `enm_v_min(prot)` | Minimum (stress) energy of the ENM |
+| `enm_g_entropy(prot, beta)` | Entropic free energy contribution |
+
+### 5.2 Pairwise energy differences (ΔΔG)
 
 | Function | Description |
 |----------|-------------|
@@ -161,16 +142,65 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 | `ddg_tds(wt, mut, beta)` | Entropic free energy difference |
 | `delta_energy_dvs(wt, mut, ideal)` | Stress energy difference |
 
----
-
-## 7. Activation Energy (ΔΔG‡)
-
-### 7.1 Pairwise activation energy functions
+### 5.3 Activation energy functions (ΔΔG‡)
 
 | Function | Description |
 |----------|-------------|
-| `ddgact_dv(wt, mut, ideal, pdb_site_active)` | Energy contribution to activation change |
-| `ddgact_tds(wt, mut, ideal, pdb_site_active, beta)` | Entropy contribution to activation change |
+| `dgact_dv(prot, ideal, pdb_site_active)` | Energy contribution to activation |
+| `dgact_tds(prot, ideal, pdb_site_active, beta)` | Entropy contribution to activation |
+| `ddgact_dv(wt, mut, ideal, pdb_site_active)` | Activation energy difference (energy part) |
+| `ddgact_tds(wt, mut, ideal, pdb_site_active, beta)` | Activation energy difference (entropy part) |
+
+---
+
+## 6. Getter Functions (Exported)
+
+Functions to access `prot` object components:
+
+| Getter | Returns |
+|--------|---------|
+| `get_enm_param(prot)` | List of ENM parameters (node, model, d_max) |
+| `get_nsites(prot)` | Number of sites (ENM nodes) |
+| `get_site(prot)` | Site indexes (1 to nsites) |
+| `get_pdb_site(prot)` | PDB residue numbers |
+| `get_bfactor(prot)` | B-factors from X-ray file |
+| `get_xyz(prot)` | 3N vector of xyz coordinates |
+
+---
+
+## 7. Analysis Functions (Exported)
+
+### 7.1 Site profiles
+
+| Function | Returns |
+|----------|---------|
+| `get_cn(prot)` | Contact number profile |
+| `get_wcn(prot)` | Weighted contact number profile |
+| `get_dactive(prot, pdb_site_active)` | Distance to active site profile |
+| `get_msf_site(prot)` | Mean-square fluctuation per site |
+| `get_mlms(prot, sdij_cut)` | Mean local mutational stress profile |
+| `get_stress(prot)` | Stress energy per site |
+
+### 7.2 Mode profiles
+
+| Function | Returns |
+|----------|---------|
+| `get_msf_mode(prot)` | MSF per mode (1/λ) |
+
+### 7.3 Site-by-site matrices
+
+| Function | Returns |
+|----------|---------|
+| `get_rho_matrix(prot)` | Correlation matrix (normalized cmat) |
+| `get_reduced_cmat(prot)` | N×N covariance matrix |
+| `get_reduced_kmat(prot)` | N×N Kirchhoff matrix |
+
+### 7.4 Site-by-mode matrices
+
+| Function | Returns |
+|----------|---------|
+| `get_msf_site_mode(prot)` | MSF[site,mode] matrix |
+| `get_umat2(prot)` | |u_i,n|² matrix |
 
 ---
 
@@ -187,14 +217,14 @@ where `C` is the covariance matrix, `f` is the force vector from edge perturbati
 f_ij = -k_ij × δl_ij × ê_ij
 ```
 
-### Strain energy
+### Minimum energy
 ```
-V_s = ½ Σ k_ij × δl_ij²
+V_min = Σ v0_ij + ½ Σ k_ij × (d_ij - l_ij)²
 ```
 
-### Stability change (ΔΔG)
+### Stress energy
 ```
-ΔΔG ≈ ΔV_s - ΔE_def = ½ Σ k_ij δl_ij² - ½ Σ k_i (δr_i)²
+V_s = ½ Σ k_ij × (d_ij^ideal - l_ij)²
 ```
 
 ---

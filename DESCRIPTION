@@ -17,14 +17,11 @@ Suggests:
 Depends:
     R (>= 2.10),
 Imports:
-    matrixStats,
     pracma,
     bio3d,
     dplyr,
     jefuns,
     magrittr,
-    Matrix,
-    purrr,
     stats,
     tibble,
     tidyr
