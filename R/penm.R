@@ -26,13 +26,13 @@
 mutenm <- function(wt, site_mut, mutation = 0, mut_model = "lfenm", mut_dl_sigma = .3, mut_sd_min = 2, seed = 241956) {
 
   if (mut_model == "lfenm") {
-    mut <- get_mutant_site_lfenm(wt, site_mut, mutation, mut_dl_sigma, mut_sd_min, seed)
+    mut <- mutenm_lfenm(wt, site_mut, mutation, mut_dl_sigma, mut_sd_min, seed)
     return(mut)
   }
 
 
   if (mut_model == "sclfenm") { # recalculate enm
-    mut <- get_mutant_site_sclfenm(wt, site_mut, mutation, mut_dl_sigma, mut_sd_min, seed)
+    mut <- mutenm_sclfenm(wt, site_mut, mutation, mut_dl_sigma, mut_sd_min, seed)
     return(mut)
   }
 
@@ -40,7 +40,7 @@ mutenm <- function(wt, site_mut, mutation = 0, mut_model = "lfenm", mut_dl_sigma
 
 }
 
-#' Get a single-point mutant using lfenm model
+#' Mutate ENM using lfenm model
 #'
 #' Returns a mutant given a wt and a site to mutate (site_mut)
 #'
@@ -58,7 +58,7 @@ mutenm <- function(wt, site_mut, mutation = 0, mut_model = "lfenm", mut_dl_sigma
 #'
 #' @family enm mutating functions
 #'
-get_mutant_site_lfenm <- function(wt, site_mut, mutation, mut_dl_sigma, mut_sd_min,  seed) {
+mutenm_lfenm <- function(wt, site_mut, mutation, mut_dl_sigma, mut_sd_min,  seed) {
 
   if (mutation == 0) {
     # if mutation is 0, return wt
@@ -79,7 +79,7 @@ get_mutant_site_lfenm <- function(wt, site_mut, mutation, mut_dl_sigma, mut_sd_m
 
 
 
-#' Get a single-point mutant using sclfenm model
+#' Mutate ENM using sclfenm model
 #'
 #' Returns a mutant given a wt and a site to mutate (site_mut).
 #' According to the sclfenm, the network matrix K is recalculated using the
@@ -99,7 +99,7 @@ get_mutant_site_lfenm <- function(wt, site_mut, mutation, mut_dl_sigma, mut_sd_m
 #'
 #' @family enm mutating functions
 #'
-get_mutant_site_sclfenm <- function(wt, site_mut, mutation,  mut_dl_sigma, mut_sd_min,  seed) {
+mutenm_sclfenm <- function(wt, site_mut, mutation,  mut_dl_sigma, mut_sd_min,  seed) {
 
   if (mutation == 0) {
     # if mutation is 0, return wt
