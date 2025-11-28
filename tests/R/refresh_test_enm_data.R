@@ -6,7 +6,7 @@ library(tidyverse)
 library(bio3d)
 library(here)
 library(jefuns)
-library(penm)
+library(mutenm)
 
 load(here("data/pdb_2acy_A.rda"))
 

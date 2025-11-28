@@ -16,7 +16,7 @@ This document describes both external package dependencies and internal code dep
 | `tibble` | Tibble data structures (tibble, as_tibble, lst) | Throughout |
 | `tidyr` | Data reshaping (pivot_longer, expand_grid, unnest) | `mrs.R`, `enm.R` |
 | `magrittr` | Pipe operator (`%>%`) | Throughout |
-| `stats` | Random number generation (rnorm) | `penm.R` |
+| `stats` | Random number generation (rnorm) | `mutenm.R` |
 | `jefuns` | `beta_boltzmann()` for thermodynamic calculations | `delta_energy.R`, `enm_energy_activation.R` |
 
 ### 1.2 From bio3d (imported functions)
@@ -43,14 +43,14 @@ This document describes both external package dependencies and internal code dep
 ├─────────────────────────────────────────────────────────────────────┤
 │                    INTERMEDIATE FUNCTIONS                            │
 ├─────────────────────────────────────────────────────────────────────┤
-│  get_mutant_site()                                                   │
-│  (penm.R)                                                            │
+│  mutenm()                                                            │
+│  (mutenm.R)                                                          │
 ├─────────────────────────────────────────────────────────────────────┤
 │              COMPARISON FUNCTIONS (wt vs mut)                        │
 ├─────────────────────────────────────────────────────────────────────┤
-│  delta_structure_dr2i()    delta_motion_dmsfi()    ddg_dv()         │
-│  delta_structure_dr2n()    delta_motion_dmsfn()    ddg_tds()        │
-│                                                     delta_energy_*() │
+│  delta_structure_dr2i()    delta_motion_dmsfi()    delta_energy_dv()│
+│  delta_structure_dr2n()    delta_motion_dmsfn()    delta_energy_tds()│
+│                                                    delta_energy_*()  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                       GETTERS & ANALYSIS                             │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -110,10 +110,10 @@ set_enm(pdb, node, model, d_max)
 ### 3.2 Mutation Chain
 
 ```
-get_mutant_site(wt, site_mut, mutation, mut_model, mut_dl_sigma, mut_sd_min, seed)
+mutenm(wt, site_mut, mutation, mut_model, mut_dl_sigma, mut_sd_min, seed)
     │
     ├── [if mut_model == "lfenm"]
-    │       └── get_mutant_site_lfenm()
+    │       └── mutenm_lfenm()
     │               ├── generate_delta_lij(wt, site_mut, mut_sd_min, mut_dl_sigma)
     │               │       └── uses get_graph(wt), rnorm()
     │               ├── calculate_force(wt, delta_lij)
@@ -122,7 +122,7 @@ get_mutant_site(wt, site_mut, mutation, mut_model, mut_dl_sigma, mut_sd_min, see
     │                       └── uses get_cmat(wt)  → δr = C × f
     │
     └── [if mut_model == "sclfenm"]
-            └── get_mutant_site_sclfenm()
+            └── mutenm_sclfenm()
                     ├── (same as lfenm for initial displacement)
                     └── mutate_enm(mut)            → recalculates ENM
                             ├── mutate_graph()
@@ -140,18 +140,18 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
     │
     ├── For each site j:
     │       └── For each mutation m:
-    │               ├── get_mutant_site(wt, j, m, ...)
+    │               ├── mutenm(wt, j, m, ...)
     │               │
     │               ├── Calculate requested responses:
     │               │       ├── delta_structure_dr2i(wt, mut)
     │               │       ├── delta_structure_dr2n(wt, mut)
     │               │       ├── delta_motion_dmsfi(wt, mut)
     │               │       ├── delta_motion_dmsfn(wt, mut)
-    │               │       ├── ddg_dv(wt, mut)
-    │               │       ├── ddg_tds(wt, mut)
+    │               │       ├── delta_energy_dv(wt, mut)
+    │               │       ├── delta_energy_tds(wt, mut)
     │               │       ├── delta_energy_dvs(wt, mut)
-    │               │       ├── ddgact_dv(wt, mut)
-    │               │       └── ddgact_tds(wt, mut)
+    │               │       ├── delta_energy_act_dv(wt, mut)
+    │               │       └── delta_energy_act_tds(wt, mut)
     │               │
     │               └── Discard mutant (rm(mut))
     │
@@ -161,10 +161,10 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
 ### 3.4 Energy Calculations
 
 ```
-ddg_dv(wt, mut)      → enm_v_min(mut) - enm_v_min(wt)
-ddg_tds(wt, mut)     → enm_g_entropy(mut) - enm_g_entropy(wt)
-ddgact_dv(wt, mut)   → dgact_dv(mut) - dgact_dv(wt)
-ddgact_tds(wt, mut)  → dgact_tds(mut) - dgact_tds(wt)
+delta_energy_dv(wt, mut)      → enm_v_min(mut) - enm_v_min(wt)
+delta_energy_tds(wt, mut)     → enm_g_entropy(mut) - enm_g_entropy(wt)
+delta_energy_act_dv(wt, mut)  → dgact_dv(mut) - dgact_dv(wt)
+delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 ```
 
 ---
@@ -189,13 +189,13 @@ ddgact_tds(wt, mut)  → dgact_tds(mut) - dgact_tds(wt)
 | `get_enm_node(prot)` | `prot$param$node` | set_enm_nodes |
 | `get_enm_model(prot)` | `prot$param$model` | set_enm_graph |
 | `get_d_max(prot)` | `prot$param$d_max` | set_enm_graph, get_cn |
-| `get_graph(prot)` | `prot$graph` | penm.R, enm_analysis.R |
-| `get_eij(prot)` | `prot$eij` | penm.R |
+| `get_graph(prot)` | `prot$graph` | mutenm.R, enm_analysis.R |
+| `get_eij(prot)` | `prot$eij` | mutenm.R |
 | `get_kmat(prot)` | `prot$kmat` | delta functions |
 | `get_mode(prot)` | `prot$nma$mode` | - |
 | `get_evalue(prot)` | `prot$nma$evalue` | Multiple |
 | `get_umat(prot)` | `prot$nma$umat` | delta functions |
-| `get_cmat(prot)` | `prot$nma$cmat` | penm.R |
+| `get_cmat(prot)` | `prot$nma$cmat` | mutenm.R |
 | `get_nmodes(prot)` | `max(prot$nma$mode)` | mrs |
 
 ---
@@ -258,11 +258,11 @@ ddgact_tds(wt, mut)  → dgact_tds(mut) - dgact_tds(wt)
 
 | Function | Depends On |
 |----------|------------|
-| `ddg_dv(wt, mut)` | `enm_v_min()` |
-| `ddg_tds(wt, mut, beta)` | `enm_g_entropy()` |
+| `delta_energy_dv(wt, mut)` | `enm_v_min()` |
+| `delta_energy_tds(wt, mut, beta)` | `enm_g_entropy()` |
 | `delta_energy_dvs(wt, mut, ideal)` | `calculate_vs()` |
-| `ddgact_dv(wt, mut, ideal, pdb_site_active)` | `dgact_dv()` |
-| `ddgact_tds(wt, mut, ideal, pdb_site_active, beta)` | `dgact_tds()` |
+| `delta_energy_act_dv(wt, mut, ideal, pdb_site_active)` | `dgact_dv()` |
+| `delta_energy_act_tds(wt, mut, ideal, pdb_site_active, beta)` | `dgact_tds()` |
 
 ---
 
@@ -277,15 +277,15 @@ ddgact_tds(wt, mut)  → dgact_tds(mut) - dgact_tds(wt)
 | `enm_energy_activation.R` | Activation energies | `dgact_dv`, `dgact_tds` |
 | `enm_utils_nodes.R` | Node coordinate calculation | (internal) |
 | `enm_utils_kij_functions.R` | Spring constant models | (internal) |
-| `penm.R` | Mutation perturbation | `get_mutant_site` (internal but used by mrs) |
+| `mutenm.R` | Mutation perturbation | `mutenm` |
 | `mrs.R` | Mutation response scanning | `mrs` |
 | `delta_structure_by_site.R` | Structure response (per site) | `delta_structure_dr2i` |
 | `delta_structure_by_mode.R` | Structure response (per mode) | `delta_structure_dr2n` |
 | `delta_motion_by_site.R` | Dynamics response (per site) | `delta_motion_dmsfi` |
 | `delta_motion_by_mode.R` | Dynamics response (per mode) | `delta_motion_dmsfn` |
-| `delta_energy.R` | Energy differences | `ddg_dv`, `ddg_tds`, `delta_energy_dvs`, `ddgact_dv`, `ddgact_tds` |
+| `delta_energy.R` | Energy differences | `delta_energy_dv`, `delta_energy_tds`, `delta_energy_dvs`, `delta_energy_act_dv`, `delta_energy_act_tds` |
 | `utils.R` | General utilities | (internal) |
-| `penm-imports.R` | Package imports | - |
+| `mutenm-imports.R` | Package imports | - |
 | `mutenm-package.R` | Package documentation | - |
 
 ---
