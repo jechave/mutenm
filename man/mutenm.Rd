@@ -7,7 +7,7 @@
 mutenm(
   wt,
   site_mut,
-  mutation = 0,
+  mutation,
   mut_model = "lfenm",
   mut_dl_sigma = 0.3,
   mut_sd_min = 2,
@@ -19,7 +19,7 @@ mutenm(
 
 \item{site_mut}{The site to mutate (not the pdb_site, but sequential)}
 
-\item{mutation}{An integer, if 0, return \code{wt} without mutating}
+\item{mutation}{An integer (required). If 0, returns \code{wt} unchanged (with warning). Used with seed to generate reproducible random perturbations.}
 
 \item{mut_model}{A string specifying mutational model ("lfenm" or "sclfenm")}
 

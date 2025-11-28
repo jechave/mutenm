@@ -4,7 +4,7 @@
 #'
 #' @param wt The protein \code{prot} to mutate
 #' @param site_mut The site to mutate (not the pdb_site, but sequential)
-#' @param mutation An integer, if 0, return \code{wt} without mutating
+#' @param mutation An integer (required). If 0, returns \code{wt} unchanged (with warning). Used with seed to generate reproducible random perturbations.
 #' @param mut_model A string specifying mutational model ("lfenm" or "sclfenm")
 #' @param mut_dl_sigma The standard deviation of a normal distribution from which edge-length perturbation is picked.
 #' @param mut_sd_min An integer, only edges with \code{sdij >= mut_sd_min} are mutated
@@ -23,7 +23,12 @@
 #'
 #' @family enm mutating functions
 #'
-mutenm <- function(wt, site_mut, mutation = 0, mut_model = "lfenm", mut_dl_sigma = .3, mut_sd_min = 2, seed = 241956) {
+mutenm <- function(wt, site_mut, mutation, mut_model = "lfenm", mut_dl_sigma = .3, mut_sd_min = 2, seed = 241956) {
+
+  stopifnot(mutation >= 0)
+  if (mutation == 0) {
+    warning("mutation = 0 returns wt unchanged (no mutation applied)")
+  }
 
   if (mut_model == "lfenm") {
     mut <- mutenm_lfenm(wt, site_mut, mutation, mut_dl_sigma, mut_sd_min, seed)
