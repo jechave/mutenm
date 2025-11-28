@@ -7,7 +7,7 @@
 get_reduced_cmat(prot)
 }
 \arguments{
-\item{prot}{is a protein object obtained using set_enm()}
+\item{prot}{is a protein object obtained using enm()}
 }
 \value{
 a matrix of size nsites x nsites with \eqn{c_{ij} = < d\mathbf{r}_i . d\mathbf{r}_j >}

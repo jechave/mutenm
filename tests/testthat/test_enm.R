@@ -8,14 +8,14 @@ load(here("tests/data/pdb_2acy_A.rda"))
 load(here("tests/data/prot_2acy_A_ming_wall_ca.rda"))
 
 
-test_that("set_enm gets prot  equal to prot_2acy_A", {
-  expect_equal(set_enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5),
+test_that("enm gets prot equal to prot_2acy_A", {
+  expect_equal(enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5),
                prot_2acy_A_ming_wall_ca)
 })
 
-test_that("set_enm works with beta carbon nodes", {
+test_that("enm works with beta carbon nodes", {
   # Test that CB nodes can be created
-  prot_cb <- set_enm(pdb_2acy_A, node = "cb", model = "anm", d_max = 12.0)
+  prot_cb <- enm(pdb_2acy_A, node = "cb", model = "anm", d_max = 12.0)
 
   # Check that the object is created properly
   expect_s3_class(prot_cb, "prot")
@@ -33,10 +33,10 @@ test_that("set_enm works with beta carbon nodes", {
   expect_false(is.null(prot_cb$graph))
 })
 
-test_that("set_enm accepts both 'cb' and 'beta' for beta carbon nodes", {
+test_that("enm accepts both 'cb' and 'beta' for beta carbon nodes", {
   # Test that both 'cb' and 'beta' work
-  prot_cb1 <- set_enm(pdb_2acy_A, node = "cb", model = "anm", d_max = 12.0)
-  prot_cb2 <- set_enm(pdb_2acy_A, node = "beta", model = "anm", d_max = 12.0)
+  prot_cb1 <- enm(pdb_2acy_A, node = "cb", model = "anm", d_max = 12.0)
+  prot_cb2 <- enm(pdb_2acy_A, node = "beta", model = "anm", d_max = 12.0)
 
   # Both should produce the same result
   expect_equal(prot_cb1$nodes$xyz, prot_cb2$nodes$xyz)

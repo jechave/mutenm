@@ -7,7 +7,7 @@
 get_msf_site_mode(prot)
 }
 \arguments{
-\item{prot}{is a protein object obtained using set_enm()}
+\item{prot}{is a protein object obtained using enm()}
 }
 \value{
 a matrix of size nsites x nmodes with the msf of each site contributed by each mode

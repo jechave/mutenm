@@ -38,7 +38,7 @@ This document describes both external package dependencies and internal code dep
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         USER-FACING API                              │
 ├─────────────────────────────────────────────────────────────────────┤
-│  set_enm()              mrs()                                        │
+│  enm()                  mrs()                                        │
 │  (enm.R)               (mrs.R)                                       │
 ├─────────────────────────────────────────────────────────────────────┤
 │                    INTERMEDIATE FUNCTIONS                            │
@@ -71,7 +71,7 @@ This document describes both external package dependencies and internal code dep
 ### 3.1 ENM Construction Chain
 
 ```
-set_enm(pdb, node, model, d_max)
+enm(pdb, node, model, d_max)
     │
     ├── create_enm()                           → creates empty prot structure
     │
@@ -270,7 +270,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 
 | File | Purpose | Exports |
 |------|---------|---------|
-| `enm.R` | ENM construction | `set_enm` |
+| `enm.R` | ENM construction | `enm` |
 | `enm_getters.R` | Access prot components | `get_enm_param`, `get_nsites`, `get_site`, `get_pdb_site`, `get_bfactor`, `get_xyz` |
 | `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `get_msf_site`, `get_msf_mode`, `get_mlms`, `get_stress`, `get_rho_matrix`, `get_reduced_cmat`, `get_reduced_kmat`, `get_msf_site_mode`, `get_umat2` |
 | `enm_energy.R` | ENM energies | `enm_v_min`, `enm_g_entropy` |

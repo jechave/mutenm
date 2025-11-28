@@ -7,7 +7,7 @@
 get_msf_mode(prot)
 }
 \arguments{
-\item{prot}{is a protein object obtained using set_enm()}
+\item{prot}{is a protein object obtained using enm()}
 }
 \value{
 a vector of size nsites with msf values for each mode

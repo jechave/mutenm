@@ -3,7 +3,7 @@
 #' Calculate mutation response matrices using process-and-discard approach.
 #' Memory efficient: generates one mutant at a time, calculates responses, discards.
 #'
-#' @param wt Wild-type protein object from set_enm()
+#' @param wt Wild-type protein object from enm()
 #' @param nmut Number of mutations per site
 #' @param mut_model Mutation model: "lfenm" (fast) or "sclfenm" (recalculates ENM)
 #' @param mut_dl_sigma Sigma of normal distribution for bond length perturbations

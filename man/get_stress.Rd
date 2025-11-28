@@ -7,7 +7,7 @@
 get_stress(prot)
 }
 \arguments{
-\item{prot}{is a protein object obtained using set_enm()}
+\item{prot}{is a protein object obtained using enm()}
 }
 \value{
 a vector of site-dependent stress-energy values

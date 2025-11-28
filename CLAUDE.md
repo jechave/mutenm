@@ -47,7 +47,7 @@ Components are being evaluated during the trimming process. See the R/ directory
 ### Data Flow
 
 1. PDB file → `bio3d::read.pdb()` → pdb object
-2. pdb object → `set_enm()` → prot object
+2. pdb object → `enm()` → prot object
 3. prot object → scanning functions → response matrices
 
 ### Key Dependencies

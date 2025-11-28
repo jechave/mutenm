@@ -7,7 +7,7 @@
 get_mlms(prot, sdij_cut = 2)
 }
 \arguments{
-\item{prot}{is a protein object obtained using set_enm()}
+\item{prot}{is a protein object obtained using enm()}
 
 \item{sdij_cut}{An integer cutoff of sequence distance to include in calculation}
 }

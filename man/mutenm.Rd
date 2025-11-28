@@ -38,7 +38,7 @@ Generates a single-point mutant of a protein ENM by perturbing contacts at a spe
 \examples{
 \dontrun{
 pdb <- bio3d::read.pdb("2acy")
-wt <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+wt <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
 mut <- mutenm(wt, site_mut = 11, mutation = 1, mut_model = "lfenm", seed = 1024)
 }
 

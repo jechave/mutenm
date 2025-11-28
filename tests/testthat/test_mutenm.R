@@ -10,8 +10,8 @@ load(here("tests/data/mut_lf.rda"))
 load(here("tests/data/mut_qf.rda"))
 
 
-test_that("set_enm gets wt ok", {
-  expect_equal(set_enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5), wt)
+test_that("enm gets wt ok", {
+  expect_equal(enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5), wt)
 })
 
 test_that("mutenm gets mut_lf", {

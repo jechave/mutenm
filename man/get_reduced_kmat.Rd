@@ -7,7 +7,7 @@
 get_reduced_kmat(prot)
 }
 \arguments{
-\item{prot}{is a protein object obtained using set_enm()}
+\item{prot}{is a protein object obtained using enm()}
 }
 \value{
 a matrix of size nsites x nsites \eqn{K_{ij} = Tr(\mathbf{K}_{ij})}

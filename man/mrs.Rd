@@ -15,7 +15,7 @@ mrs(
 )
 }
 \arguments{
-\item{wt}{Wild-type protein object from set_enm()}
+\item{wt}{Wild-type protein object from enm()}
 
 \item{nmut}{Number of mutations per site}
 

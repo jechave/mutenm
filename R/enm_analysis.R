@@ -7,7 +7,7 @@
 #'
 #' Calculates the Contact Number (CN) of each site
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a vector of size nsites with cn values for each site
 #'
 #' @export
@@ -21,7 +21,7 @@ get_cn <- function(prot) cn_xyz(get_xyz(prot), get_d_max(prot))
 #'
 #' Calculates the Weighted Contact Number (WCN) of each site
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a vector of size nsites with wcn values for each site
 #'
 #' @export
@@ -35,7 +35,7 @@ get_wcn <- function(prot) wcn_xyz(get_xyz(prot))
 #'
 #' Calculates the distance from each site to the closest active residue
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @param pdb_site_active is a vector of pdb resno of active residues.
 #'
 #' @returns a vector of size nsites with dactive values for each site
@@ -60,7 +60,7 @@ get_dactive <- function(prot, pdb_site_active) {
 #'
 #' Calculates the mean-square-fluctuation of each site
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a vector of size nsites with msf values for each site
 #'
 #' @export
@@ -78,7 +78,7 @@ get_msf_site <- function(prot) {
 #'
 #' Calculates the Mean Local Mutational Stress (MLMS) profile using graph of prot object
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @param sdij_cut An integer cutoff of sequence distance to include in calculation
 #' @returns the profile of mean-local-mutational-stress (mlms) values
 #'
@@ -108,7 +108,7 @@ get_mlms <- function(prot, sdij_cut = 2) {
 #'
 #' Calculates the sum for each site of the stress energy of each of it's springs at equilibrium
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a vector of site-dependent stress-energy values
 #'
 #' @export
@@ -142,7 +142,7 @@ get_stress <- function(prot) {
 #'
 #' Calculates the mean-square-fluctuation in the direction of each normal mode
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a vector of size nsites with msf values for each mode
 #'
 #' @export
@@ -162,7 +162,7 @@ get_msf_mode <-  function(prot) 1 / get_evalue(prot)
 #'
 #' Calculates the reduced correlation matrix (size nsites x nsites, diag(rho) = 1)
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a matrix of size nsites x nsites with rho(i,j) = cmat(i,j)/sqrt(cmat(i,i) * cmat(j,j))
 #'
 #' @export
@@ -179,7 +179,7 @@ get_rho_matrix <- function(prot) {
 #'
 #' Calculates the reduced covariance matrix (size nsites x nsites)
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a matrix of size nsites x nsites with \eqn{c_{ij} = < d\mathbf{r}_i . d\mathbf{r}_j >}
 #'
 #' @export
@@ -196,7 +196,7 @@ get_reduced_cmat <- function(prot) {
 #'
 #' Calculates the reduced K matrix (size nsites x nsites)
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a matrix of size nsites x nsites \eqn{K_{ij} = Tr(\mathbf{K}_{ij})}
 #'
 #' @export
@@ -218,7 +218,7 @@ get_reduced_kmat <- function(prot) {
 
 #' Calculate MSF site-dependent profile for each mode
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a matrix of size nsites x nmodes with the msf of each site contributed by each mode
 #'
 #' @export
@@ -238,7 +238,7 @@ get_msf_site_mode <- function(prot) {
 #'
 #'Calculates a matrix of size nsites x nmodes. Element umat2(i,n) is the contribution of site i to mode n (amplitude squared, added over x,y,z)
 #'
-#' @param prot is a protein object obtained using set_enm()
+#' @param prot is a protein object obtained using enm()
 #' @returns a matrix of size nsites x nmodes with contribution of each site to each mode.
 #'
 #' @export

@@ -2,10 +2,10 @@
 # Create and set prot object ----------------------------------------------
 
 
-#' Set up 'prot' object
+#' Create an Elastic Network Model
 #'
 #' @description
-#' `set_enm` set's up a `prot` object containing information on ENM structure, parameters, and normal modes
+#' `enm` creates a `prot` object containing information on ENM structure, parameters, and normal modes
 #'
 #' @param pdb   pdb object obtained using bio3d::read.pdb
 #' @param node  parameter specifying how network nodes should be built: "sc" (side chains), "ca" (alpha carbons), or "cb" (beta carbons)
@@ -19,11 +19,11 @@
 #' @examples
 #' \dontrun{
 #' pdb <- bio3d::read.pdb("2acy")
-#' set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
-#' set_enm(pdb, node = "sc", model = "anm", d_max = 12.5)
-#' set_enm(pdb, node = "cb", model = "anm", d_max = 12.0)
+#' enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+#' enm(pdb, node = "sc", model = "anm", d_max = 12.5)
+#' enm(pdb, node = "cb", model = "anm", d_max = 12.0)
 #' }
-set_enm <- function(pdb, node, model, d_max) {
+enm <- function(pdb, node, model, d_max) {
 
   prot <- create_enm() %>%
     set_enm_param(node = node, model = model, d_max = d_max) %>%

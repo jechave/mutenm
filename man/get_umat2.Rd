@@ -7,7 +7,7 @@
 get_umat2(prot)
 }
 \arguments{
-\item{prot}{is a protein object obtained using set_enm()}
+\item{prot}{is a protein object obtained using enm()}
 }
 \value{
 a matrix of size nsites x nmodes with contribution of each site to each mode.

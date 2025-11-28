@@ -6,7 +6,7 @@ This document provides a comprehensive analysis of what the mutenm package can d
 
 ## 1. ENM Construction
 
-### `set_enm(pdb, node, model, d_max)`
+### `enm(pdb, node, model, d_max)`
 
 Creates a `prot` object containing the Elastic Network Model.
 
@@ -34,9 +34,9 @@ Creates a `prot` object containing the Elastic Network Model.
 
 ## 2. Mutation Perturbation
 
-### `get_mutant_site(wt, site_mut, mutation, mut_model, mut_dl_sigma, mut_sd_min, seed)`
+### `mutenm(wt, site_mut, mutation, mut_model, mut_dl_sigma, mut_sd_min, seed)`
 
-Core function for introducing mutations and calculating structural responses. (Internal, called by `mrs()`)
+Core function for introducing mutations and calculating structural responses. (Called by `mrs()`, also exported for direct use.)
 
 **Parameters:**
 

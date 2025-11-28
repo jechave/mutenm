@@ -7,7 +7,7 @@
 get_dactive(prot, pdb_site_active)
 }
 \arguments{
-\item{prot}{is a protein object obtained using set_enm()}
+\item{prot}{is a protein object obtained using enm()}
 
 \item{pdb_site_active}{is a vector of pdb resno of active residues.}
 }

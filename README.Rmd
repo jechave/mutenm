@@ -46,18 +46,18 @@ Then, create the `prot` object, that contains the full ENM analysis.
 
 ```{r, results = 'hide'}
 pdb <- bio3d::read.pdb("data-raw/2XWRa.pdb") # read a pdb file
-wt <- set_enm(pdb, node = "calpha", model = "anm", d_max = 10.5)
+wt <- enm(pdb, node = "calpha", model = "anm", d_max = 10.5)
 ```
 
-`wt` created here by `set_enm()` is an object of class _prot_.
+`wt` created here by `enm()` is an object of class _prot_.
 In this example, network nodes are placed at $C_\alpha$ coordinates, the model used is Bahar's Anisotropic Network Model (`model = "anm"`) with a cut-off distance to define contacts of `d_max = 10.5`.
 
 ## Create a mutant
 
-Use `get_mutant_site()` to create a mutant at a specific site:
+Use `mutenm()` to create a mutant at a specific site:
 
 ```{r}
-mut <- get_mutant_site(wt, site = 50, mutation = 1, mut_model = "lfenm", mut_dl_sigma = 0.3, seed = 123)
+mut <- mutenm(wt, site_mut = 50, mutation = 1, mut_model = "lfenm", mut_dl_sigma = 0.3, seed = 123)
 ```
 
 This creates a mutant protein by perturbing contacts at site 50 using the LFENM model.
