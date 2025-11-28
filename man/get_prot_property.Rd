@@ -23,7 +23,7 @@ get_bfactor(prot)
 get_xyz(prot)
 }
 \arguments{
-\item{prot}{A protein with its associated ENM model, obtained using `set_enm`}
+\item{prot}{A protein with its associated ENM model, obtained using `enm()`}
 }
 \value{
 \code{get_enm_param}: list of ENM parameters

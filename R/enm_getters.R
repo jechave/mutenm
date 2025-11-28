@@ -3,7 +3,7 @@
 
 #' Get various properties of a prot object
 #'
-#' @param prot A protein with its associated ENM model, obtained using `set_enm`
+#' @param prot A protein with its associated ENM model, obtained using `enm()`
 #'
 #' @name get_prot_property
 #'
