@@ -7,12 +7,6 @@ kij_anm  <- function(dij, sdij, d_max = 10, k = 1,  ...) {
   kij
 }
 
-#' Calculate kij for the GNM
-#'
-#' @noRd
-#'
-kij_gnm <- kij_anm
-
 #' Calculate kij for model by Hinsen
 #'
 #' @noRd
@@ -52,16 +46,6 @@ kij_ming_wall <- function(dij, sdij,
 kij_pfanm <- function(dij, ...) {
   1 / dij^2
 }
-
-
-
-#' Calculate kij for the pfanm
-#'
-#' @noRd
-#'
-kij_pfgnm <- kij_pfanm
-
-
 
 #' Calculate kij for model by Reach et al.
 #'

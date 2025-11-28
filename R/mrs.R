@@ -22,7 +22,7 @@ mrs <- function(wt, nmut, mut_model = "lfenm", mut_dl_sigma = 0.3,
   # Response categories
   site_responses <- c("dr2ij", "dmsfij")
   mode_responses <- c("dr2nj", "dmsfnj")
-  scalar_responses <- c("ddg_dv", "ddg_tds", "dvs", "ddgact_dv", "ddgact_tds")
+  scalar_responses <- c("dv", "tds", "dvs", "act_dv", "act_tds")
   motion_responses <- c("dmsfij", "dmsfnj")
   all_valid <- c(site_responses, mode_responses, scalar_responses)
 
@@ -92,11 +92,11 @@ mrs <- function(wt, nmut, mut_model = "lfenm", mut_dl_sigma = 0.3,
       if ("dmsfnj" %in% req_mode) mode_accum$dmsfnj[, m] <- delta_motion_dmsfn(wt, mut)
 
       # Scalar responses
-      if ("ddg_dv" %in% req_scalar) scalar_accum$ddg_dv[m] <- ddg_dv(wt, mut)
-      if ("ddg_tds" %in% req_scalar) scalar_accum$ddg_tds[m] <- ddg_tds(wt, mut)
+      if ("dv" %in% req_scalar) scalar_accum$dv[m] <- delta_energy_dv(wt, mut)
+      if ("tds" %in% req_scalar) scalar_accum$tds[m] <- delta_energy_tds(wt, mut)
       if ("dvs" %in% req_scalar) scalar_accum$dvs[m] <- delta_energy_dvs(wt, mut)
-      if ("ddgact_dv" %in% req_scalar) scalar_accum$ddgact_dv[m] <- ddgact_dv(wt, mut)
-      if ("ddgact_tds" %in% req_scalar) scalar_accum$ddgact_tds[m] <- ddgact_tds(wt, mut)
+      if ("act_dv" %in% req_scalar) scalar_accum$act_dv[m] <- delta_energy_act_dv(wt, mut)
+      if ("act_tds" %in% req_scalar) scalar_accum$act_tds[m] <- delta_energy_act_tds(wt, mut)
 
       rm(mut)
     }

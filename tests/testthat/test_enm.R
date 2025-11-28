@@ -2,7 +2,7 @@ library(here)
 library(tidyverse)
 library(bio3d)
 library(jefuns)
-library(penm)
+library(mutenm)
 
 load(here("tests/data/pdb_2acy_A.rda"))
 load(here("tests/data/prot_2acy_A_ming_wall_ca.rda"))

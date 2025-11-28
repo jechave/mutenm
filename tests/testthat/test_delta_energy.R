@@ -1,0 +1,30 @@
+library(here)
+
+load(here("tests/data/wt.rda"))
+load(here("tests/data/mut_qf.rda"))
+
+test_that("delta_energy_dv returns numeric", {
+  result <- delta_energy_dv(wt, mut_qf)
+  expect_type(result, "double")
+})
+
+test_that("delta_energy_tds returns non-zero for sclfenm mutant", {
+  result <- delta_energy_tds(wt, mut_qf)
+  expect_type(result, "double")
+  expect_false(result == 0)
+})
+
+test_that("delta_energy_dvs returns numeric", {
+  result <- delta_energy_dvs(wt, mut_qf)
+  expect_type(result, "double")
+})
+
+test_that("delta_energy_act_dv returns NA when no active site specified", {
+  result <- delta_energy_act_dv(wt, mut_qf)
+  expect_true(is.na(result))
+})
+
+test_that("delta_energy_act_tds returns NA when no active site specified", {
+  result <- delta_energy_act_tds(wt, mut_qf)
+  expect_true(is.na(result))
+})

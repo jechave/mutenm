@@ -1,4 +1,4 @@
 library(testthat)
-library(penm)
+library(mutenm)
 
-test_check("penm")
+test_check("mutenm")

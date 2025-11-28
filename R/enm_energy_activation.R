@@ -51,7 +51,7 @@ active_site_indexes <- function(prot, pdb_site_active) {
   pdb_site_active <- pdb_site_active  # active sites in pdb numbering
   site <- get_site(prot)
   pdb_site <- get_pdb_site(prot)
-  site_active <- site[pdb_site %in% pdb_site_active] # active site in penm numbering
+  site_active <- site[pdb_site %in% pdb_site_active] # active site in protein numbering
   ind_active <- xyz_indices_site(site_active) # indices of xyz coordinates of active sites
   lst(pdb_site_active, site_active, ind_active)
 }

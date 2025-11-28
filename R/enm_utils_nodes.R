@@ -190,34 +190,6 @@ residue.bfactors = function(pdb) {
 vnorm = function(v)  sqrt(sum(v^2))
 
 
-#' Angle between two vectors
-#'
-#' @param v1 a vector
-#' @param v2 a vector
-#'
-#' @returns the angle between the vectors
-#'
-#' @noRd
-#'
-theta = function(v1,v2) {
-  th = acos(sum(v1*v2)/sqrt(sum(v1^2)*sum(v2^2)))
-  th
-}
-
-#' Distance between two points
-#'
-#' @param r1 a vector
-#' @param r2 a vector
-#'
-#' @returns the distance
-#'
-#' @noRd
-#'
-distance = function(r1,r2) {
-  r12 = r2-r1
-  d12 = sqrt(sum(r12^2))
-  d12
-}
 
 #' Coordinates of beta carbon, estimated by Levitt (1996)
 #'

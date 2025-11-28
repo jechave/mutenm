@@ -12,20 +12,20 @@ NULL
 
 #' @rdname delta_energy
 #'
-#' @details `ddg_dv` calculates the minimum-energy difference between \code{mut} and \code{wt}
+#' @details `delta_energy_dv` calculates the minimum-energy difference between \code{mut} and \code{wt}
 #'
 #' @export
 #'
-ddg_dv <- function(wt, mut)
+delta_energy_dv <- function(wt, mut)
   enm_v_min(mut) - enm_v_min(wt)
 
 #' @rdname delta_energy
 #'
-#' @details `ddg_tds` calculates the entropic free energ difference between \code{mut} and \code{wt}
+#' @details `delta_energy_tds` calculates the entropic free energy difference between \code{mut} and \code{wt}
 #'
 #' @export
 #'
-ddg_tds <- function(wt, mut, beta = beta_boltzmann())
+delta_energy_tds <- function(wt, mut, beta = beta_boltzmann())
   enm_g_entropy(mut, beta) - enm_g_entropy(wt, beta)
 
 
@@ -44,11 +44,11 @@ delta_energy_dvs <- function(wt, mut, ideal = wt)
 
 #' @rdname delta_energy
 #'
-#' @details `ddgact_dv` calculates the energy contribution to the change in activation energy between \code{mut} and \code{wt}
+#' @details `delta_energy_act_dv` calculates the energy contribution to the change in activation energy between \code{mut} and \code{wt}
 #'
 #' @export
 #'
-ddgact_dv <- function(wt, mut, ideal = wt, pdb_site_active = NA) {
+delta_energy_act_dv <- function(wt, mut, ideal = wt, pdb_site_active = NA) {
   result <- dgact_dv(mut, ideal, pdb_site_active) - dgact_dv(wt, ideal, pdb_site_active)
   result
 }
@@ -56,11 +56,11 @@ ddgact_dv <- function(wt, mut, ideal = wt, pdb_site_active = NA) {
 
 #' @rdname delta_energy
 #'
-#' @details `ddgact_tds` calculates the entropy contribution to the change in activation energy between \code{mut} and \code{wt}
+#' @details `delta_energy_act_tds` calculates the entropy contribution to the change in activation energy between \code{mut} and \code{wt}
 #'
 #' @export
 #'
-ddgact_tds <- function(wt, mut, ideal = wt, pdb_site_active = NA, beta = beta_boltzmann()) {
+delta_energy_act_tds <- function(wt, mut, ideal = wt, pdb_site_active = NA, beta = beta_boltzmann()) {
   result <- dgact_tds(mut, ideal, pdb_site_active) - dgact_tds(wt, ideal, pdb_site_active)
   result
 }

@@ -1,0 +1,17 @@
+mutenm TO-DO list
+=================
+
+1. Bug in calculate_vs() [R/delta_energy.R line 83]
+
+   Warning: "número de items para sustituir no es un múltiplo de la longitud del reemplazo"
+
+   Problem: When sclfenm recalculates the ENM, edges can appear/disappear if distances
+   cross d_max threshold. The assignment:
+
+       g$dij_ideal[edge_in_ideal] <- g_ideal$dij
+
+   assumes g and g_ideal have matching edges, but they may differ.
+
+   Possible fix:
+
+       g$dij_ideal[edge_in_ideal] <- g_ideal$dij[g_ideal$edge %in% g$edge]

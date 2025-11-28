@@ -7,7 +7,7 @@ library(bio3d)
 load(here("tests/data/pdb_2acy_A.rda"))
 load(here("tests/data/wt_sc.rda"))
 load(here("tests/data/mut_sc_lf.rda"))
-# load(here("tests/data/mut_sc_qf.rda"))
+load(here("tests/data/mut_sc_qf.rda"))
 
 
 test_that("set_enm gets wt_sc ok", {
@@ -22,8 +22,7 @@ test_that("get_mutant_site gets mut_sc_lf", {
     mut_sc_lf)
 })
 
-test_that("get_mutant_site gets mut_qf", {
-  skip("Skip sclfenm test until sclefnm is fixed")
+test_that("get_mutant_site gets mut_sc_qf", {
   expect_equal(
     get_mutant_site(wt_sc,  site_mut = 80, mutation = 1,
                     mut_model = "sclfenm", mut_sd_min = 1, mut_dl_sigma = 0.3),
