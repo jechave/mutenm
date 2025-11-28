@@ -1,6 +1,6 @@
-#' Get a single-point mutant
+#' Mutate an Elastic Network Model
 #'
-#' Returns a mutant given a wt and a site to mutate (site_mut)
+#' Generates a single-point mutant of a protein ENM by perturbing contacts at a specified site.
 #'
 #' @param wt The protein \code{prot} to mutate
 #' @param site_mut The site to mutate (not the pdb_site, but sequential)
@@ -18,12 +18,12 @@
 #' \dontrun{
 #' pdb <- bio3d::read.pdb("2acy")
 #' wt <- set_enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
-#' mut <- get_mutant_site(wt, site_mut = 11, mutation = 1, mut_model = "lfenm", seed = 1024)
+#' mut <- mutenm(wt, site_mut = 11, mutation = 1, mut_model = "lfenm", seed = 1024)
 #' }
 #'
 #' @family enm mutating functions
 #'
-get_mutant_site <- function(wt, site_mut, mutation = 0, mut_model = "lfenm", mut_dl_sigma = .3, mut_sd_min = 2, seed = 241956) {
+mutenm <- function(wt, site_mut, mutation = 0, mut_model = "lfenm", mut_dl_sigma = .3, mut_sd_min = 2, seed = 241956) {
 
   if (mut_model == "lfenm") {
     mut <- get_mutant_site_lfenm(wt, site_mut, mutation, mut_dl_sigma, mut_sd_min, seed)
@@ -36,7 +36,7 @@ get_mutant_site <- function(wt, site_mut, mutation = 0, mut_model = "lfenm", mut
     return(mut)
   }
 
-  stop(paste("Error in get_mutant_site,  undefined mut_model:", mut_model))
+  stop(paste("Error in mutenm, undefined mut_model:", mut_model))
 
 }
 

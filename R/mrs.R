@@ -81,7 +81,7 @@ mrs <- function(wt, nmut, mut_model = "lfenm", mut_dl_sigma = 0.3,
     names(scalar_accum) <- req_scalar
 
     for (m in seq_len(nmut)) {
-      mut <- get_mutant_site(wt, j, m, mut_model, mut_dl_sigma, mut_sd_min, seed)
+      mut <- mutenm(wt, j, m, mut_model, mut_dl_sigma, mut_sd_min, seed)
 
       # Site responses
       if ("dr2ij" %in% req_site) site_accum$dr2ij[, m] <- delta_structure_dr2i(wt, mut)

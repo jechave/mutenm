@@ -15,16 +15,16 @@ test_that("set_enm gets wt_sc ok", {
                wt_sc)
 })
 
-test_that("get_mutant_site gets mut_sc_lf", {
+test_that("mutenm gets mut_sc_lf", {
   expect_equal(
-    get_mutant_site(wt_sc, site_mut = 80, mutation = 1,
-                    mut_model = "lfenm", mut_sd_min = 1, mut_dl_sigma = 0.3),
+    mutenm(wt_sc, site_mut = 80, mutation = 1,
+           mut_model = "lfenm", mut_sd_min = 1, mut_dl_sigma = 0.3),
     mut_sc_lf)
 })
 
-test_that("get_mutant_site gets mut_sc_qf", {
+test_that("mutenm gets mut_sc_qf", {
   expect_equal(
-    get_mutant_site(wt_sc,  site_mut = 80, mutation = 1,
-                    mut_model = "sclfenm", mut_sd_min = 1, mut_dl_sigma = 0.3),
+    mutenm(wt_sc,  site_mut = 80, mutation = 1,
+           mut_model = "sclfenm", mut_sd_min = 1, mut_dl_sigma = 0.3),
     mut_sc_qf)
 })

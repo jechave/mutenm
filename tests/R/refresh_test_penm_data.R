@@ -17,16 +17,16 @@ usethis::use_data(wt,  overwrite = TRUE)
 
 ## ----------------------------------------------------------------------------------------------------------------------
 
-mut_lf  <- get_mutant_site(wt, site_mut = 80, mutation = 1,
-                           mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 1)
+mut_lf  <- mutenm(wt, site_mut = 80, mutation = 1,
+                  mut_model = "lfenm", mut_dl_sigma = 0.3, mut_sd_min = 1)
 
 usethis::use_data(mut_lf,  overwrite = TRUE)
 
 ## ----------------------------------------------------------------------------------------------------------------------
 skip <-  TRUE
 if (!skip) {
-  mut_qf <- get_mutant_site(wt, site_mut = 80, mutation = 1,
-                            mut_model = "sclfenm", mut_del_sigma = 0.3, mut_sd_min = 1)
+  mut_qf <- mutenm(wt, site_mut = 80, mutation = 1,
+                   mut_model = "sclfenm", mut_del_sigma = 0.3, mut_sd_min = 1)
   usethis::use_data(mut_qf, overwrite = TRUE)
 }
 
