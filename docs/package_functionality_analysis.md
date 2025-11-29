@@ -131,7 +131,7 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 
 | Function | Description |
 |----------|-------------|
-| `enm_v_min(prot)` | Minimum (stress) energy of the ENM |
+| `v_min(prot)` | Minimum (stress) energy of the ENM |
 | `enm_g_entropy(prot, beta)` | Entropic free energy contribution |
 
 ### 5.2 Pairwise energy differences (ΔΔG)
