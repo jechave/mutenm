@@ -18,7 +18,7 @@ Calculate minimum energy of a given prot object
 }
 \seealso{
 Other enm_energy: 
-\code{\link{dgact_tds}()},
+\code{\link{dg_ent_act}()},
 \code{\link{dv_act}()},
 \code{\link{g_ent}()}
 }

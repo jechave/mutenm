@@ -17,10 +17,10 @@ test_that("dv_act returns correct value with active site", {
   expect_equal(dv_act(wt, wt, pdb_site_active), ref_dgact_dv)
 })
 
-test_that("dgact_tds returns NA when no active site", {
-  expect_true(is.na(dgact_tds(wt, wt, pdb_site_active = NA)))
+test_that("dg_ent_act returns NA when no active site", {
+  expect_true(is.na(dg_ent_act(wt, wt, pdb_site_active = NA)))
 })
 
-test_that("dgact_tds returns correct value with active site", {
-  expect_equal(dgact_tds(wt, wt, pdb_site_active), ref_dgact_tds)
+test_that("dg_ent_act returns correct value with active site", {
+  expect_equal(dg_ent_act(wt, wt, pdb_site_active), ref_dgact_tds)
 })

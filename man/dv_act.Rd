@@ -11,7 +11,7 @@ Activation free energy, internal energy contribution
 }
 \seealso{
 Other enm_energy: 
-\code{\link{dgact_tds}()},
+\code{\link{dg_ent_act}()},
 \code{\link{g_ent}()},
 \code{\link{v_min}()}
 }

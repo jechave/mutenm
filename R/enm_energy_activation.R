@@ -20,7 +20,7 @@ dv_act <- function(prot, ideal, pdb_site_active = NA) {
 #' @export
 #' @family enm_energy
 #'
-dgact_tds <- function(prot, ideal, pdb_site_active = NA, beta = beta_boltzmann()) {
+dg_ent_act <- function(prot, ideal, pdb_site_active = NA, beta = beta_boltzmann()) {
   # Calculate entropic contribution to dg_activation
   if (anyNA(pdb_site_active)) {
     result <- NA

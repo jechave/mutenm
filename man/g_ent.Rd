@@ -16,7 +16,7 @@ Calculate entropic total free energy of prot object
 }
 \seealso{
 Other enm_energy: 
-\code{\link{dgact_tds}()},
+\code{\link{dg_ent_act}()},
 \code{\link{dv_act}()},
 \code{\link{v_min}()}
 }

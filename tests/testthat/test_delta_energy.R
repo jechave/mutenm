@@ -22,7 +22,7 @@ test_that("Ddv_act returns NA when no active site specified", {
   expect_true(is.na(result))
 })
 
-test_that("delta_energy_act_tds returns NA when no active site specified", {
-  result <- delta_energy_act_tds(wt, mut_qf)
+test_that("Ddg_ent_act returns NA when no active site specified", {
+  result <- Ddg_ent_act(wt, mut_qf)
   expect_true(is.na(result))
 })

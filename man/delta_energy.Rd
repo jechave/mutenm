@@ -6,7 +6,7 @@
 \alias{Dg_ent}
 \alias{delta_energy_dvs}
 \alias{Ddv_act}
-\alias{delta_energy_act_tds}
+\alias{Ddg_ent_act}
 \title{Calculate energy differences between a mutant and wild type}
 \usage{
 Dv_min(wt, mut)
@@ -17,13 +17,7 @@ delta_energy_dvs(wt, mut, ideal = wt)
 
 Ddv_act(wt, mut, ideal = wt, pdb_site_active = NA)
 
-delta_energy_act_tds(
-  wt,
-  mut,
-  ideal = wt,
-  pdb_site_active = NA,
-  beta = beta_boltzmann()
-)
+Ddg_ent_act(wt, mut, ideal = wt, pdb_site_active = NA, beta = beta_boltzmann())
 }
 \arguments{
 \item{wt}{A protein object}
@@ -45,5 +39,5 @@ Calculate energy differences between a mutant and wild type
 
 `Ddv_act` calculates the energy contribution to the change in activation energy between \code{mut} and \code{wt}
 
-`delta_energy_act_tds` calculates the entropy contribution to the change in activation energy between \code{mut} and \code{wt}
+`Ddg_ent_act` calculates the entropy contribution to the change in activation energy between \code{mut} and \code{wt}
 }

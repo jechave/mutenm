@@ -56,12 +56,12 @@ Ddv_act <- function(wt, mut, ideal = wt, pdb_site_active = NA) {
 
 #' @rdname delta_energy
 #'
-#' @details `delta_energy_act_tds` calculates the entropy contribution to the change in activation energy between \code{mut} and \code{wt}
+#' @details `Ddg_ent_act` calculates the entropy contribution to the change in activation energy between \code{mut} and \code{wt}
 #'
 #' @export
 #'
-delta_energy_act_tds <- function(wt, mut, ideal = wt, pdb_site_active = NA, beta = beta_boltzmann()) {
-  result <- dgact_tds(mut, ideal, pdb_site_active) - dgact_tds(wt, ideal, pdb_site_active)
+Ddg_ent_act <- function(wt, mut, ideal = wt, pdb_site_active = NA, beta = beta_boltzmann()) {
+  result <- dg_ent_act(mut, ideal, pdb_site_active) - dg_ent_act(wt, ideal, pdb_site_active)
   result
 }
 

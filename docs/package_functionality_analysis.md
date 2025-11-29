@@ -95,7 +95,7 @@ Memory-efficient function for calculating mutation-response matrices. Uses proce
 | `ddg_tds` | profile (N) | Entropic free energy change for mutations at j | lfenm or sclfenm |
 | `dvs` | profile (N) | Stress energy change for mutations at j | lfenm or sclfenm |
 | `Ddv_act` | profile (N) | Activation energy change (energy part) | lfenm or sclfenm |
-| `ddgact_tds` | profile (N) | Activation energy change (entropy part) | lfenm or sclfenm |
+| `Ddg_ent_act` | profile (N) | Activation energy change (entropy part) | lfenm or sclfenm |
 
 **Returns:** List with:
 - Requested site matrices as tibbles: `i`, `j`, `<response>`
@@ -147,9 +147,9 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 | Function | Description |
 |----------|-------------|
 | `dv_act(prot, ideal, pdb_site_active)` | Energy contribution to activation |
-| `dgact_tds(prot, ideal, pdb_site_active, beta)` | Entropy contribution to activation |
+| `dg_ent_act(prot, ideal, pdb_site_active, beta)` | Entropy contribution to activation |
 | `Ddv_act(wt, mut, ideal, pdb_site_active)` | Activation energy difference (energy part) |
-| `ddgact_tds(wt, mut, ideal, pdb_site_active, beta)` | Activation energy difference (entropy part) |
+| `Ddg_ent_act(wt, mut, ideal, pdb_site_active, beta)` | Activation energy difference (entropy part) |
 
 ---
 
