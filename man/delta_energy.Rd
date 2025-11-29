@@ -4,7 +4,6 @@
 \alias{delta_energy}
 \alias{Dv_min}
 \alias{Dg_ent}
-\alias{delta_energy_dvs}
 \alias{Ddv_act}
 \alias{Ddg_ent_act}
 \title{Calculate energy differences between a mutant and wild type}
@@ -12,8 +11,6 @@
 Dv_min(wt, mut)
 
 Dg_ent(wt, mut, beta = beta_boltzmann())
-
-delta_energy_dvs(wt, mut, ideal = wt)
 
 Ddv_act(wt, mut, ideal = wt, pdb_site_active = NA)
 
@@ -34,8 +31,6 @@ Calculate energy differences between a mutant and wild type
 `Dv_min` calculates the minimum-energy difference between \code{mut} and \code{wt}
 
 `Dg_ent` calculates the entropic free energy difference between \code{mut} and \code{wt}
-
-`delta_energy_dvs` calculates the ideal-conformation stress-energy difference between \code{mut} and \code{wt}
 
 `Ddv_act` calculates the energy contribution to the change in activation energy between \code{mut} and \code{wt}
 

@@ -93,7 +93,6 @@ Memory-efficient function for calculating mutation-response matrices. Uses proce
 | `dmsfnj` | mode matrix (M×N) | MSF change in mode n due to mutation at j | sclfenm |
 | `ddg_dv` | profile (N) | Minimum energy change for mutations at j | lfenm or sclfenm |
 | `ddg_tds` | profile (N) | Entropic free energy change for mutations at j | lfenm or sclfenm |
-| `dvs` | profile (N) | Stress energy change for mutations at j | lfenm or sclfenm |
 | `Ddv_act` | profile (N) | Activation energy change (energy part) | lfenm or sclfenm |
 | `Ddg_ent_act` | profile (N) | Activation energy change (entropy part) | lfenm or sclfenm |
 
@@ -140,7 +139,6 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 |----------|-------------|
 | `Dv_min(wt, mut)` | Minimum energy difference |
 | `Dg_ent(wt, mut, beta)` | Entropic free energy difference |
-| `delta_energy_dvs(wt, mut, ideal)` | Stress energy difference |
 
 ### 5.3 Activation energy functions (ΔΔG‡)
 

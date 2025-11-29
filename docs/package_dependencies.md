@@ -149,7 +149,6 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
     │               │       ├── Dmsfn(wt, mut)
     │               │       ├── Dv_min(wt, mut)
     │               │       ├── Dg_ent(wt, mut)
-    │               │       ├── delta_energy_dvs(wt, mut)
     │               │       ├── Ddv_act(wt, mut)
     │               │       └── Ddg_ent_act(wt, mut)
     │               │
@@ -258,7 +257,6 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 |----------|------------|
 | `Dv_min(wt, mut)` | `v_min()` |
 | `Dg_ent(wt, mut, beta)` | `g_ent()` |
-| `delta_energy_dvs(wt, mut, ideal)` | `calculate_vs()` |
 | `Ddv_act(wt, mut, ideal, pdb_site_active)` | `dv_act()` |
 | `Ddg_ent_act(wt, mut, ideal, pdb_site_active, beta)` | `dg_ent_act()` |
 
@@ -281,7 +279,7 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 | `delta_structure_by_mode.R` | Structure response (per mode) | `Dr2n` |
 | `delta_motion_by_site.R` | Dynamics response (per site) | `Dmsfi` |
 | `delta_motion_by_mode.R` | Dynamics response (per mode) | `Dmsfn` |
-| `delta_energy.R` | Energy differences | `Dv_min`, `Dg_ent`, `delta_energy_dvs`, `Ddv_act`, `Ddg_ent_act` |
+| `delta_energy.R` | Energy differences | `Dv_min`, `Dg_ent`, `Ddv_act`, `Ddg_ent_act` |
 | `utils.R` | General utilities | (internal) |
 | `mutenm-imports.R` | Package imports | - |
 | `mutenm-package.R` | Package documentation | - |

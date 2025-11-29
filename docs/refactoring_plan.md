@@ -26,7 +26,6 @@
 | `delta_structure_dr2i` | `Dr2i` | ✓ done |
 | `delta_structure_dr2n` | `Dr2n` | ✓ done |
 
-**Deferred:** stress-related functions (`calculate_vs`, `delta_energy_dvs`)
 
 ## Process for each rename
 
