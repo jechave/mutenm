@@ -240,16 +240,16 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 | Function | Depends On |
 |----------|------------|
 | `v_min(prot)` | `get_graph()`, `v_dij()` |
-| `g_ent(prot, beta)` | `get_evalue()`, `enm_g_entropy_mode()` |
+| `g_ent(prot, beta)` | `get_evalue()`, `g_ent_mode()` |
 | `v_dij(dij, v0ij, kij, lij)` | (internal) |
-| `enm_g_entropy_mode(energy, beta)` | (internal) |
+| `g_ent_mode(energy, beta)` | (internal) |
 
 ### 7.2 enm_energy_activation.R
 
 | Function | Depends On |
 |----------|------------|
 | `dgact_dv(prot, ideal, pdb_site_active)` | `kmat_asite()`, `dxyz_asite()`, `my_quad_form()` |
-| `dgact_tds(prot, ideal, pdb_site_active, beta)` | `kmat_asite()`, `enm_g_entropy_mode()` |
+| `dgact_tds(prot, ideal, pdb_site_active, beta)` | `kmat_asite()`, `g_ent_mode()` |
 | `active_site_indexes(prot, pdb_site_active)` | `get_site()`, `get_pdb_site()`, `xyz_indices_site()` |
 | `kmat_asite(prot, pdb_site_active)` | `active_site_indexes()`, `get_cmat()`, `solve()` |
 | `dxyz_asite(prot, ideal, pdb_site_active)` | `active_site_indexes()`, `get_xyz()` |

@@ -27,7 +27,7 @@ v_min <- function(prot) {
 g_ent <- function(prot, beta) {
   # Calculate T*S from the energy spectrum
   energy <- get_evalue(prot)
-  sum(enm_g_entropy_mode(energy, beta))
+  sum(g_ent_mode(energy, beta))
 }
 
 ## Internal
@@ -50,7 +50,7 @@ v_dij <- function(dij, v0ij, kij, lij) {
 #'
 #' @noRd
 #'
-enm_g_entropy_mode <- function(energy, beta) {
+g_ent_mode <- function(energy, beta) {
   # returns vector of entropic terms given vector of mode energies
   g_entropy_mode <- 1 / (2 * beta) * log((beta * energy) / (2 * pi))
   g_entropy_mode

@@ -13,6 +13,7 @@
 | `enm_v_min` | `v_min` | ✓ done |
 | `delta_energy_dv` | `Dv_min` | ✓ done |
 | `enm_g_entropy` | `g_ent` | ✓ done |
+| `enm_g_entropy_mode` | `g_ent_mode` | ✓ done |
 | `delta_energy_tds` | `Dg_ent` | ✓ done |
 | `dgact_dv` | `dv_act` | pending |
 | `dgact_tds` | `dg_ent_act` | pending |
@@ -33,14 +34,15 @@
 1. Rename function definition in R/ file
 2. Update roxygen `@details` if it mentions the function name
 3. Update all callers (grep in R/ and tests/)
-4. Run `devtools::document()`
-5. Run `devtools::test()`
-6. Commit
-7. Update docs/ files if needed (package_dependencies.md, package_functionality_analysis.md)
+4. Update docs/ files (package_dependencies.md, package_functionality_analysis.md)
+5. Run `devtools::document()`
+6. Run `devtools::test()`
+7. Grep for any remaining occurrences of old name
+8. Single commit with all changes (code + docs together)
 
 ## Suggested groupings (families)
 
-- **g_ent family**: `enm_g_entropy` → `g_ent`, `delta_energy_tds` → `Dg_ent`
+- ~~**g_ent family**: `enm_g_entropy` → `g_ent`, `enm_g_entropy_mode` → `g_ent_mode`, `delta_energy_tds` → `Dg_ent`~~ **DONE**
 - **dv_act family**: `dgact_dv` → `dv_act`, `delta_energy_act_dv` → `Ddv_act`
 - **dg_ent_act family**: `dgact_tds` → `dg_ent_act`, `delta_energy_act_tds` → `Ddg_ent_act`
 - **msf family**: `get_msf_site` → `msfi`, `get_msf_mode` → `msfn`, `delta_motion_dmsfi` → `Dmsfi`, `delta_motion_dmsfn` → `Dmsfn`
