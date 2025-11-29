@@ -17,7 +17,7 @@ NULL
 #' @export
 #'
 delta_energy_dv <- function(wt, mut)
-  enm_v_min(mut) - enm_v_min(wt)
+  v_min(mut) - v_min(wt)
 
 #' @rdname delta_energy
 #'

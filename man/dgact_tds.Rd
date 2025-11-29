@@ -13,6 +13,6 @@ Activation free energy, entropic contribution
 Other enm_energy: 
 \code{\link{dgact_dv}()},
 \code{\link{enm_g_entropy}()},
-\code{\link{enm_v_min}()}
+\code{\link{v_min}()}
 }
 \concept{enm_energy}

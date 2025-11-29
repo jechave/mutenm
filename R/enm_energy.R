@@ -8,7 +8,7 @@
 #' @export
 #' @family enm_energy
 #'
-enm_v_min <- function(prot) {
+v_min <- function(prot) {
   graph <- get_graph(prot)
   v <- with(graph, {
     v_dij(dij, v0ij, kij, lij)
