@@ -198,7 +198,6 @@ Functions to access `prot` object components:
 
 | Function | Returns |
 |----------|---------|
-| `get_msf_site_mode(prot)` | MSF[site,mode] matrix |
 | `get_umat2(prot)` | |u_i,n|² matrix |
 
 ---

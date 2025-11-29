@@ -187,21 +187,6 @@ get_reduced_kmat <- function(prot) {
 # site by mode matrices ---------------------------------------------------
 
 
-#' Calculate MSF site-dependent profile for each mode
-#'
-#' @param prot is a protein object obtained using enm()
-#' @returns a matrix of size nsites x nmodes with the msf of each site contributed by each mode
-#'
-#' @export
-#'
-#'
-#' @family site-by-mode matrices
-#'
-get_msf_site_mode <- function(prot) {
-  umat2 <- get_umat2(prot)
-  msf_site_mode <- t(t(umat2) / get_evalue(prot))
-  msf_site_mode
-}
 
 
 
