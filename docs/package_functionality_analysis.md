@@ -113,8 +113,8 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 
 | Function | Returns | Description |
 |----------|---------|-------------|
-| `delta_structure_dr2i(wt, mut)` | vector[i] | Squared displacement per site |
-| `delta_structure_dr2n(wt, mut)` | vector[n] | Squared displacement per mode |
+| `Dr2i(wt, mut)` | vector[i] | Squared displacement per site |
+| `Dr2n(wt, mut)` | vector[n] | Squared displacement per mode |
 
 ### 4.2 Motion comparisons
 

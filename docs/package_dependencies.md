@@ -48,8 +48,8 @@ This document describes both external package dependencies and internal code dep
 ├─────────────────────────────────────────────────────────────────────┤
 │              COMPARISON FUNCTIONS (wt vs mut)                        │
 ├─────────────────────────────────────────────────────────────────────┤
-│  delta_structure_dr2i()    Dmsfi()                 Dv_min()         │
-│  delta_structure_dr2n()    Dmsfn()                 Dg_ent()          │
+│  Dr2i()                    Dmsfi()                 Dv_min()         │
+│  Dr2n()                    Dmsfn()                 Dg_ent()          │
 │                                                    delta_energy_*()  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                       GETTERS & ANALYSIS                             │
@@ -143,8 +143,8 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
     │               ├── mutenm(wt, j, m, ...)
     │               │
     │               ├── Calculate requested responses:
-    │               │       ├── delta_structure_dr2i(wt, mut)
-    │               │       ├── delta_structure_dr2n(wt, mut)
+    │               │       ├── Dr2i(wt, mut)
+    │               │       ├── Dr2n(wt, mut)
     │               │       ├── Dmsfi(wt, mut)
     │               │       ├── Dmsfn(wt, mut)
     │               │       ├── Dv_min(wt, mut)
@@ -279,8 +279,8 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 | `enm_utils_kij_functions.R` | Spring constant models | (internal) |
 | `mutenm.R` | Mutation perturbation | `mutenm` |
 | `mrs.R` | Mutation response scanning | `mrs` |
-| `delta_structure_by_site.R` | Structure response (per site) | `delta_structure_dr2i` |
-| `delta_structure_by_mode.R` | Structure response (per mode) | `delta_structure_dr2n` |
+| `delta_structure_by_site.R` | Structure response (per site) | `Dr2i` |
+| `delta_structure_by_mode.R` | Structure response (per mode) | `Dr2n` |
 | `delta_motion_by_site.R` | Dynamics response (per site) | `Dmsfi` |
 | `delta_motion_by_mode.R` | Dynamics response (per mode) | `Dmsfn` |
 | `delta_energy.R` | Energy differences | `Dv_min`, `Dg_ent`, `delta_energy_dvs`, `Ddv_act`, `Ddg_ent_act` |

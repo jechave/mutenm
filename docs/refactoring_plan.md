@@ -23,8 +23,8 @@
 | `get_msf_mode` | `msfn` | ✓ done |
 | `delta_motion_dmsfi` | `Dmsfi` | ✓ done |
 | `delta_motion_dmsfn` | `Dmsfn` | ✓ done |
-| `delta_structure_dr2i` | `Dr2i` | pending |
-| `delta_structure_dr2n` | `Dr2n` | pending |
+| `delta_structure_dr2i` | `Dr2i` | ✓ done |
+| `delta_structure_dr2n` | `Dr2n` | ✓ done |
 
 **Deferred:** stress-related functions (`calculate_vs`, `delta_energy_dvs`, `get_stress`)
 
@@ -46,7 +46,7 @@
 - ~~**dv_act family**: `dgact_dv` → `dv_act`, `delta_energy_act_dv` → `Ddv_act`~~ **DONE**
 - ~~**dg_ent_act family**: `dgact_tds` → `dg_ent_act`, `delta_energy_act_tds` → `Ddg_ent_act`~~ **DONE**
 - ~~**msf family**: `get_msf_site` → `msfi`, `get_msf_mode` → `msfn`, `delta_motion_dmsfi` → `Dmsfi`, `delta_motion_dmsfn` → `Dmsfn`~~ **DONE**
-- **structure family**: `delta_structure_dr2i` → `Dr2i`, `delta_structure_dr2n` → `Dr2n`
+- ~~**structure family**: `delta_structure_dr2i` → `Dr2i`, `delta_structure_dr2n` → `Dr2n`~~ **DONE**
 
 ## Notes
 

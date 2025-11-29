@@ -9,7 +9,7 @@
 #'
 #' @export
 #'
-delta_structure_dr2n <- function(wt, mut) {
+Dr2n <- function(wt, mut) {
   stopifnot(wt$node$pdb_site == mut$node$pdb_site) # no indels
   dr <- as.vector(get_xyz(mut) - get_xyz(wt))
   drn <- as.vector(crossprod(get_umat(wt), dr))

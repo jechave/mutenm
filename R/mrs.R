@@ -84,11 +84,11 @@ mrs <- function(wt, nmut, mut_model = "lfenm", mut_dl_sigma = 0.3,
       mut <- mutenm(wt, j, m, mut_model, mut_dl_sigma, mut_sd_min, seed)
 
       # Site responses
-      if ("dr2ij" %in% req_site) site_accum$dr2ij[, m] <- delta_structure_dr2i(wt, mut)
+      if ("dr2ij" %in% req_site) site_accum$dr2ij[, m] <- Dr2i(wt, mut)
       if ("dmsfij" %in% req_site) site_accum$dmsfij[, m] <- Dmsfi(wt, mut)
 
       # Mode responses
-      if ("dr2nj" %in% req_mode) mode_accum$dr2nj[, m] <- delta_structure_dr2n(wt, mut)
+      if ("dr2nj" %in% req_mode) mode_accum$dr2nj[, m] <- Dr2n(wt, mut)
       if ("dmsfnj" %in% req_mode) mode_accum$dmsfnj[, m] <- Dmsfn(wt, mut)
 
       # Scalar responses

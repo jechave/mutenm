@@ -9,7 +9,7 @@
 #'
 #' @export
 #'
-delta_structure_dr2i <- function(wt, mut) {
+Dr2i <- function(wt, mut) {
   stopifnot(wt$node$pdb_site == mut$node$pdb_site) # no indels
   stopifnot(wt$node$site == mut$node$site) # no indels
   dxyz <- my_as_xyz(mut$nodes$xyz - wt$nodes$xyz) # use c(3, nsites) representation of xyz
