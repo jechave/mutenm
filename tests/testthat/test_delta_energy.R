@@ -6,8 +6,8 @@ test_that("Dv_min returns numeric", {
   expect_type(result, "double")
 })
 
-test_that("delta_energy_tds returns non-zero for sclfenm mutant", {
-  result <- delta_energy_tds(wt, mut_qf)
+test_that("Dg_ent returns non-zero for sclfenm mutant", {
+  result <- Dg_ent(wt, mut_qf)
   expect_type(result, "double")
   expect_false(result == 0)
 })

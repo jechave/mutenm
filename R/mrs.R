@@ -93,7 +93,7 @@ mrs <- function(wt, nmut, mut_model = "lfenm", mut_dl_sigma = 0.3,
 
       # Scalar responses
       if ("dv" %in% req_scalar) scalar_accum$dv[m] <- Dv_min(wt, mut)
-      if ("tds" %in% req_scalar) scalar_accum$tds[m] <- delta_energy_tds(wt, mut)
+      if ("tds" %in% req_scalar) scalar_accum$tds[m] <- Dg_ent(wt, mut)
       if ("dvs" %in% req_scalar) scalar_accum$dvs[m] <- delta_energy_dvs(wt, mut)
       if ("act_dv" %in% req_scalar) scalar_accum$act_dv[m] <- delta_energy_act_dv(wt, mut)
       if ("act_tds" %in% req_scalar) scalar_accum$act_tds[m] <- delta_energy_act_tds(wt, mut)

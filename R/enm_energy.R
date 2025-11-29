@@ -24,7 +24,7 @@ v_min <- function(prot) {
 #' @family enm_energy
 #' @export
 #'
-enm_g_entropy <- function(prot, beta) {
+g_ent <- function(prot, beta) {
   # Calculate T*S from the energy spectrum
   energy <- get_evalue(prot)
   sum(enm_g_entropy_mode(energy, beta))

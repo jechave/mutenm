@@ -21,12 +21,12 @@ Dv_min <- function(wt, mut)
 
 #' @rdname delta_energy
 #'
-#' @details `delta_energy_tds` calculates the entropic free energy difference between \code{mut} and \code{wt}
+#' @details `Dg_ent` calculates the entropic free energy difference between \code{mut} and \code{wt}
 #'
 #' @export
 #'
-delta_energy_tds <- function(wt, mut, beta = beta_boltzmann())
-  enm_g_entropy(mut, beta) - enm_g_entropy(wt, beta)
+Dg_ent <- function(wt, mut, beta = beta_boltzmann())
+  g_ent(mut, beta) - g_ent(wt, beta)
 
 
 #' @rdname delta_energy

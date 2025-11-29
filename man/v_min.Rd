@@ -20,6 +20,6 @@ Calculate minimum energy of a given prot object
 Other enm_energy: 
 \code{\link{dgact_dv}()},
 \code{\link{dgact_tds}()},
-\code{\link{enm_g_entropy}()}
+\code{\link{g_ent}()}
 }
 \concept{enm_energy}

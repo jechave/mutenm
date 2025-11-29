@@ -29,6 +29,7 @@
 
 ## Process for each rename
 
+0. Check there're appropriate tests for the functions to be renamed
 1. Rename function definition in R/ file
 2. Update roxygen `@details` if it mentions the function name
 3. Update all callers (grep in R/ and tests/)

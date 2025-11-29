@@ -12,7 +12,7 @@ Activation free energy, internal energy contribution
 \seealso{
 Other enm_energy: 
 \code{\link{dgact_tds}()},
-\code{\link{enm_g_entropy}()},
+\code{\link{g_ent}()},
 \code{\link{v_min}()}
 }
 \concept{enm_energy}
