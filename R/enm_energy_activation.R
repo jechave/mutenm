@@ -3,7 +3,7 @@
 #' @export
 #' @family enm_energy
 #'
-dgact_dv <- function(prot, ideal, pdb_site_active = NA) {
+dv_act <- function(prot, ideal, pdb_site_active = NA) {
   if (anyNA(pdb_site_active)) {
     result <- NA
   } else {

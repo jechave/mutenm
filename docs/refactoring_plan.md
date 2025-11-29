@@ -15,9 +15,9 @@
 | `enm_g_entropy` | `g_ent` | ✓ done |
 | `enm_g_entropy_mode` | `g_ent_mode` | ✓ done |
 | `delta_energy_tds` | `Dg_ent` | ✓ done |
-| `dgact_dv` | `dv_act` | pending |
+| `dgact_dv` | `dv_act` | ✓ done |
 | `dgact_tds` | `dg_ent_act` | pending |
-| `delta_energy_act_dv` | `Ddv_act` | pending |
+| `delta_energy_act_dv` | `Ddv_act` | ✓ done |
 | `delta_energy_act_tds` | `Ddg_ent_act` | pending |
 | `get_msf_site` | `msfi` | pending |
 | `get_msf_mode` | `msfn` | pending |
@@ -43,7 +43,7 @@
 ## Suggested groupings (families)
 
 - ~~**g_ent family**: `enm_g_entropy` → `g_ent`, `enm_g_entropy_mode` → `g_ent_mode`, `delta_energy_tds` → `Dg_ent`~~ **DONE**
-- **dv_act family**: `dgact_dv` → `dv_act`, `delta_energy_act_dv` → `Ddv_act`
+- ~~**dv_act family**: `dgact_dv` → `dv_act`, `delta_energy_act_dv` → `Ddv_act`~~ **DONE**
 - **dg_ent_act family**: `dgact_tds` → `dg_ent_act`, `delta_energy_act_tds` → `Ddg_ent_act`
 - **msf family**: `get_msf_site` → `msfi`, `get_msf_mode` → `msfn`, `delta_motion_dmsfi` → `Dmsfi`, `delta_motion_dmsfn` → `Dmsfn`
 - **structure family**: `delta_structure_dr2i` → `Dr2i`, `delta_structure_dr2n` → `Dr2n`

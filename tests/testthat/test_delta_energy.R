@@ -17,8 +17,8 @@ test_that("delta_energy_dvs returns numeric", {
   expect_type(result, "double")
 })
 
-test_that("delta_energy_act_dv returns NA when no active site specified", {
-  result <- delta_energy_act_dv(wt, mut_qf)
+test_that("Ddv_act returns NA when no active site specified", {
+  result <- Ddv_act(wt, mut_qf)
   expect_true(is.na(result))
 })
 

@@ -44,12 +44,12 @@ delta_energy_dvs <- function(wt, mut, ideal = wt)
 
 #' @rdname delta_energy
 #'
-#' @details `delta_energy_act_dv` calculates the energy contribution to the change in activation energy between \code{mut} and \code{wt}
+#' @details `Ddv_act` calculates the energy contribution to the change in activation energy between \code{mut} and \code{wt}
 #'
 #' @export
 #'
-delta_energy_act_dv <- function(wt, mut, ideal = wt, pdb_site_active = NA) {
-  result <- dgact_dv(mut, ideal, pdb_site_active) - dgact_dv(wt, ideal, pdb_site_active)
+Ddv_act <- function(wt, mut, ideal = wt, pdb_site_active = NA) {
+  result <- dv_act(mut, ideal, pdb_site_active) - dv_act(wt, ideal, pdb_site_active)
   result
 }
 

@@ -150,7 +150,7 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
     │               │       ├── Dv_min(wt, mut)
     │               │       ├── Dg_ent(wt, mut)
     │               │       ├── delta_energy_dvs(wt, mut)
-    │               │       ├── delta_energy_act_dv(wt, mut)
+    │               │       ├── Ddv_act(wt, mut)
     │               │       └── delta_energy_act_tds(wt, mut)
     │               │
     │               └── Discard mutant (rm(mut))
@@ -163,7 +163,7 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
 ```
 Dv_min(wt, mut)               → v_min(mut) - v_min(wt)
 Dg_ent(wt, mut)               → g_ent(mut) - g_ent(wt)
-delta_energy_act_dv(wt, mut)  → dgact_dv(mut) - dgact_dv(wt)
+Ddv_act(wt, mut)              → dv_act(mut) - dv_act(wt)
 delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 ```
 
@@ -229,7 +229,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 | `reduce_matrix(m)` | `get_reduced_cmat()`, `get_reduced_kmat()` |
 | `dactive.xyz(xyz, site_active)` | `get_dactive()` |
 | `xyz_indices_site(site)` | `active_site_indexes()` |
-| `my_quad_form(x, m, y)` | `dgact_dv()` |
+| `my_quad_form(x, m, y)` | `dv_act()` |
 
 ---
 
@@ -248,7 +248,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 
 | Function | Depends On |
 |----------|------------|
-| `dgact_dv(prot, ideal, pdb_site_active)` | `kmat_asite()`, `dxyz_asite()`, `my_quad_form()` |
+| `dv_act(prot, ideal, pdb_site_active)` | `kmat_asite()`, `dxyz_asite()`, `my_quad_form()` |
 | `dgact_tds(prot, ideal, pdb_site_active, beta)` | `kmat_asite()`, `g_ent_mode()` |
 | `active_site_indexes(prot, pdb_site_active)` | `get_site()`, `get_pdb_site()`, `xyz_indices_site()` |
 | `kmat_asite(prot, pdb_site_active)` | `active_site_indexes()`, `get_cmat()`, `solve()` |
@@ -261,7 +261,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 | `Dv_min(wt, mut)` | `v_min()` |
 | `Dg_ent(wt, mut, beta)` | `g_ent()` |
 | `delta_energy_dvs(wt, mut, ideal)` | `calculate_vs()` |
-| `delta_energy_act_dv(wt, mut, ideal, pdb_site_active)` | `dgact_dv()` |
+| `Ddv_act(wt, mut, ideal, pdb_site_active)` | `dv_act()` |
 | `delta_energy_act_tds(wt, mut, ideal, pdb_site_active, beta)` | `dgact_tds()` |
 
 ---
@@ -274,7 +274,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 | `enm_getters.R` | Access prot components | `get_enm_param`, `get_nsites`, `get_site`, `get_pdb_site`, `get_bfactor`, `get_xyz` |
 | `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `get_msf_site`, `get_msf_mode`, `get_mlms`, `get_stress`, `get_rho_matrix`, `get_reduced_cmat`, `get_reduced_kmat`, `get_msf_site_mode`, `get_umat2` |
 | `enm_energy.R` | ENM energies | `v_min`, `g_ent` |
-| `enm_energy_activation.R` | Activation energies | `dgact_dv`, `dgact_tds` |
+| `enm_energy_activation.R` | Activation energies | `dv_act`, `dgact_tds` |
 | `enm_utils_nodes.R` | Node coordinate calculation | (internal) |
 | `enm_utils_kij_functions.R` | Spring constant models | (internal) |
 | `mutenm.R` | Mutation perturbation | `mutenm` |
@@ -283,7 +283,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 | `delta_structure_by_mode.R` | Structure response (per mode) | `delta_structure_dr2n` |
 | `delta_motion_by_site.R` | Dynamics response (per site) | `delta_motion_dmsfi` |
 | `delta_motion_by_mode.R` | Dynamics response (per mode) | `delta_motion_dmsfn` |
-| `delta_energy.R` | Energy differences | `Dv_min`, `Dg_ent`, `delta_energy_dvs`, `delta_energy_act_dv`, `delta_energy_act_tds` |
+| `delta_energy.R` | Energy differences | `Dv_min`, `Dg_ent`, `delta_energy_dvs`, `Ddv_act`, `delta_energy_act_tds` |
 | `utils.R` | General utilities | (internal) |
 | `mutenm-imports.R` | Package imports | - |
 | `mutenm-package.R` | Package documentation | - |

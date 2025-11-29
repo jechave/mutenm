@@ -9,12 +9,12 @@ test_that("g_ent returns correct value", {
   expect_equal(g_ent(wt, beta = 1.0), ref_enm_g_entropy)
 })
 
-test_that("dgact_dv returns NA when no active site", {
-  expect_true(is.na(dgact_dv(wt, wt, pdb_site_active = NA)))
+test_that("dv_act returns NA when no active site", {
+  expect_true(is.na(dv_act(wt, wt, pdb_site_active = NA)))
 })
 
-test_that("dgact_dv returns correct value with active site", {
-  expect_equal(dgact_dv(wt, wt, pdb_site_active), ref_dgact_dv)
+test_that("dv_act returns correct value with active site", {
+  expect_equal(dv_act(wt, wt, pdb_site_active), ref_dgact_dv)
 })
 
 test_that("dgact_tds returns NA when no active site", {

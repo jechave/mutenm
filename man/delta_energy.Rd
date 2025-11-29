@@ -5,7 +5,7 @@
 \alias{Dv_min}
 \alias{Dg_ent}
 \alias{delta_energy_dvs}
-\alias{delta_energy_act_dv}
+\alias{Ddv_act}
 \alias{delta_energy_act_tds}
 \title{Calculate energy differences between a mutant and wild type}
 \usage{
@@ -15,7 +15,7 @@ Dg_ent(wt, mut, beta = beta_boltzmann())
 
 delta_energy_dvs(wt, mut, ideal = wt)
 
-delta_energy_act_dv(wt, mut, ideal = wt, pdb_site_active = NA)
+Ddv_act(wt, mut, ideal = wt, pdb_site_active = NA)
 
 delta_energy_act_tds(
   wt,
@@ -43,7 +43,7 @@ Calculate energy differences between a mutant and wild type
 
 `delta_energy_dvs` calculates the ideal-conformation stress-energy difference between \code{mut} and \code{wt}
 
-`delta_energy_act_dv` calculates the energy contribution to the change in activation energy between \code{mut} and \code{wt}
+`Ddv_act` calculates the energy contribution to the change in activation energy between \code{mut} and \code{wt}
 
 `delta_energy_act_tds` calculates the entropy contribution to the change in activation energy between \code{mut} and \code{wt}
 }
