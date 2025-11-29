@@ -1,40 +1,28 @@
 library(here)
 
 load(here("tests/data/wt.rda"))
+load(here("tests/data/ref_enm_energy.rda"))
 
-# 2acy active site residues (PDB numbering): Arg23, Asn41
-pdb_site_active <- c(23, 41)
-
-test_that("enm_v_min returns numeric scalar", {
-  result <- enm_v_min(wt)
-  expect_type(result, "double")
-  expect_length(result, 1)
+test_that("enm_v_min returns correct value", {
+  expect_equal(enm_v_min(wt), ref_enm_v_min)
 })
 
-test_that("enm_g_entropy returns numeric scalar", {
-  result <- enm_g_entropy(wt, beta = 1.0)
-  expect_type(result, "double")
-  expect_length(result, 1)
+test_that("enm_g_entropy returns correct value", {
+  expect_equal(enm_g_entropy(wt, beta = 1.0), ref_enm_g_entropy)
 })
 
-test_that("dgact_dv returns NA when no active site specified", {
-  result <- dgact_dv(wt, wt, pdb_site_active = NA)
-  expect_true(is.na(result))
+test_that("dgact_dv returns NA when no active site", {
+  expect_true(is.na(dgact_dv(wt, wt, pdb_site_active = NA)))
 })
 
-test_that("dgact_dv returns numeric when active site specified", {
-  result <- dgact_dv(wt, wt, pdb_site_active = pdb_site_active)
-  expect_type(result, "double")
-  expect_length(result, 1)
+test_that("dgact_dv returns correct value with active site", {
+  expect_equal(dgact_dv(wt, wt, pdb_site_active), ref_dgact_dv)
 })
 
-test_that("dgact_tds returns NA when no active site specified", {
-  result <- dgact_tds(wt, wt, pdb_site_active = NA)
-  expect_true(is.na(result))
+test_that("dgact_tds returns NA when no active site", {
+  expect_true(is.na(dgact_tds(wt, wt, pdb_site_active = NA)))
 })
 
-test_that("dgact_tds returns numeric when active site specified", {
-  result <- dgact_tds(wt, wt, pdb_site_active = pdb_site_active)
-  expect_type(result, "double")
-  expect_length(result, 1)
+test_that("dgact_tds returns correct value with active site", {
+  expect_equal(dgact_tds(wt, wt, pdb_site_active), ref_dgact_tds)
 })
