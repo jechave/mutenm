@@ -1,7 +1,5 @@
-library(here)
-
-load(here("tests/data/wt.rda"))
-load(here("tests/data/mut_qf.rda"))
+load(test_path("..", "data", "wt.rda"))
+load(test_path("..", "data", "mut_qf.rda"))
 
 test_that("Dv_min returns numeric", {
   result <- Dv_min(wt, mut_qf)

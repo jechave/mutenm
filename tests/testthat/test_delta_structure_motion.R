@@ -1,8 +1,6 @@
-library(here)
-
-load(here("tests/data/wt.rda"))
-load(here("tests/data/mut_qf.rda"))
-load(here("tests/data/ref_delta_structure_motion.rda"))
+load(test_path("..", "data", "wt.rda"))
+load(test_path("..", "data", "mut_qf.rda"))
+load(test_path("..", "data", "ref_delta_structure_motion.rda"))
 
 test_that("delta_structure_dr2i returns correct values", {
   expect_equal(delta_structure_dr2i(wt, mut_qf), ref_dr2i)

@@ -1,13 +1,7 @@
-library(here)
-library(tidyverse)
-library(jefuns)
-library(bio3d)
-
-
-load(here("tests/data/pdb_2acy_A.rda"))
-load(here("tests/data/wt_sc.rda"))
-load(here("tests/data/mut_sc_lf.rda"))
-load(here("tests/data/mut_sc_qf.rda"))
+load(test_path("..", "data", "pdb_2acy_A.rda"))
+load(test_path("..", "data", "wt_sc.rda"))
+load(test_path("..", "data", "mut_sc_lf.rda"))
+load(test_path("..", "data", "mut_sc_qf.rda"))
 
 
 test_that("enm gets wt_sc ok", {
