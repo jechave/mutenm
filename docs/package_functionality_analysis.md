@@ -132,14 +132,14 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 | Function | Description |
 |----------|-------------|
 | `v_min(prot)` | Minimum (stress) energy of the ENM |
-| `enm_g_entropy(prot, beta)` | Entropic free energy contribution |
+| `g_ent(prot, beta)` | Entropic free energy contribution |
 
 ### 5.2 Pairwise energy differences (ΔΔG)
 
 | Function | Description |
 |----------|-------------|
-| `ddg_dv(wt, mut)` | Minimum energy difference |
-| `ddg_tds(wt, mut, beta)` | Entropic free energy difference |
+| `Dv_min(wt, mut)` | Minimum energy difference |
+| `Dg_ent(wt, mut, beta)` | Entropic free energy difference |
 | `delta_energy_dvs(wt, mut, ideal)` | Stress energy difference |
 
 ### 5.3 Activation energy functions (ΔΔG‡)

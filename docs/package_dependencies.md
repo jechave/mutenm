@@ -49,7 +49,7 @@ This document describes both external package dependencies and internal code dep
 │              COMPARISON FUNCTIONS (wt vs mut)                        │
 ├─────────────────────────────────────────────────────────────────────┤
 │  delta_structure_dr2i()    delta_motion_dmsfi()    Dv_min()         │
-│  delta_structure_dr2n()    delta_motion_dmsfn()    delta_energy_tds()│
+│  delta_structure_dr2n()    delta_motion_dmsfn()    Dg_ent()          │
 │                                                    delta_energy_*()  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                       GETTERS & ANALYSIS                             │
@@ -148,7 +148,7 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
     │               │       ├── delta_motion_dmsfi(wt, mut)
     │               │       ├── delta_motion_dmsfn(wt, mut)
     │               │       ├── Dv_min(wt, mut)
-    │               │       ├── delta_energy_tds(wt, mut)
+    │               │       ├── Dg_ent(wt, mut)
     │               │       ├── delta_energy_dvs(wt, mut)
     │               │       ├── delta_energy_act_dv(wt, mut)
     │               │       └── delta_energy_act_tds(wt, mut)
@@ -162,7 +162,7 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
 
 ```
 Dv_min(wt, mut)               → v_min(mut) - v_min(wt)
-delta_energy_tds(wt, mut)     → enm_g_entropy(mut) - enm_g_entropy(wt)
+Dg_ent(wt, mut)               → g_ent(mut) - g_ent(wt)
 delta_energy_act_dv(wt, mut)  → dgact_dv(mut) - dgact_dv(wt)
 delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 ```
@@ -240,7 +240,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 | Function | Depends On |
 |----------|------------|
 | `v_min(prot)` | `get_graph()`, `v_dij()` |
-| `enm_g_entropy(prot, beta)` | `get_evalue()`, `enm_g_entropy_mode()` |
+| `g_ent(prot, beta)` | `get_evalue()`, `enm_g_entropy_mode()` |
 | `v_dij(dij, v0ij, kij, lij)` | (internal) |
 | `enm_g_entropy_mode(energy, beta)` | (internal) |
 
@@ -259,7 +259,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 | Function | Depends On |
 |----------|------------|
 | `Dv_min(wt, mut)` | `v_min()` |
-| `delta_energy_tds(wt, mut, beta)` | `enm_g_entropy()` |
+| `Dg_ent(wt, mut, beta)` | `g_ent()` |
 | `delta_energy_dvs(wt, mut, ideal)` | `calculate_vs()` |
 | `delta_energy_act_dv(wt, mut, ideal, pdb_site_active)` | `dgact_dv()` |
 | `delta_energy_act_tds(wt, mut, ideal, pdb_site_active, beta)` | `dgact_tds()` |
@@ -273,7 +273,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 | `enm.R` | ENM construction | `enm` |
 | `enm_getters.R` | Access prot components | `get_enm_param`, `get_nsites`, `get_site`, `get_pdb_site`, `get_bfactor`, `get_xyz` |
 | `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `get_msf_site`, `get_msf_mode`, `get_mlms`, `get_stress`, `get_rho_matrix`, `get_reduced_cmat`, `get_reduced_kmat`, `get_msf_site_mode`, `get_umat2` |
-| `enm_energy.R` | ENM energies | `v_min`, `enm_g_entropy` |
+| `enm_energy.R` | ENM energies | `v_min`, `g_ent` |
 | `enm_energy_activation.R` | Activation energies | `dgact_dv`, `dgact_tds` |
 | `enm_utils_nodes.R` | Node coordinate calculation | (internal) |
 | `enm_utils_kij_functions.R` | Spring constant models | (internal) |
@@ -283,7 +283,7 @@ delta_energy_act_tds(wt, mut) → dgact_tds(mut) - dgact_tds(wt)
 | `delta_structure_by_mode.R` | Structure response (per mode) | `delta_structure_dr2n` |
 | `delta_motion_by_site.R` | Dynamics response (per site) | `delta_motion_dmsfi` |
 | `delta_motion_by_mode.R` | Dynamics response (per mode) | `delta_motion_dmsfn` |
-| `delta_energy.R` | Energy differences | `Dv_min`, `delta_energy_tds`, `delta_energy_dvs`, `delta_energy_act_dv`, `delta_energy_act_tds` |
+| `delta_energy.R` | Energy differences | `Dv_min`, `Dg_ent`, `delta_energy_dvs`, `delta_energy_act_dv`, `delta_energy_act_tds` |
 | `utils.R` | General utilities | (internal) |
 | `mutenm-imports.R` | Package imports | - |
 | `mutenm-package.R` | Package documentation | - |

@@ -12,8 +12,8 @@
 |---------|-----|--------|
 | `enm_v_min` | `v_min` | ✓ done |
 | `delta_energy_dv` | `Dv_min` | ✓ done |
-| `enm_g_entropy` | `g_ent` | pending |
-| `delta_energy_tds` | `Dg_ent` | pending |
+| `enm_g_entropy` | `g_ent` | ✓ done |
+| `delta_energy_tds` | `Dg_ent` | ✓ done |
 | `dgact_dv` | `dv_act` | pending |
 | `dgact_tds` | `dg_ent_act` | pending |
 | `delta_energy_act_dv` | `Ddv_act` | pending |
