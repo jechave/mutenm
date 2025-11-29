@@ -21,7 +21,6 @@ Calculates the Mean Local Mutational Stress (MLMS) profile using graph of prot o
 Other site profiles: 
 \code{\link{get_cn}()},
 \code{\link{get_dactive}()},
-\code{\link{get_stress}()},
 \code{\link{get_wcn}()},
 \code{\link{msfi}()}
 }

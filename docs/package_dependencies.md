@@ -210,7 +210,6 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 | `msfi(prot)` | `get_reduced_cmat()` | Mean-square fluctuation per site |
 | `msfn(prot)` | `get_evalue()` | MSF per mode (1/λ) |
 | `get_mlms(prot, sdij_cut)` | `get_graph()` | Mean local mutational stress |
-| `get_stress(prot)` | `get_graph()` | Stress energy per site |
 | `get_rho_matrix(prot)` | `get_reduced_cmat()` | Correlation matrix |
 | `get_reduced_cmat(prot)` | `get_cmat()`, `reduce_matrix()` | N×N covariance |
 | `get_reduced_kmat(prot)` | `get_kmat()`, `reduce_matrix()` | N×N Kirchhoff |
@@ -272,7 +271,7 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 |------|---------|---------|
 | `enm.R` | ENM construction | `enm` |
 | `enm_getters.R` | Access prot components | `get_enm_param`, `get_nsites`, `get_site`, `get_pdb_site`, `get_bfactor`, `get_xyz` |
-| `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `msfi`, `msfn`, `get_mlms`, `get_stress`, `get_rho_matrix`, `get_reduced_cmat`, `get_reduced_kmat`, `get_msf_site_mode`, `get_umat2` |
+| `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `msfi`, `msfn`, `get_mlms`, `get_rho_matrix`, `get_reduced_cmat`, `get_reduced_kmat`, `get_msf_site_mode`, `get_umat2` |
 | `enm_energy.R` | ENM energies | `v_min`, `g_ent` |
 | `enm_energy_activation.R` | Activation energies | `dv_act`, `dg_ent_act` |
 | `enm_utils_nodes.R` | Node coordinate calculation | (internal) |

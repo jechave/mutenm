@@ -20,7 +20,6 @@ Other site profiles:
 \code{\link{get_cn}()},
 \code{\link{get_dactive}()},
 \code{\link{get_mlms}()},
-\code{\link{get_stress}()},
 \code{\link{get_wcn}()}
 }
 \concept{site profiles}

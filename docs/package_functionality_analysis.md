@@ -179,7 +179,6 @@ Functions to access `prot` object components:
 | `get_dactive(prot, pdb_site_active)` | Distance to active site profile |
 | `msfi(prot)` | Mean-square fluctuation per site |
 | `get_mlms(prot, sdij_cut)` | Mean local mutational stress profile |
-| `get_stress(prot)` | Stress energy per site |
 
 ### 7.2 Mode profiles
 

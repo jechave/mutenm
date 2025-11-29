@@ -104,35 +104,6 @@ get_mlms <- function(prot, sdij_cut = 2) {
 
 }
 
-#' Site-dependent ENM minimum stress energy profile
-#'
-#' Calculates the sum for each site of the stress energy of each of it's springs at equilibrium
-#'
-#' @param prot is a protein object obtained using enm()
-#' @returns a vector of site-dependent stress-energy values
-#'
-#' @export
-#'
-#'
-#'
-#' @family site profiles
-#'
-get_stress <- function(prot) {
-  g1 <- get_graph(prot)
-  g2 <- g1 %>%
-    select(edge, j, i, v0ij, sdij, lij, kij, dij)
-  names(g2) <- names(g1)
-  g <- rbind(g1, g2)
-
-  g <- g %>%
-    mutate(stress = .5 * kij * (dij - lij)^2) %>%
-    group_by(i) %>%
-    summarise(stress = sum(stress))  %>%
-    select(stress)
-
-  as.vector(g$stress)
-
-}
 
 
 
