@@ -9,8 +9,8 @@
 #'
 #' @export
 #'
-delta_motion_dmsfi <- function(wt, mut) {
+Dmsfi <- function(wt, mut) {
   stopifnot(wt$node$pdb_site == mut$node$pdb_site) # no indels
-  dmsf = get_msf_site(mut) - get_msf_site(wt)
+  dmsf = msfi(mut) - msfi(wt)
   dmsf
 }

@@ -10,9 +10,9 @@
 #'
 #' @export
 #'
-delta_motion_dmsfn <- function(wt, mut) {
+Dmsfn <- function(wt, mut) {
   stopifnot(wt$node$pdb_site == mut$node$pdb_site) # no indels
-  msf_wt <- get_msf_mode(wt)
+  msf_wt <- msfn(wt)
   msf_mut <- diag(t(get_umat(wt)) %*% (get_cmat(mut) %*% get_umat(wt)))
   dmsf = msf_mut - msf_wt
   dmsf

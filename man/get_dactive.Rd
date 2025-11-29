@@ -21,8 +21,8 @@ Calculates the distance from each site to the closest active residue
 Other site profiles: 
 \code{\link{get_cn}()},
 \code{\link{get_mlms}()},
-\code{\link{get_msf_site}()},
 \code{\link{get_stress}()},
-\code{\link{get_wcn}()}
+\code{\link{get_wcn}()},
+\code{\link{msfi}()}
 }
 \concept{site profiles}

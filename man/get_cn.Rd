@@ -19,8 +19,8 @@ Calculates the Contact Number (CN) of each site
 Other site profiles: 
 \code{\link{get_dactive}()},
 \code{\link{get_mlms}()},
-\code{\link{get_msf_site}()},
 \code{\link{get_stress}()},
-\code{\link{get_wcn}()}
+\code{\link{get_wcn}()},
+\code{\link{msfi}()}
 }
 \concept{site profiles}

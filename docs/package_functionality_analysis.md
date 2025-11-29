@@ -120,8 +120,8 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 
 | Function | Returns | Description |
 |----------|---------|-------------|
-| `delta_motion_dmsfi(wt, mut)` | vector[i] | MSF change per site |
-| `delta_motion_dmsfn(wt, mut)` | vector[n] | MSF change per mode |
+| `Dmsfi(wt, mut)` | vector[i] | MSF change per site |
+| `Dmsfn(wt, mut)` | vector[n] | MSF change per mode |
 
 ---
 
@@ -177,7 +177,7 @@ Functions to access `prot` object components:
 | `get_cn(prot)` | Contact number profile |
 | `get_wcn(prot)` | Weighted contact number profile |
 | `get_dactive(prot, pdb_site_active)` | Distance to active site profile |
-| `get_msf_site(prot)` | Mean-square fluctuation per site |
+| `msfi(prot)` | Mean-square fluctuation per site |
 | `get_mlms(prot, sdij_cut)` | Mean local mutational stress profile |
 | `get_stress(prot)` | Stress energy per site |
 
@@ -185,7 +185,7 @@ Functions to access `prot` object components:
 
 | Function | Returns |
 |----------|---------|
-| `get_msf_mode(prot)` | MSF per mode (1/λ) |
+| `msfn(prot)` | MSF per mode (1/λ) |
 
 ### 7.3 Site-by-site matrices
 

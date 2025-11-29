@@ -10,10 +10,10 @@ test_that("delta_structure_dr2n returns correct values", {
   expect_equal(delta_structure_dr2n(wt, mut_qf), ref_dr2n)
 })
 
-test_that("delta_motion_dmsfi returns correct values", {
-  expect_equal(delta_motion_dmsfi(wt, mut_qf), ref_dmsfi)
+test_that("Dmsfi returns correct values", {
+  expect_equal(Dmsfi(wt, mut_qf), ref_dmsfi)
 })
 
-test_that("delta_motion_dmsfn returns correct values", {
-  expect_equal(delta_motion_dmsfn(wt, mut_qf), ref_dmsfn)
+test_that("Dmsfn returns correct values", {
+  expect_equal(Dmsfn(wt, mut_qf), ref_dmsfn)
 })

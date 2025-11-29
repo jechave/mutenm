@@ -68,7 +68,7 @@ get_dactive <- function(prot, pdb_site_active) {
 #'
 #' @family site profiles
 #'
-get_msf_site <- function(prot) {
+msfi <- function(prot) {
   diag(get_reduced_cmat(prot))
 }
 
@@ -150,7 +150,7 @@ get_stress <- function(prot) {
 #'
 #' @family mode profiles
 #'
-get_msf_mode <-  function(prot) 1 / get_evalue(prot)
+msfn <-  function(prot) 1 / get_evalue(prot)
 
 
 

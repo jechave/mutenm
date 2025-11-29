@@ -48,8 +48,8 @@ This document describes both external package dependencies and internal code dep
 ├─────────────────────────────────────────────────────────────────────┤
 │              COMPARISON FUNCTIONS (wt vs mut)                        │
 ├─────────────────────────────────────────────────────────────────────┤
-│  delta_structure_dr2i()    delta_motion_dmsfi()    Dv_min()         │
-│  delta_structure_dr2n()    delta_motion_dmsfn()    Dg_ent()          │
+│  delta_structure_dr2i()    Dmsfi()                 Dv_min()         │
+│  delta_structure_dr2n()    Dmsfn()                 Dg_ent()          │
 │                                                    delta_energy_*()  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                       GETTERS & ANALYSIS                             │
@@ -145,8 +145,8 @@ mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)
     │               ├── Calculate requested responses:
     │               │       ├── delta_structure_dr2i(wt, mut)
     │               │       ├── delta_structure_dr2n(wt, mut)
-    │               │       ├── delta_motion_dmsfi(wt, mut)
-    │               │       ├── delta_motion_dmsfn(wt, mut)
+    │               │       ├── Dmsfi(wt, mut)
+    │               │       ├── Dmsfn(wt, mut)
     │               │       ├── Dv_min(wt, mut)
     │               │       ├── Dg_ent(wt, mut)
     │               │       ├── delta_energy_dvs(wt, mut)
@@ -207,8 +207,8 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 | `get_cn(prot)` | `cn_xyz()`, `get_xyz()`, `get_d_max()` | Contact number profile |
 | `get_wcn(prot)` | `wcn_xyz()`, `get_xyz()` | Weighted contact number |
 | `get_dactive(prot, sites)` | `dactive.xyz()`, `active_site_indexes()` | Distance to active site |
-| `get_msf_site(prot)` | `get_reduced_cmat()` | Mean-square fluctuation per site |
-| `get_msf_mode(prot)` | `get_evalue()` | MSF per mode (1/λ) |
+| `msfi(prot)` | `get_reduced_cmat()` | Mean-square fluctuation per site |
+| `msfn(prot)` | `get_evalue()` | MSF per mode (1/λ) |
 | `get_mlms(prot, sdij_cut)` | `get_graph()` | Mean local mutational stress |
 | `get_stress(prot)` | `get_graph()` | Stress energy per site |
 | `get_rho_matrix(prot)` | `get_reduced_cmat()` | Correlation matrix |
@@ -272,7 +272,7 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 |------|---------|---------|
 | `enm.R` | ENM construction | `enm` |
 | `enm_getters.R` | Access prot components | `get_enm_param`, `get_nsites`, `get_site`, `get_pdb_site`, `get_bfactor`, `get_xyz` |
-| `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `get_msf_site`, `get_msf_mode`, `get_mlms`, `get_stress`, `get_rho_matrix`, `get_reduced_cmat`, `get_reduced_kmat`, `get_msf_site_mode`, `get_umat2` |
+| `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `msfi`, `msfn`, `get_mlms`, `get_stress`, `get_rho_matrix`, `get_reduced_cmat`, `get_reduced_kmat`, `get_msf_site_mode`, `get_umat2` |
 | `enm_energy.R` | ENM energies | `v_min`, `g_ent` |
 | `enm_energy_activation.R` | Activation energies | `dv_act`, `dg_ent_act` |
 | `enm_utils_nodes.R` | Node coordinate calculation | (internal) |
@@ -281,8 +281,8 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 | `mrs.R` | Mutation response scanning | `mrs` |
 | `delta_structure_by_site.R` | Structure response (per site) | `delta_structure_dr2i` |
 | `delta_structure_by_mode.R` | Structure response (per mode) | `delta_structure_dr2n` |
-| `delta_motion_by_site.R` | Dynamics response (per site) | `delta_motion_dmsfi` |
-| `delta_motion_by_mode.R` | Dynamics response (per mode) | `delta_motion_dmsfn` |
+| `delta_motion_by_site.R` | Dynamics response (per site) | `Dmsfi` |
+| `delta_motion_by_mode.R` | Dynamics response (per mode) | `Dmsfn` |
 | `delta_energy.R` | Energy differences | `Dv_min`, `Dg_ent`, `delta_energy_dvs`, `Ddv_act`, `Ddg_ent_act` |
 | `utils.R` | General utilities | (internal) |
 | `mutenm-imports.R` | Package imports | - |
