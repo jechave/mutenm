@@ -92,7 +92,7 @@ mrs <- function(wt, nmut, mut_model = "lfenm", mut_dl_sigma = 0.3,
       if ("dmsfnj" %in% req_mode) mode_accum$dmsfnj[, m] <- delta_motion_dmsfn(wt, mut)
 
       # Scalar responses
-      if ("dv" %in% req_scalar) scalar_accum$dv[m] <- delta_energy_dv(wt, mut)
+      if ("dv" %in% req_scalar) scalar_accum$dv[m] <- Dv_min(wt, mut)
       if ("tds" %in% req_scalar) scalar_accum$tds[m] <- delta_energy_tds(wt, mut)
       if ("dvs" %in% req_scalar) scalar_accum$dvs[m] <- delta_energy_dvs(wt, mut)
       if ("act_dv" %in% req_scalar) scalar_accum$act_dv[m] <- delta_energy_act_dv(wt, mut)

@@ -2,14 +2,14 @@
 % Please edit documentation in R/delta_energy.R
 \name{delta_energy}
 \alias{delta_energy}
-\alias{delta_energy_dv}
+\alias{Dv_min}
 \alias{delta_energy_tds}
 \alias{delta_energy_dvs}
 \alias{delta_energy_act_dv}
 \alias{delta_energy_act_tds}
 \title{Calculate energy differences between a mutant and wild type}
 \usage{
-delta_energy_dv(wt, mut)
+Dv_min(wt, mut)
 
 delta_energy_tds(wt, mut, beta = beta_boltzmann())
 
@@ -37,7 +37,7 @@ A (scalar) energy difference between mutant and wild type.
 Calculate energy differences between a mutant and wild type
 }
 \details{
-`delta_energy_dv` calculates the minimum-energy difference between \code{mut} and \code{wt}
+`Dv_min` calculates the minimum-energy difference between \code{mut} and \code{wt}
 
 `delta_energy_tds` calculates the entropic free energy difference between \code{mut} and \code{wt}
 

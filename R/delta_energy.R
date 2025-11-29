@@ -12,11 +12,11 @@ NULL
 
 #' @rdname delta_energy
 #'
-#' @details `delta_energy_dv` calculates the minimum-energy difference between \code{mut} and \code{wt}
+#' @details `Dv_min` calculates the minimum-energy difference between \code{mut} and \code{wt}
 #'
 #' @export
 #'
-delta_energy_dv <- function(wt, mut)
+Dv_min <- function(wt, mut)
   v_min(mut) - v_min(wt)
 
 #' @rdname delta_energy

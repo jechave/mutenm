@@ -3,8 +3,8 @@ library(here)
 load(here("tests/data/wt.rda"))
 load(here("tests/data/mut_qf.rda"))
 
-test_that("delta_energy_dv returns numeric", {
-  result <- delta_energy_dv(wt, mut_qf)
+test_that("Dv_min returns numeric", {
+  result <- Dv_min(wt, mut_qf)
   expect_type(result, "double")
 })
 
