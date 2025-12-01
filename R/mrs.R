@@ -8,41 +8,28 @@
 #' @param mut_model Mutation model: "lfenm" (fast) or "sclfenm" (recalculates ENM)
 #' @param mut_dl_sigma Sigma of normal distribution for bond length perturbations
 #' @param mut_sd_min Minimum sequence distance of contacts to perturb
-#' @param responses Character vector of responses to calculate
 #' @param seed Random seed for reproducibility
 #'
-#' @return List with requested response tibbles and params
-#'
-#' @importFrom tidyr pivot_longer
+#' @return List with response tibbles and params:
+#'   \itemize{
+#'     \item Dr2i: tibble (i, j, Dr2i) - structural change at site i due to mutation at site j
+#'     \item Dmsfi: tibble (i, j, Dmsfi) - dynamics change at site i due to mutation at site j
+#'     \item Dr2n: tibble (n, j, Dr2n) - structural change in mode n due to mutation at site j
+#'     \item Dmsfn: tibble (n, j, Dmsfn) - dynamics change in mode n due to mutation at site j
+#'     \item Dv_min: tibble (j, Dv_min) - minimum energy change due to mutation at site j
+#'     \item Dg_ent: tibble (j, Dg_ent) - entropic free energy change due to mutation at site j
+#'     \item Ddv_act: tibble (j, Ddv_act) - activation energy change due to mutation at site j
+#'     \item Ddg_ent_act: tibble (j, Ddg_ent_act) - activation entropy change due to mutation at site j
+#'     \item params: list with enm_param and mut_param
+#'   }
 #'
 #' @export
 mrs <- function(wt, nmut, mut_model = "lfenm", mut_dl_sigma = 0.3,
-                mut_sd_min = 2, responses = c("dr2ij"), seed = NULL) {
+                mut_sd_min = 2, seed = NULL) {
 
-  # Response categories
-  site_responses <- c("dr2ij", "dmsfij")
-  mode_responses <- c("dr2nj", "dmsfnj")
-  scalar_responses <- c("dv", "tds", "act_dv", "act_tds")
-  motion_responses <- c("dmsfij", "dmsfnj")
-  all_valid <- c(site_responses, mode_responses, scalar_responses)
-
-  # Validate responses
-  invalid <- setdiff(responses, all_valid)
-  if (length(invalid) > 0) {
-    stop("Invalid responses: ", paste(invalid, collapse = ", "),
-         "\nValid: ", paste(all_valid, collapse = ", "))
-  }
-
-  # Warn if motion requested with lfenm
-  requested_motion <- intersect(responses, motion_responses)
-  if (mut_model == "lfenm" && length(requested_motion) > 0) {
-    warning("Motion responses require mut_model='sclfenm'. Skipping: ",
-            paste(requested_motion, collapse = ", "))
-    responses <- setdiff(responses, motion_responses)
-  }
-
-  if (length(responses) == 0) {
-    stop("No valid responses to calculate")
+  # Warning for lfenm model
+  if (mut_model == "lfenm") {
+    warning("lfenm: dynamics unchanged, Dmsfi/Dmsfn/Dg_ent/Ddg_ent_act will be zero")
   }
 
   # Setup
@@ -51,93 +38,77 @@ mrs <- function(wt, nmut, mut_model = "lfenm", mut_dl_sigma = 0.3,
   sites <- get_site(wt)
   nmodes <- get_nmodes(wt)
 
-  # Identify which response types are requested
-  req_site <- intersect(responses, site_responses)
-  req_mode <- intersect(responses, mode_responses)
-  req_scalar <- intersect(responses, scalar_responses)
-
-  # Initialize accumulators
-  site_results <- lapply(req_site, function(r) matrix(0, nrow = nsites, ncol = nsites))
-  names(site_results) <- req_site
-
-  mode_results <- lapply(req_mode, function(r) matrix(0, nrow = nmodes, ncol = nsites))
-  names(mode_results) <- req_mode
-
-  scalar_results <- lapply(req_scalar, function(r) numeric(nsites))
-  names(scalar_results) <- req_scalar
+  # Initialize accumulators (matrices for site/mode responses, vectors for scalars)
+  Dr2i_mat <- matrix(0, nsites, nsites)
+  Dmsfi_mat <- matrix(0, nsites, nsites)
+  Dr2n_mat <- matrix(0, nmodes, nsites)
+  Dmsfn_mat <- matrix(0, nmodes, nsites)
+  Dv_min_vec <- numeric(nsites)
+  Dg_ent_vec <- numeric(nsites)
+  Ddv_act_vec <- numeric(nsites)
+  Ddg_ent_act_vec <- numeric(nsites)
 
   # Main loop: process and discard
   for (jj in seq_along(sites)) {
     j <- sites[jj]
 
-    # Accumulate over mutations at site j
-    site_accum <- lapply(req_site, function(r) matrix(0, nrow = nsites, ncol = nmut))
-    names(site_accum) <- req_site
-
-    mode_accum <- lapply(req_mode, function(r) matrix(0, nrow = nmodes, ncol = nmut))
-    names(mode_accum) <- req_mode
-
-    scalar_accum <- lapply(req_scalar, function(r) numeric(nmut))
-    names(scalar_accum) <- req_scalar
+    # Accumulators for mutations at site j
+    Dr2i_accum <- matrix(0, nsites, nmut)
+    Dmsfi_accum <- matrix(0, nsites, nmut)
+    Dr2n_accum <- matrix(0, nmodes, nmut)
+    Dmsfn_accum <- matrix(0, nmodes, nmut)
+    Dv_min_accum <- numeric(nmut)
+    Dg_ent_accum <- numeric(nmut)
+    Ddv_act_accum <- numeric(nmut)
+    Ddg_ent_act_accum <- numeric(nmut)
 
     for (m in seq_len(nmut)) {
       mut <- mutenm(wt, j, m, mut_model, mut_dl_sigma, mut_sd_min, seed)
 
       # Site responses
-      if ("dr2ij" %in% req_site) site_accum$dr2ij[, m] <- Dr2i(wt, mut)
-      if ("dmsfij" %in% req_site) site_accum$dmsfij[, m] <- Dmsfi(wt, mut)
+      Dr2i_accum[, m] <- Dr2i(wt, mut)
+      Dmsfi_accum[, m] <- Dmsfi(wt, mut)
 
       # Mode responses
-      if ("dr2nj" %in% req_mode) mode_accum$dr2nj[, m] <- Dr2n(wt, mut)
-      if ("dmsfnj" %in% req_mode) mode_accum$dmsfnj[, m] <- Dmsfn(wt, mut)
+      Dr2n_accum[, m] <- Dr2n(wt, mut)
+      Dmsfn_accum[, m] <- Dmsfn(wt, mut)
 
       # Scalar responses
-      if ("dv" %in% req_scalar) scalar_accum$dv[m] <- Dv_min(wt, mut)
-      if ("tds" %in% req_scalar) scalar_accum$tds[m] <- Dg_ent(wt, mut)
-      if ("act_dv" %in% req_scalar) scalar_accum$act_dv[m] <- Ddv_act(wt, mut)
-      if ("act_tds" %in% req_scalar) scalar_accum$act_tds[m] <- Ddg_ent_act(wt, mut)
+      Dv_min_accum[m] <- Dv_min(wt, mut)
+      Dg_ent_accum[m] <- Dg_ent(wt, mut)
+      Ddv_act_accum[m] <- Ddv_act(wt, mut)
+      Ddg_ent_act_accum[m] <- Ddg_ent_act(wt, mut)
 
       rm(mut)
     }
 
     # Average over mutations for site j
-    for (resp in req_site) site_results[[resp]][, jj] <- rowMeans(site_accum[[resp]])
-    for (resp in req_mode) mode_results[[resp]][, jj] <- rowMeans(mode_accum[[resp]])
-    for (resp in req_scalar) scalar_results[[resp]][jj] <- mean(scalar_accum[[resp]])
+    Dr2i_mat[, jj] <- rowMeans(Dr2i_accum)
+    Dmsfi_mat[, jj] <- rowMeans(Dmsfi_accum)
+    Dr2n_mat[, jj] <- rowMeans(Dr2n_accum)
+    Dmsfn_mat[, jj] <- rowMeans(Dmsfn_accum)
+    Dv_min_vec[jj] <- mean(Dv_min_accum)
+    Dg_ent_vec[jj] <- mean(Dg_ent_accum)
+    Ddv_act_vec[jj] <- mean(Ddv_act_accum)
+    Ddg_ent_act_vec[jj] <- mean(Ddg_ent_act_accum)
 
     if (jj %% 10 == 0) gc()
   }
 
-  # Convert to tibbles
-  output <- list()
-
-  for (resp in req_site) {
-    colnames(site_results[[resp]]) <- sites
-    output[[resp]] <- site_results[[resp]] %>%
-      as_tibble() %>%
-      mutate(i = sites) %>%
-      pivot_longer(-i, names_to = "j", values_to = resp) %>%
-      mutate(j = as.integer(j))
-  }
-
-  for (resp in req_mode) {
-    colnames(mode_results[[resp]]) <- sites
-    output[[resp]] <- mode_results[[resp]] %>%
-      as_tibble() %>%
-      mutate(n = seq_len(nmodes)) %>%
-      pivot_longer(-n, names_to = "j", values_to = resp) %>%
-      mutate(j = as.integer(j))
-  }
-
-  for (resp in req_scalar) {
-    output[[resp]] <- tibble(j = sites, !!resp := scalar_results[[resp]])
-  }
-
-  output$params <- list(
-    enm_param = get_enm_param(wt),
-    mut_param = list(nmut = nmut, mut_model = mut_model,
-                     mut_dl_sigma = mut_dl_sigma, mut_sd_min = mut_sd_min)
+  # Convert to tibbles and return
+  list(
+    Dr2i = matrix_to_tibble(Dr2i_mat, "i", "j", "Dr2i"),
+    Dmsfi = matrix_to_tibble(Dmsfi_mat, "i", "j", "Dmsfi"),
+    Dr2n = matrix_to_tibble(Dr2n_mat, "n", "j", "Dr2n"),
+    Dmsfn = matrix_to_tibble(Dmsfn_mat, "n", "j", "Dmsfn"),
+    Dv_min = tibble(j = sites, Dv_min = Dv_min_vec),
+    Dg_ent = tibble(j = sites, Dg_ent = Dg_ent_vec),
+    Ddv_act = tibble(j = sites, Ddv_act = Ddv_act_vec),
+    Ddg_ent_act = tibble(j = sites, Ddg_ent_act = Ddg_ent_act_vec),
+    params = list(
+      enm_param = get_enm_param(wt),
+      mut_param = list(nmut = nmut, mut_model = mut_model,
+                       mut_dl_sigma = mut_dl_sigma, mut_sd_min = mut_sd_min)
+    )
   )
-
-  output
 }
