@@ -20,7 +20,6 @@ Imports:
     pracma,
     bio3d,
     dplyr,
-    jefuns,
     magrittr,
     stats,
     tibble,

@@ -130,3 +130,14 @@ my_quad_form <- function(x,m,y) {
   ret <- crossprod(y,crossprod(m,x))
   as.numeric(ret)
 }
+
+#' Boltzmann's beta = 1 / RT
+#'
+#' @param R gas constant in kcal/(mol·K)
+#' @param T absolute temperature in Kelvin
+#'
+#' @returns 1 / (RT)
+#'
+#' @noRd
+#'
+beta_boltzmann <- function(R = 1.986e-3, T = 298) 1 / (R * T)

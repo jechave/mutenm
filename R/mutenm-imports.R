@@ -8,7 +8,6 @@
 #' @importFrom dplyr select near rename arrange
 #'
 #' @import bio3d
-#' @import jefuns
 #'
 #' @noRd
 #'
