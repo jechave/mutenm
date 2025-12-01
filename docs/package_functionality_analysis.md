@@ -1,198 +1,173 @@
-# mutenm Package Functionality Analysis
+# mutenm Package Overview
 
-This document provides a comprehensive analysis of what the mutenm package can do, based on examination of the source code.
-
----
-
-## 1. ENM Construction
-
-### `enm(pdb, node, model, d_max)`
-
-Creates a `prot` object containing the Elastic Network Model.
-
-**Parameters:**
-
-| Parameter | Type | Description | Values |
-|-----------|------|-------------|--------|
-| `pdb` | bio3d object | PDB structure from `bio3d::read.pdb()` | - |
-| `node` | character | Network node placement | `"ca"`, `"calpha"` (α-carbons), `"sc"`, `"side_chain"` (side chain centers), `"cb"`, `"beta"` (β-carbons) |
-| `model` | character | ENM model type | `"anm"`, `"ming_wall"`, `"pfanm"`, `"hnm"`, `"hnm0"`, `"reach"` |
-| `d_max` | numeric | Distance cutoff for contacts (Å) | Typical: 10.5 for Cα, 12.5 for side chains |
-
-**Output (`prot` object components):**
-
-| Component | Description |
-|-----------|-------------|
-| `param` | List: `node`, `model`, `d_max` |
-| `nodes` | List: `nsites`, `site` (sequential 1:N), `pdb_site` (PDB residue numbers), `bfactor`, `xyz` (coordinates) |
-| `graph` | Tibble: `edge`, `i`, `j`, `v0ij`, `sdij` (sequence distance), `lij` (equilibrium length), `kij` (spring constant), `dij` (actual distance) |
-| `eij` | Matrix (n_edges × 3): unit vectors along contacts |
-| `kmat` | Matrix (3N × 3N): Kirchhoff/Hessian matrix |
-| `nma` | List: `mode`, `evalue` (eigenvalues), `umat` (eigenvectors), `cmat` (covariance matrix) |
+The `mutenm` package builds Elastic Network Models (ENMs) from protein structures and simulates the effects of mutations using linear response theory. It provides tools to analyze how mutations at specific sites affect protein structure, dynamics, and energetics.
 
 ---
 
-## 2. Mutation Perturbation
+## Workflow
 
-### `mutenm(wt, site_mut, mutation, mut_model, mut_dl_sigma, mut_sd_min, seed)`
+A typical analysis has three steps:
 
-Core function for introducing mutations and calculating structural responses. (Called by `mrs()`, also exported for direct use.)
+1. **Build the ENM** from a PDB structure using `enm()`
+2. **Simulate mutations** using either:
+   - `mutenm()` for a single mutation at a specific site
+   - `mrs()` for scanning all sites at once (mutation response scanning)
+3. **Analyze the effects** using property functions (structure, dynamics, energy)
 
-**Parameters:**
+```
+PDB file
+    ↓
+enm(pdb, node, model, d_max) → prot object (wild-type ENM)
+    ↓
+    ├── mutenm(wt, site_mut, ...) → prot object (mutant)
+    │       ↓
+    │       Compare wt and mut using D-functions
+    │
+    └── mrs(wt, nmut, responses, ...) → response matrices for all sites
+```
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `wt` | prot | - | Wild-type protein object |
-| `site_mut` | integer | - | Site to mutate (sequential index, not PDB number) |
-| `mutation` | integer | 0 | Mutation index (0 = no mutation, returns wt) |
-| `mut_model` | character | `"lfenm"` | Mutation model: `"lfenm"` (fast, linear) or `"sclfenm"` (self-consistent, recalculates ENM) |
-| `mut_dl_sigma` | numeric | 0.3 | Standard deviation for edge length perturbations (Å) |
-| `mut_sd_min` | integer | 2 | Minimum sequence distance for edges to be perturbed |
-| `seed` | integer | 241956 | Random seed for reproducibility |
-
-**Mutation Models:**
-
-| Model | Description | Speed | Accuracy |
-|-------|-------------|-------|----------|
-| `lfenm` | Linear Force ENM - uses linear response approximation | Fast | Approximate |
-| `sclfenm` | Self-Consistent LFENM - recalculates full ENM after perturbation | Slow | More accurate |
-
-**How mutations work:**
-1. Edges connected to `site_mut` with sequence distance ≥ `mut_sd_min` are selected
-2. Each selected edge length is perturbed by `δl ~ N(0, mut_dl_sigma)`
-3. Forces are calculated: `f_ij = -k_ij × δl_ij`
-4. Structural response: `δr = C × f` (using covariance matrix)
+The `prot` object contains the protein's graph (nodes and edges), the Hessian matrix, and the results of normal mode analysis (eigenvalues, eigenvectors, covariance matrix).
 
 ---
 
-## 3. Mutation Response Scanning
+## Functions
 
-### `mrs(wt, nmut, mut_model, mut_dl_sigma, mut_sd_min, responses, seed)`
-
-Memory-efficient function for calculating mutation-response matrices. Uses process-and-discard approach: generates one mutant at a time, calculates responses, discards immediately.
-
-**Parameters:**
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `wt` | prot | - | Wild-type protein |
-| `nmut` | integer | - | Number of mutations per site to simulate |
-| `mut_model` | character | `"lfenm"` | Mutation model |
-| `mut_dl_sigma` | numeric | 0.3 | Perturbation magnitude (Å) |
-| `mut_sd_min` | integer | 2 | Minimum sequence distance |
-| `responses` | character | `"dr2ij"` | Vector of responses to calculate |
-| `seed` | integer | NULL | Random seed |
-
-**Available responses:**
-
-| Response | Type | Description | Requires |
-|----------|------|-------------|----------|
-| `dr2ij` | site matrix (N×N) | Squared displacement at site i due to mutation at j | lfenm or sclfenm |
-| `dr2nj` | mode matrix (M×N) | Squared displacement in mode n due to mutation at j | lfenm or sclfenm |
-| `dmsfij` | site matrix (N×N) | MSF change at site i due to mutation at j | sclfenm |
-| `dmsfnj` | mode matrix (M×N) | MSF change in mode n due to mutation at j | sclfenm |
-| `ddg_dv` | profile (N) | Minimum energy change for mutations at j | lfenm or sclfenm |
-| `ddg_tds` | profile (N) | Entropic free energy change for mutations at j | lfenm or sclfenm |
-| `Ddv_act` | profile (N) | Activation energy change (energy part) | lfenm or sclfenm |
-| `Ddg_ent_act` | profile (N) | Activation energy change (entropy part) | lfenm or sclfenm |
-
-**Returns:** List with:
-- Requested site matrices as tibbles: `i`, `j`, `<response>`
-- Requested mode matrices as tibbles: `n`, `j`, `<response>`
-- Requested scalar profiles as tibbles: `j`, `<response>`
-- `$params` — ENM and mutation parameters for reproducibility
-
----
-
-## 4. Pairwise Comparison Functions
-
-These functions compare a single wild-type/mutant pair. Used internally by `mrs()`.
-
-### 4.1 Structural comparisons
-
-| Function | Returns | Description |
-|----------|---------|-------------|
-| `Dr2i(wt, mut)` | vector[i] | Squared displacement per site |
-| `Dr2n(wt, mut)` | vector[n] | Squared displacement per mode |
-
-### 4.2 Motion comparisons
-
-| Function | Returns | Description |
-|----------|---------|-------------|
-| `Dmsfi(wt, mut)` | vector[i] | MSF change per site |
-| `Dmsfn(wt, mut)` | vector[n] | MSF change per mode |
-
----
-
-## 5. Energy Functions
-
-### 5.1 ENM energy calculations
+### Core (2 functions)
 
 | Function | Description |
 |----------|-------------|
-| `v_min(prot)` | Minimum (stress) energy of the ENM |
-| `g_ent(prot, beta)` | Entropic free energy contribution |
+| `enm(pdb, node, model, d_max)` | Build an ENM from a PDB structure. Returns a `prot` object. |
+| `mutenm(wt, site_mut, ...)` | Create a mutant by perturbing edges at a specific site. Returns a `prot` object. |
 
-### 5.2 Pairwise energy differences (ΔΔG)
+These are the core functions of the package: `enm()` builds the model, `mutenm()` simulates a mutation.
+
+#### Mutation Models
+
+The `mutenm()` function supports two mutation models:
+
+| Model | Description |
+|-------|-------------|
+| `lfenm` | Linear Force ENM — uses linear response to estimate structural change. Only coordinates are updated. |
+| `sclfenm` | Self-Consistent LFENM — recalculates the full ENM after perturbation (graph, Hessian, normal modes, covariance matrix). |
+
+Use `lfenm` for structural effects. Use `sclfenm` when you need dynamics or entropy changes.
+
+### Scanning (1 function)
 
 | Function | Description |
 |----------|-------------|
-| `Dv_min(wt, mut)` | Minimum energy difference |
-| `Dg_ent(wt, mut, beta)` | Entropic free energy difference |
+| `mrs(wt, nmut, responses, ...)` | Mutation Response Scanning — loops over all sites calling `mutenm()`, returns response matrices. |
 
-### 5.3 Activation energy functions (ΔΔG‡)
+### Single Protein (9 functions)
+
+Functions that take one `prot` object and return a property.
+
+#### Structure
 
 | Function | Description |
 |----------|-------------|
-| `dv_act(prot, ideal, pdb_site_active)` | Energy contribution to activation |
-| `dg_ent_act(prot, ideal, pdb_site_active, beta)` | Entropy contribution to activation |
-| `Ddv_act(wt, mut, ideal, pdb_site_active)` | Activation energy difference (energy part) |
-| `Ddg_ent_act(wt, mut, ideal, pdb_site_active, beta)` | Activation energy difference (entropy part) |
+| `cn(prot)` | Contact number (neighbors within cutoff) |
+| `wcn(prot)` | Weighted contact number (Σ 1/d²) |
+| `dactive(prot, pdb_site_active)` | Distance to active site |
+
+#### Dynamics
+
+| Function | Description |
+|----------|-------------|
+| `msfi(prot)` | Mean-square fluctuation at each site |
+| `msfn(prot)` | MSF contribution from each mode |
+
+#### Energy
+
+| Function | Description |
+|----------|-------------|
+| `v_min(prot)` | Minimum (stress) energy |
+| `g_ent(prot, beta)` | Entropic free energy |
+| `dv_act(prot, ideal, pdb_site_active)` | Activation energy (internal) |
+| `dg_ent_act(prot, ideal, pdb_site_active, beta)` | Activation entropy |
+
+### Pair Comparison (8 functions)
+
+Functions that compare wild-type and mutant: `Df(wt, mut)`.
+
+#### Structure
+
+| Function | Description |
+|----------|-------------|
+| `Dr2i(wt, mut)` | Squared displacement at each site |
+| `Dr2n(wt, mut)` | Squared displacement projected onto each mode |
+
+#### Dynamics
+
+| Function | Description |
+|----------|-------------|
+| `Dmsfi(wt, mut)` | Change in MSF at each site |
+| `Dmsfn(wt, mut)` | Change in MSF per mode |
+
+Note: `Dmsfi` and `Dmsfn` require the `sclfenm` mutation model (full ENM recalculation) to be meaningful.
+
+#### Energy
+
+| Function | Description |
+|----------|-------------|
+| `Dv_min(wt, mut)` | Change in minimum energy |
+| `Dg_ent(wt, mut, beta)` | Change in entropic free energy |
+| `Ddv_act(wt, mut, ...)` | Change in activation energy |
+| `Ddg_ent_act(wt, mut, ...)` | Change in activation entropy |
 
 ---
 
-## 6. Analysis Functions (Exported)
+## Key Equations
 
-### 6.1 Site profiles
+### Symbols
 
-| Function | Returns |
-|----------|---------|
-| `cn(prot)` | Contact number profile |
-| `wcn(prot)` | Weighted contact number profile |
-| `dactive(prot, pdb_site_active)` | Distance to active site profile |
-| `msfi(prot)` | Mean-square fluctuation per site |
-
-### 6.2 Mode profiles
-
-| Function | Returns |
-|----------|---------|
-| `msfn(prot)` | MSF per mode (1/λ) |
-
----
-
-## 7. Key Equations
+| Symbol | Description |
+|--------|-------------|
+| `C` | Covariance matrix (3N × 3N) — encodes thermal fluctuations |
+| `k_ij` | Spring constant for edge between sites i and j |
+| `d_ij` | Current distance between sites i and j |
+| `l_ij` | Equilibrium (rest) length of edge i-j |
+| `ê_ij` | Unit vector along edge i-j |
+| `δl_ij` | Perturbation to edge length (mutation effect) |
+| `v0_ij` | Baseline energy of edge i-j |
 
 ### Linear Response
+
+The structural response to a mutation is computed using linear response theory:
+
 ```
 δr = C × f
 ```
-where `C` is the covariance matrix, `f` is the force vector from edge perturbations.
 
-### Force from perturbation
+where `C` is the covariance matrix and `f` is the force vector from edge perturbations.
+
+### Force from Perturbation
+
+When an edge length is perturbed by `δl_ij`, it generates a force:
+
 ```
 f_ij = -k_ij × δl_ij × ê_ij
 ```
 
-### Minimum energy
+### Minimum Energy
+
+The total energy of the ENM at the current conformation:
+
 ```
 V_min = Σ v0_ij + ½ Σ k_ij × (d_ij - l_ij)²
 ```
 
-### Stress energy
+### Stress Energy
+
+The energy cost to deform the active site to an ideal conformation:
+
 ```
 V_s = ½ Σ k_ij × (d_ij^ideal - l_ij)²
 ```
 
 ---
 
-*Generated for mutenm package development reference*
+## See Also
+
+- Run `?enm`, `?mutenm`, `?mrs` in R for detailed function documentation
+- `function_grouping.md` — rationale for function organization
