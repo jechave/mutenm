@@ -175,7 +175,7 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 | `get_enm_param(prot)` | `prot$param` | mrs |
 | `get_enm_node(prot)` | `prot$param$node` | set_enm_nodes |
 | `get_enm_model(prot)` | `prot$param$model` | set_enm_graph |
-| `get_d_max(prot)` | `prot$param$d_max` | set_enm_graph, get_cn |
+| `get_d_max(prot)` | `prot$param$d_max` | set_enm_graph, cn |
 | `get_nsites(prot)` | `prot$nodes$nsites` | Throughout |
 | `get_site(prot)` | `prot$nodes$site` | mrs |
 | `get_pdb_site(prot)` | `prot$nodes$pdb_site` | active_site_indexes |
@@ -196,9 +196,9 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 
 | Function | Depends On | Returns |
 |----------|------------|---------|
-| `get_cn(prot)` | `cn_xyz()`, `get_xyz()`, `get_d_max()` | Contact number profile |
-| `get_wcn(prot)` | `wcn_xyz()`, `get_xyz()` | Weighted contact number |
-| `get_dactive(prot, sites)` | `dactive.xyz()`, `active_site_indexes()` | Distance to active site |
+| `cn(prot)` | `cn_xyz()`, `get_xyz()`, `get_d_max()` | Contact number profile |
+| `wcn(prot)` | `wcn_xyz()`, `get_xyz()` | Weighted contact number |
+| `dactive(prot, sites)` | `dactive.xyz()`, `active_site_indexes()` | Distance to active site |
 | `msfi(prot)` | `get_reduced_cmat()` | Mean-square fluctuation per site |
 | `msfn(prot)` | `get_evalue()` | MSF per mode (1/λ) |
 | `get_mlms(prot, sdij_cut)` | `get_graph()` | Mean local mutational stress |
@@ -210,10 +210,10 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 | Function | Used By |
 |----------|---------|
 | `my_as_xyz(r)` | Throughout (converts vector to 3×N matrix) |
-| `wcn_xyz(xyz)` | `get_wcn()` |
-| `cn_xyz(xyz, d_max)` | `get_cn()` |
+| `wcn_xyz(xyz)` | `wcn()` |
+| `cn_xyz(xyz, d_max)` | `cn()` |
 | `reduce_matrix(m)` | `get_reduced_cmat()` |
-| `dactive.xyz(xyz, site_active)` | `get_dactive()` |
+| `dactive.xyz(xyz, site_active)` | `dactive()` |
 | `xyz_indices_site(site)` | `active_site_indexes()` |
 | `my_quad_form(x, m, y)` | `dv_act()` |
 
@@ -257,7 +257,7 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 |------|---------|---------|
 | `enm.R` | ENM construction | `enm` |
 | `enm_getters.R` | Access prot components | (internal) |
-| `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `msfi`, `msfn`, `get_mlms` |
+| `enm_analysis.R` | Derived properties | `cn`, `wcn`, `dactive`, `msfi`, `msfn`, `get_mlms` |
 | `enm_energy.R` | ENM energies | `v_min`, `g_ent` |
 | `enm_energy_activation.R` | Activation energies | `dv_act`, `dg_ent_act` |
 | `enm_utils_nodes.R` | Node coordinate calculation | (internal) |

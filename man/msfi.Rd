@@ -17,9 +17,9 @@ Calculates the mean-square-fluctuation of each site
 }
 \seealso{
 Other site profiles: 
-\code{\link{get_cn}()},
-\code{\link{get_dactive}()},
+\code{\link{cn}()},
+\code{\link{dactive}()},
 \code{\link{get_mlms}()},
-\code{\link{get_wcn}()}
+\code{\link{wcn}()}
 }
 \concept{site profiles}

@@ -15,7 +15,7 @@
 #' @family site profiles
 #'
 #'
-get_cn <- function(prot) cn_xyz(get_xyz(prot), get_d_max(prot))
+cn <- function(prot) cn_xyz(get_xyz(prot), get_d_max(prot))
 
 #' Calculate WCN site-dependent profile
 #'
@@ -28,7 +28,7 @@ get_cn <- function(prot) cn_xyz(get_xyz(prot), get_d_max(prot))
 #'
 #' @family site profiles
 #'
-get_wcn <- function(prot) wcn_xyz(get_xyz(prot))
+wcn <- function(prot) wcn_xyz(get_xyz(prot))
 
 
 #' Calculate distance to active site
@@ -44,7 +44,7 @@ get_wcn <- function(prot) wcn_xyz(get_xyz(prot))
 #'
 #' @family site profiles
 #'
-get_dactive <- function(prot, pdb_site_active) {
+dactive <- function(prot, pdb_site_active) {
   xyz <- get_xyz(prot)
   asite <- active_site_indexes(prot, pdb_site_active)
   site_active <- asite$site_active

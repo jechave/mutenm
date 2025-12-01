@@ -157,9 +157,9 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 
 | Function | Returns |
 |----------|---------|
-| `get_cn(prot)` | Contact number profile |
-| `get_wcn(prot)` | Weighted contact number profile |
-| `get_dactive(prot, pdb_site_active)` | Distance to active site profile |
+| `cn(prot)` | Contact number profile |
+| `wcn(prot)` | Weighted contact number profile |
+| `dactive(prot, pdb_site_active)` | Distance to active site profile |
 | `msfi(prot)` | Mean-square fluctuation per site |
 | `get_mlms(prot, sdij_cut)` | Mean local mutational stress profile |
 
