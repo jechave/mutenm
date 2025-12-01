@@ -23,7 +23,7 @@ enm(pdb, node, model, d_max) → prot object (wild-type ENM)
     │       ↓
     │       Compare wt and mut using D-functions
     │
-    └── mrs(wt, nmut, responses, ...) → response matrices for all sites
+    └── mrs(wt, nmut, ...) → response tibbles
 ```
 
 The `prot` object contains the protein's graph (nodes and edges), the Hessian matrix, and the results of normal mode analysis (eigenvalues, eigenvectors, covariance matrix).
@@ -56,7 +56,7 @@ Use `lfenm` for structural effects. Use `sclfenm` when you need dynamics or entr
 
 | Function | Description |
 |----------|-------------|
-| `mrs(wt, nmut, responses, ...)` | Mutation Response Scanning — loops over all sites calling `mutenm()`, returns response matrices. |
+| `mrs(wt, nmut, ...)` | Mutation Response Scanning — loops over all sites, averages over nmut mutations per site, returns response tibbles. |
 
 ### Single Protein (9 functions)
 
