@@ -201,7 +201,6 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 | `dactive(prot, sites)` | `dactive.xyz()`, `active_site_indexes()` | Distance to active site |
 | `msfi(prot)` | `get_reduced_cmat()` | Mean-square fluctuation per site |
 | `msfn(prot)` | `get_evalue()` | MSF per mode (1/λ) |
-| `get_mlms(prot, sdij_cut)` | `get_graph()` | Mean local mutational stress |
 
 ---
 
@@ -257,7 +256,7 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 |------|---------|---------|
 | `enm.R` | ENM construction | `enm` |
 | `enm_getters.R` | Access prot components | (internal) |
-| `enm_analysis.R` | Derived properties | `cn`, `wcn`, `dactive`, `msfi`, `msfn`, `get_mlms` |
+| `enm_analysis.R` | Derived properties | `cn`, `wcn`, `dactive`, `msfi`, `msfn` |
 | `enm_energy.R` | ENM energies | `v_min`, `g_ent` |
 | `enm_energy_activation.R` | Activation energies | `dv_act`, `dg_ent_act` |
 | `enm_utils_nodes.R` | Node coordinate calculation | (internal) |

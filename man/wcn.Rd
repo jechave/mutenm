@@ -19,7 +19,6 @@ Calculates the Weighted Contact Number (WCN) of each site
 Other site profiles: 
 \code{\link{cn}()},
 \code{\link{dactive}()},
-\code{\link{get_mlms}()},
 \code{\link{msfi}()}
 }
 \concept{site profiles}

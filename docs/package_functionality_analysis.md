@@ -161,7 +161,6 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 | `wcn(prot)` | Weighted contact number profile |
 | `dactive(prot, pdb_site_active)` | Distance to active site profile |
 | `msfi(prot)` | Mean-square fluctuation per site |
-| `get_mlms(prot, sdij_cut)` | Mean local mutational stress profile |
 
 ### 6.2 Mode profiles
 

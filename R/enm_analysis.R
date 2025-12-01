@@ -74,36 +74,6 @@ msfi <- function(prot) {
 
 
 
-#' Calculate MLMS site-dependent profile
-#'
-#' Calculates the Mean Local Mutational Stress (MLMS) profile using graph of prot object
-#'
-#' @param prot is a protein object obtained using enm()
-#' @param sdij_cut An integer cutoff of sequence distance to include in calculation
-#' @returns the profile of mean-local-mutational-stress (mlms) values
-#'
-#' @export
-#'
-#'
-#' @family site profiles
-#'
-get_mlms <- function(prot, sdij_cut = 2) {
-  g1 <- get_graph(prot)
-  g2 <- g1 %>%
-    select(edge, j, i, v0ij, sdij, lij, kij, dij)
-  names(g2) <- names(g1)
-  g <- rbind(g1, g2)
-
-  g <- g %>%
-    filter(sdij >= sdij_cut) %>%
-    group_by(i) %>%
-    summarise(mlms = sum(kij))  %>%
-    select(mlms)
-
-  as.vector(g$mlms)
-
-}
-
 
 
 

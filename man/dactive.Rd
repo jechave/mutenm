@@ -20,7 +20,6 @@ Calculates the distance from each site to the closest active residue
 \seealso{
 Other site profiles: 
 \code{\link{cn}()},
-\code{\link{get_mlms}()},
 \code{\link{msfi}()},
 \code{\link{wcn}()}
 }
