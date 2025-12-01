@@ -168,26 +168,19 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 
 ---
 
-## 4. Getter Functions
-
-### 4.1 Exported Getters (enm_getters.R)
+## 4. Internal Getters (enm_getters.R)
 
 | Getter | Returns | Used By |
 |--------|---------|---------|
 | `get_enm_param(prot)` | `prot$param` | mrs |
+| `get_enm_node(prot)` | `prot$param$node` | set_enm_nodes |
+| `get_enm_model(prot)` | `prot$param$model` | set_enm_graph |
+| `get_d_max(prot)` | `prot$param$d_max` | set_enm_graph, get_cn |
 | `get_nsites(prot)` | `prot$nodes$nsites` | Throughout |
 | `get_site(prot)` | `prot$nodes$site` | mrs |
 | `get_pdb_site(prot)` | `prot$nodes$pdb_site` | active_site_indexes |
 | `get_bfactor(prot)` | `prot$nodes$bfactor` | - |
 | `get_xyz(prot)` | `prot$nodes$xyz` | Multiple |
-
-### 4.2 Internal Getters (enm_getters.R)
-
-| Getter | Returns | Used By |
-|--------|---------|---------|
-| `get_enm_node(prot)` | `prot$param$node` | set_enm_nodes |
-| `get_enm_model(prot)` | `prot$param$model` | set_enm_graph |
-| `get_d_max(prot)` | `prot$param$d_max` | set_enm_graph, get_cn |
 | `get_graph(prot)` | `prot$graph` | mutenm.R, enm_analysis.R |
 | `get_eij(prot)` | `prot$eij` | mutenm.R |
 | `get_kmat(prot)` | `prot$kmat` | delta functions |
@@ -263,7 +256,7 @@ Ddg_ent_act(wt, mut)          → dg_ent_act(mut) - dg_ent_act(wt)
 | File | Purpose | Exports |
 |------|---------|---------|
 | `enm.R` | ENM construction | `enm` |
-| `enm_getters.R` | Access prot components | `get_enm_param`, `get_nsites`, `get_site`, `get_pdb_site`, `get_bfactor`, `get_xyz` |
+| `enm_getters.R` | Access prot components | (internal) |
 | `enm_analysis.R` | Derived properties | `get_cn`, `get_wcn`, `get_dactive`, `msfi`, `msfn`, `get_mlms` |
 | `enm_energy.R` | ENM energies | `v_min`, `g_ent` |
 | `enm_energy_activation.R` | Activation energies | `dv_act`, `dg_ent_act` |

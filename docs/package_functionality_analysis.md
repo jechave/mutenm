@@ -151,24 +151,9 @@ These functions compare a single wild-type/mutant pair. Used internally by `mrs(
 
 ---
 
-## 6. Getter Functions (Exported)
+## 6. Analysis Functions (Exported)
 
-Functions to access `prot` object components:
-
-| Getter | Returns |
-|--------|---------|
-| `get_enm_param(prot)` | List of ENM parameters (node, model, d_max) |
-| `get_nsites(prot)` | Number of sites (ENM nodes) |
-| `get_site(prot)` | Site indexes (1 to nsites) |
-| `get_pdb_site(prot)` | PDB residue numbers |
-| `get_bfactor(prot)` | B-factors from X-ray file |
-| `get_xyz(prot)` | 3N vector of xyz coordinates |
-
----
-
-## 7. Analysis Functions (Exported)
-
-### 7.1 Site profiles
+### 6.1 Site profiles
 
 | Function | Returns |
 |----------|---------|
@@ -178,7 +163,7 @@ Functions to access `prot` object components:
 | `msfi(prot)` | Mean-square fluctuation per site |
 | `get_mlms(prot, sdij_cut)` | Mean local mutational stress profile |
 
-### 7.2 Mode profiles
+### 6.2 Mode profiles
 
 | Function | Returns |
 |----------|---------|
@@ -186,7 +171,7 @@ Functions to access `prot` object components:
 
 ---
 
-## 8. Key Equations
+## 7. Key Equations
 
 ### Linear Response
 ```

@@ -1,33 +1,16 @@
 # Functions to query prot object -------------------------------------------------------
 
 
-#' Get various properties of a prot object
+
+#' Get ENM parameters
 #'
-#' @param prot A protein with its associated ENM model, obtained using `enm()`
-#'
-#' @name get_prot_property
-#'
-NULL
-
-
-
-
-
-
-#' @rdname get_prot_property
-#'
-#' @return \code{get_enm_param}: list of ENM parameters
-#'
-#' @export
+#' @noRd
 #'
 get_enm_param <- function(prot) prot$param
 
 
 
-#' @rdname get_prot_property
-#'
-#'
-#' @return \code{get_enm_node}: ENM node type ("ca" or "sc")
+#' Get ENM node type
 #'
 #' @noRd
 #'
@@ -56,52 +39,36 @@ get_enm_model <- function(prot)  prot$param$model
 get_d_max <- function(prot) prot$param$d_max
 
 
-#' @rdname get_prot_property
+#' Get number of sites
 #'
-#'
-#' @return \code{get_nsites}: number of sites (ENM nodes)
-#'
-#' @export
+#' @noRd
 #'
 get_nsites <- function(prot) prot$nodes$nsites
 
 
-#' @rdname get_prot_property
+#' Get site indexes
 #'
-#'
-#' @return \code{get_site}: site indexes, from `1` to `nsites`
-#'
-#' @export
+#' @noRd
 #'
 get_site  <- function(prot) prot$nodes$site
 
 
-#' @rdname get_prot_property
+#' Get PDB site indexes
 #'
-#'
-#' @return \code{get_pdb_site}: site indexes, pdb numeration (resno)
-#'
-#' @export
+#' @noRd
 #'
 get_pdb_site <- function(prot) prot$nodes$pdb_site
 
-#' @rdname get_prot_property
+#' Get B-factors
 #'
-#'
-#' @return \code{get_bfactor}: B-factors of the X-ray file for the ENM nodes
-#'
-#' @export
+#' @noRd
 #'
 get_bfactor <- function(prot) prot$nodes$bfactor
 
-#' @rdname get_prot_property
+#' Get xyz coordinates
 #'
+#' @noRd
 #'
-#' @return \code{get_xyz}: A 3*N vector of xyz coordinates of the N ENM nodes
-#'
-#' @export
-#'
-
 get_xyz <- function(prot)  prot$nodes$xyz
 
 
