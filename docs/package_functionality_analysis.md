@@ -184,20 +184,6 @@ Functions to access `prot` object components:
 |----------|---------|
 | `msfn(prot)` | MSF per mode (1/λ) |
 
-### 7.3 Site-by-site matrices
-
-| Function | Returns |
-|----------|---------|
-| `get_rho_matrix(prot)` | Correlation matrix (normalized cmat) |
-| `get_reduced_cmat(prot)` | N×N covariance matrix |
-| `get_reduced_kmat(prot)` | N×N Kirchhoff matrix |
-
-### 7.4 Site-by-mode matrices
-
-| Function | Returns |
-|----------|---------|
-| `get_umat2(prot)` | |u_i,n|² matrix |
-
 ---
 
 ## 8. Key Equations

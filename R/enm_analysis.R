@@ -126,88 +126,17 @@ msfn <-  function(prot) 1 / get_evalue(prot)
 
 
 
-# get site by site matrices -----------------------------------------------
-
-
-#' Calculate rho matrix
-#'
-#' Calculates the reduced correlation matrix (size nsites x nsites, diag(rho) = 1)
-#'
-#' @param prot is a protein object obtained using enm()
-#' @returns a matrix of size nsites x nsites with rho(i,j) = cmat(i,j)/sqrt(cmat(i,i) * cmat(j,j))
-#'
-#' @export
-#'
-#'
-#' @family site-by-site matrices
-#'
-get_rho_matrix <- function(prot) {
-  cmat <- get_reduced_cmat(prot)
-  t(cmat / sqrt(diag(cmat))) / sqrt(diag(cmat))
-}
+# internal helper -----------------------------------------------
 
 #' Calculate reduced covariance matrix
 #'
-#' Calculates the reduced covariance matrix (size nsites x nsites)
-#'
-#' @param prot is a protein object obtained using enm()
-#' @returns a matrix of size nsites x nsites with \eqn{c_{ij} = < d\mathbf{r}_i . d\mathbf{r}_j >}
-#'
-#' @export
-#'
-#'
-#' @family site-by-site matrices
+#' @noRd
 #'
 get_reduced_cmat <- function(prot) {
   get_cmat(prot) %>%
     reduce_matrix()
 }
 
-#' Calculate reduced ENM K matrix
-#'
-#' Calculates the reduced K matrix (size nsites x nsites)
-#'
-#' @param prot is a protein object obtained using enm()
-#' @returns a matrix of size nsites x nsites \eqn{K_{ij} = Tr(\mathbf{K}_{ij})}
-#'
-#' @export
-#'
-#'
-#' @family site-by-site matrices
-#'
-get_reduced_kmat <- function(prot) {
-  get_kmat(prot) %>%
-    reduce_matrix()
-}
-
-
-
-
-
-# site by mode matrices ---------------------------------------------------
-
-
-
-
-
-#' Calculate Reduced \code{umat^2}
-#'
-#'Calculates a matrix of size nsites x nmodes. Element umat2(i,n) is the contribution of site i to mode n (amplitude squared, added over x,y,z)
-#'
-#' @param prot is a protein object obtained using enm()
-#' @returns a matrix of size nsites x nmodes with contribution of each site to each mode.
-#'
-#' @export
-#'
-#'
-#' @family site-by-mode matrices
-#'
-get_umat2 <- function(prot) {
-  umat2 <- get_umat(prot)^2
-  dim(umat2) <- c(3, nrow(umat2) / 3, ncol(umat2))
-  umat2 <- apply(umat2, c(2, 3), sum)
-  umat2
-}
 
 
 
