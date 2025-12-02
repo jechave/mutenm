@@ -50,6 +50,13 @@ vignettes/*.pdf
 
 .DS_Store
 
+# Generated PDF manuals
+*.pdf
+
+# Claude Code working directory and instructions
+.claude/
+CLAUDE.md
+
 # End of https://www.gitignore.io/api/r
 
 
