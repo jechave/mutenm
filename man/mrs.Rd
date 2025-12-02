@@ -10,12 +10,11 @@ mrs(
   mut_model = "lfenm",
   mut_dl_sigma = 0.3,
   mut_sd_min = 2,
-  responses = c("dr2ij"),
   seed = NULL
 )
 }
 \arguments{
-\item{wt}{Wild-type protein object from enm()}
+\item{wt}{Wild-type protein object created by [enm()]}
 
 \item{nmut}{Number of mutations per site}
 
@@ -25,14 +24,47 @@ mrs(
 
 \item{mut_sd_min}{Minimum sequence distance of contacts to perturb}
 
-\item{responses}{Character vector of responses to calculate}
-
 \item{seed}{Random seed for reproducibility}
 }
 \value{
-List with requested response tibbles and params
+List with response tibbles and params:
+  \itemize{
+    \item Dr2i: tibble (i, j, Dr2i) - structural change at site i due to mutation at site j
+    \item Dmsfi: tibble (i, j, Dmsfi) - dynamics change at site i due to mutation at site j
+    \item Dr2n: tibble (n, j, Dr2n) - structural change in mode n due to mutation at site j
+    \item Dmsfn: tibble (n, j, Dmsfn) - dynamics change in mode n due to mutation at site j
+    \item Dv_min: tibble (j, Dv_min) - minimum energy change due to mutation at site j
+    \item Dg_ent: tibble (j, Dg_ent) - entropic free energy change due to mutation at site j
+    \item Ddv_act: tibble (j, Ddv_act) - activation energy change due to mutation at site j
+    \item Ddg_ent_act: tibble (j, Ddg_ent_act) - activation entropy change due to mutation at site j
+    \item params: list with enm_param and mut_param
+  }
 }
 \description{
-Calculate mutation response matrices using process-and-discard approach.
-Memory efficient: generates one mutant at a time, calculates responses, discards.
+Systematically scans all sites, simulating mutations and calculating response
+properties for each.
 }
+\details{
+Mutation Response Scanning (MRS) applies \code{\link{mutenm}} to every site
+in the protein, generating \code{nmut} random mutations per site and averaging
+the responses. This produces response tibbles that characterize how mutations
+at each site affect the protein's structure, dynamics, and energetics.
+
+\subsection{Why multiple mutations per site?}{
+Each call to \code{mutenm} generates random perturbations to spring lengths.
+By simulating \code{nmut} independent mutations at each site and averaging,
+we obtain more robust estimates of the typical mutation response at that site.
+}
+
+\subsection{Memory efficiency}{
+Uses a process-and-discard approach: each mutant is generated, analyzed, then
+discarded before creating the next. This keeps memory usage constant regardless
+of protein size.
+}
+}
+\seealso{
+Other core functions: 
+\code{\link{enm}()},
+\code{\link{mutenm}()}
+}
+\concept{core functions}

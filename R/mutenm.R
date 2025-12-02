@@ -1,8 +1,38 @@
 #' Mutate an Elastic Network Model
 #'
-#' Generates a single-point mutant of a protein ENM by perturbing contacts at a specified site.
+#' Generates a single-point mutant of a protein ENM by perturbing contacts at
+#' a specified site.
 #'
-#' @param wt The protein \code{prot} to mutate
+#' @details
+#' Mutations are simulated by perturbing the equilibrium lengths of springs
+#' connected to the mutated site. The perturbations are drawn from a normal
+#' distribution with mean 0 and standard deviation \code{mut_dl_sigma}.
+#'
+#' \subsection{Mutation models}{
+#' \itemize{
+#'   \item \code{"lfenm"} (Linear Force ENM): Fast approximation. Calculates the
+#'     new equilibrium structure using linear response theory, but keeps the
+#'     original normal modes. Dynamics-related properties (Dmsfi, Dmsfn, Dg_ent)
+#'     will be zero.
+#'   \item \code{"sclfenm"} (Self-Consistent LFENM): After calculating the new
+#'     structure, rebuilds the ENM and recalculates normal modes. Slower but
+#'     captures changes in dynamics.
+#' }
+#' }
+#'
+#' \subsection{Reproducibility}{
+#' The random seed for perturbations is set to \code{seed + site_mut * mutation},
+#' ensuring that each site/mutation combination produces consistent results
+#' across runs while different mutations at the same site are independent.
+#' }
+#'
+#' \subsection{Sequence distance filter}{
+#' Only contacts with sequence distance >= \code{mut_sd_min} are perturbed.
+#' This excludes local backbone contacts (i, i+1) which are less affected by
+#' side chain mutations.
+#' }
+#'
+#' @inheritParams mutenm-params
 #' @param site_mut The site to mutate (not the pdb_site, but sequential)
 #' @param mutation An integer (required). If 0, returns \code{wt} unchanged (with warning). Used with seed to generate reproducible random perturbations.
 #' @param mut_model A string specifying mutational model ("lfenm" or "sclfenm")
@@ -12,6 +42,8 @@
 #'
 #' @return A mutated protein object
 #'
+#' @family core functions
+#'
 #' @export
 #'
 #' @examples
@@ -20,8 +52,6 @@
 #' wt <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
 #' mut <- mutenm(wt, site_mut = 11, mutation = 1, mut_model = "lfenm", seed = 1024)
 #' }
-#'
-#' @family enm mutating functions
 #'
 mutenm <- function(wt, site_mut, mutation, mut_model = "lfenm", mut_dl_sigma = .3, mut_sd_min = 2, seed = 241956) {
 

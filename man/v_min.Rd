@@ -2,24 +2,29 @@
 % Please edit documentation in R/single_protein.R
 \name{v_min}
 \alias{v_min}
-\title{Calculate minimum energy of a given prot object}
+\title{Minimum Energy}
 \usage{
 v_min(prot)
 }
 \arguments{
-\item{prot}{is a prot object, wit a component graph tibble
-where v0ij, kij, lij and the dij for the minimum conformation are found.}
+\item{prot}{A protein object created by [enm()]}
 }
 \value{
-a scalar: the energy at the minimum-enegy conformation
+a scalar energy value
 }
 \description{
-Calculate minimum energy of a given prot object
+Calculates the minimum (stress) energy of the protein at its current
+conformation.
 }
 \seealso{
-Other enm_energy: 
+Other single-protein functions: 
+\code{\link{cn}()},
+\code{\link{dactive}()},
 \code{\link{dg_ent_act}()},
 \code{\link{dv_act}()},
-\code{\link{g_ent}()}
+\code{\link{g_ent}()},
+\code{\link{msfi}()},
+\code{\link{msfn}()},
+\code{\link{wcn}()}
 }
-\concept{enm_energy}
+\concept{single-protein functions}

@@ -2,14 +2,48 @@
 % Please edit documentation in R/mutenm-package.R
 \docType{package}
 \name{mutenm-package}
-\alias{mutenm}
-\alias{mutenm-package}
 \title{mutenm: Mutate Elastic Network Models of Proteins}
 \description{
-Build elastic network models (ENMs) of proteins and calculate mutation-response matrices using the linear-force ENM (LFENM) perturbation model. Provides tools for analyzing how mutations propagate structural effects through proteins.
+Build elastic network models (ENMs) of proteins and simulate mutation effects
+using linear response theory.
 }
 \details{
-The \code{mutenm} package builds elastic network models (ENMs) of proteins
- and calculates mutation-response matrices using the linear-force ENM (LFENM)
- perturbation model.
+\subsection{Workflow}{
+A typical analysis has three steps:
+\enumerate{
+  \item Build the ENM from a PDB structure using \code{\link{enm}}
+  \item Simulate mutations using \code{\link{mutenm}} for a single mutation,
+        or \code{\link{mrs}} for scanning all sites
+  \item Analyze the effects using property functions
+}
+}
+
+\subsection{Core functions}{
+\itemize{
+  \item \code{\link{enm}}: Build an elastic network model from a PDB structure
+  \item \code{\link{mutenm}}: Simulate a mutation at a specific site
+  \item \code{\link{mrs}}: Mutation Response Scanning - scan all sites
+}
+}
+
+\subsection{Single-protein properties}{
+Functions that calculate properties of one protein:
+\itemize{
+  \item Structure: \code{\link{cn}}, \code{\link{wcn}}, \code{\link{dactive}}
+  \item Dynamics: \code{\link{msfi}}, \code{\link{msfn}}
+  \item Energy: \code{\link{v_min}}, \code{\link{g_ent}}, \code{\link{dv_act}},
+        \code{\link{dg_ent_act}}
+}
+}
+
+\subsection{Mutation effects (pair comparison)}{
+Functions that compare wild-type and mutant. The \code{D} prefix stands for
+"delta" (change):
+\itemize{
+  \item Structure: \code{\link{Dr2i}}, \code{\link{Dr2n}}
+  \item Dynamics: \code{\link{Dmsfi}}, \code{\link{Dmsfn}}
+  \item Energy: \code{\link{Dv_min}}, \code{\link{Dg_ent}}, \code{\link{Ddv_act}},
+        \code{\link{Ddg_ent_act}}
+}
+}
 }

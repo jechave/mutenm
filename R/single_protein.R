@@ -4,47 +4,42 @@
 
 # Structure ---------------------------------------------------------------
 
-#' Calculate CN site-dependent profile
+#' Contact Number
 #'
-#' Calculates the Contact Number (CN) of each site
+#' Calculates the Contact Number (CN) of each site - the number of neighbors
+#' within the cutoff distance.
 #'
-#' @param prot is a protein object obtained using enm()
+#' @inheritParams mutenm-params
 #' @returns a vector of size nsites with cn values for each site
 #'
+#' @family single-protein functions
+#'
 #' @export
-#'
-#' @family site profiles
-#'
-#'
 cn <- function(prot) cn_xyz(get_xyz(prot), get_d_max(prot))
 
-#' Calculate WCN site-dependent profile
+#' Weighted Contact Number
 #'
-#' Calculates the Weighted Contact Number (WCN) of each site
+#' Calculates the Weighted Contact Number (WCN) of each site - the sum of 1/d²
+#' for all pairs.
 #'
-#' @param prot is a protein object obtained using enm()
+#' @inheritParams mutenm-params
 #' @returns a vector of size nsites with wcn values for each site
 #'
+#' @family single-protein functions
+#'
 #' @export
-#'
-#' @family site profiles
-#'
 wcn <- function(prot) wcn_xyz(get_xyz(prot))
 
-
-#' Calculate distance to active site
+#' Distance to Active Site
 #'
-#' Calculates the distance from each site to the closest active residue
+#' Calculates the distance from each site to the closest active site residue.
 #'
-#' @param prot is a protein object obtained using enm()
-#' @param pdb_site_active is a vector of pdb resno of active residues.
-#'
+#' @inheritParams mutenm-params
 #' @returns a vector of size nsites with dactive values for each site
 #'
+#' @family single-protein functions
+#'
 #' @export
-#'
-#' @family site profiles
-#'
 dactive <- function(prot, pdb_site_active) {
   xyz <- get_xyz(prot)
   asite <- active_site_indexes(prot, pdb_site_active)
@@ -56,48 +51,48 @@ dactive <- function(prot, pdb_site_active) {
 
 # Dynamics ----------------------------------------------------------------
 
-#' Calculate MSF site-dependent profile
+#' Mean-Square Fluctuation per Site
 #'
-#' Calculates the mean-square-fluctuation of each site
+#' Calculates the mean-square fluctuation of each site (diagonal of the
+#' reduced covariance matrix).
 #'
-#' @param prot is a protein object obtained using enm()
+#' @inheritParams mutenm-params
 #' @returns a vector of size nsites with msf values for each site
 #'
+#' @family single-protein functions
+#'
 #' @export
-#'
-#'
-#' @family site profiles
-#'
 msfi <- function(prot) {
   diag(get_reduced_cmat(prot))
 }
 
-
-#' Calculate MSF mode-dependent profile
+#' Mean-Square Fluctuation per Mode
 #'
-#' Calculates the mean-square-fluctuation in the direction of each normal mode
+#' Calculates the mean-square fluctuation contribution from each normal mode
+#' (1/eigenvalue).
 #'
-#' @param prot is a protein object obtained using enm()
-#' @returns a vector of size nsites with msf values for each mode
+#' @inheritParams mutenm-params
+#' @returns a vector of size nmodes with msf values for each mode
+#'
+#' @family single-protein functions
 #'
 #' @export
-#'
-#'
-#' @family mode profiles
-#'
-msfn <-  function(prot) 1 / get_evalue(prot)
+msfn <- function(prot) 1 / get_evalue(prot)
 
 
 # Energy ------------------------------------------------------------------
 
-#' Calculate minimum energy of a given prot object
-#' @param prot is a prot object, wit a component graph tibble
-#' where v0ij, kij, lij and the dij for the minimum conformation are found.
-#' @return a scalar: the energy at the minimum-enegy conformation
+#' Minimum Energy
+#'
+#' Calculates the minimum (stress) energy of the protein at its current
+#' conformation.
+#'
+#' @inheritParams mutenm-params
+#' @return a scalar energy value
+#'
+#' @family single-protein functions
 #'
 #' @export
-#' @family enm_energy
-#'
 v_min <- function(prot) {
   graph <- get_graph(prot)
   v <- with(graph, {
@@ -106,26 +101,34 @@ v_min <- function(prot) {
   v
 }
 
-
-#' Calculate entropic total free energy of prot object
+#' Entropic Free Energy
 #'
-#' @param prot is a prot object with known eigenvalues of enm model
-#' @param beta is 1 / kT
-#' @family enm_energy
+#' Calculates the entropic free energy contribution from vibrational modes.
+#'
+#' @inheritParams mutenm-params
+#' @return a scalar energy value
+#'
+#' @family single-protein functions
+#'
 #' @export
-#'
-g_ent <- function(prot, beta) {
+g_ent <- function(prot, beta = beta_boltzmann()) {
   # Calculate T*S from the energy spectrum
   energy <- get_evalue(prot)
   sum(g_ent_mode(energy, beta))
 }
 
 
-#' Activation free energy, internal energy contribution
+#' Activation Energy (Internal)
+#'
+#' Calculates the internal energy contribution to activation - the cost to
+#' deform the active site to the ideal conformation.
+#'
+#' @inheritParams mutenm-params
+#' @return a scalar energy value (NA if pdb_site_active is NA)
+#'
+#' @family single-protein functions
 #'
 #' @export
-#' @family enm_energy
-#'
 dv_act <- function(prot, ideal, pdb_site_active = NA) {
   if (anyNA(pdb_site_active)) {
     result <- NA
@@ -137,12 +140,16 @@ dv_act <- function(prot, ideal, pdb_site_active = NA) {
   result
 }
 
-
-#' Activation free energy, entropic contribution
+#' Activation Energy (Entropic)
+#'
+#' Calculates the entropic contribution to activation energy.
+#'
+#' @inheritParams mutenm-params
+#' @return a scalar energy value (NA if pdb_site_active is NA)
+#'
+#' @family single-protein functions
 #'
 #' @export
-#' @family enm_energy
-#'
 dg_ent_act <- function(prot, ideal, pdb_site_active = NA, beta = beta_boltzmann()) {
   # Calculate entropic contribution to dg_activation
   if (anyNA(pdb_site_active)) {

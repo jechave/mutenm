@@ -15,7 +15,7 @@ mutenm(
 )
 }
 \arguments{
-\item{wt}{The protein \code{prot} to mutate}
+\item{wt}{Wild-type protein object created by [enm()]}
 
 \item{site_mut}{The site to mutate (not the pdb_site, but sequential)}
 
@@ -33,7 +33,37 @@ mutenm(
 A mutated protein object
 }
 \description{
-Generates a single-point mutant of a protein ENM by perturbing contacts at a specified site.
+Generates a single-point mutant of a protein ENM by perturbing contacts at
+a specified site.
+}
+\details{
+Mutations are simulated by perturbing the equilibrium lengths of springs
+connected to the mutated site. The perturbations are drawn from a normal
+distribution with mean 0 and standard deviation \code{mut_dl_sigma}.
+
+\subsection{Mutation models}{
+\itemize{
+  \item \code{"lfenm"} (Linear Force ENM): Fast approximation. Calculates the
+    new equilibrium structure using linear response theory, but keeps the
+    original normal modes. Dynamics-related properties (Dmsfi, Dmsfn, Dg_ent)
+    will be zero.
+  \item \code{"sclfenm"} (Self-Consistent LFENM): After calculating the new
+    structure, rebuilds the ENM and recalculates normal modes. Slower but
+    captures changes in dynamics.
+}
+}
+
+\subsection{Reproducibility}{
+The random seed for perturbations is set to \code{seed + site_mut * mutation},
+ensuring that each site/mutation combination produces consistent results
+across runs while different mutations at the same site are independent.
+}
+
+\subsection{Sequence distance filter}{
+Only contacts with sequence distance >= \code{mut_sd_min} are perturbed.
+This excludes local backbone contacts (i, i+1) which are less affected by
+side chain mutations.
+}
 }
 \examples{
 \dontrun{
@@ -43,4 +73,9 @@ mut <- mutenm(wt, site_mut = 11, mutation = 1, mut_model = "lfenm", seed = 1024)
 }
 
 }
-\concept{enm mutating functions}
+\seealso{
+Other core functions: 
+\code{\link{enm}()},
+\code{\link{mrs}()}
+}
+\concept{core functions}

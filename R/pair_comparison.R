@@ -4,17 +4,16 @@
 
 # Structure ---------------------------------------------------------------
 
-#' Calculate site-dependent structural difference between two proteins
+#' Squared Displacement per Site
 #'
-#' This version works only for wt and mut with no indels
+#' Calculates the squared displacement at each site between wild-type and mutant.
 #'
-#' @param wt A protein object with \code{xyz} defined
-#' @param mut A second protein object  with \code{xyz} defined
+#' @inheritParams mutenm-params
+#' @return a vector of size nsites with squared displacements
 #'
-#' @return A vector \code{(dr2_i)} of size \code{nsites}, the squared displacement at site i.
+#' @family mutation-effect functions
 #'
 #' @export
-#'
 Dr2i <- function(wt, mut) {
   stopifnot(wt$node$pdb_site == mut$node$pdb_site) # no indels
   stopifnot(wt$node$site == mut$node$site) # no indels
@@ -23,18 +22,17 @@ Dr2i <- function(wt, mut) {
   dr2i
 }
 
-
-#' Calculate mode-dependent structural difference between two proteins
+#' Squared Displacement per Mode
 #'
-#' This version works only for wt and mut with no indels
+#' Calculates the squared displacement projected onto each normal mode of the
+#' wild-type.
 #'
-#' @param wt A protein object with \code{xyz} and \code{enm} defined
-#' @param mut A second protein object with \code{xyz} defined
+#' @inheritParams mutenm-params
+#' @return a vector of size nmodes with squared displacements
 #'
-#' @return A vector \code{(dr2_n)} of size \code{nmodes}, the squared displacement in mode n.
+#' @family mutation-effect functions
 #'
 #' @export
-#'
 Dr2n <- function(wt, mut) {
   stopifnot(wt$node$pdb_site == mut$node$pdb_site) # no indels
   dr <- as.vector(get_xyz(mut) - get_xyz(wt))
@@ -47,36 +45,37 @@ Dr2n <- function(wt, mut) {
 
 # Dynamics ----------------------------------------------------------------
 
-#' Calculate site-dependent motion difference between two proteins
+#' Change in Mean-Square Fluctuation per Site
 #'
-#' This version works only for wt and mut with no indels
+#' Calculates the change in mean-square fluctuation at each site between
+#' wild-type and mutant.
 #'
-#' @param wt A protein object with \code{enm} defined
-#' @param mut A second protein object with \code{enm} defined
+#' Note: Requires the `sclfenm` mutation model to be meaningful.
 #'
-#' @return A vector \code{(dmsf_i)} of size \code{nsites}, the MSF change at site i.
+#' @inheritParams mutenm-params
+#' @return a vector of size nsites
+#'
+#' @family mutation-effect functions
 #'
 #' @export
-#'
 Dmsfi <- function(wt, mut) {
   stopifnot(wt$node$pdb_site == mut$node$pdb_site) # no indels
   dmsf = msfi(mut) - msfi(wt)
   dmsf
 }
 
-
-#' Calculate mode-dependent motion difference between two proteins
+#' Change in Mean-Square Fluctuation per Mode
 #'
-#' This version works only for wt and mut with no indels.
-#' Calculates fluctuations along normal modes of wt, independent of mode assignment issues.
+#' Calculates the change in MSF projected onto each normal mode of the wild-type.
 #'
-#' @param wt A protein object with \code{enm} defined
-#' @param mut A second protein object with \code{enm} defined
+#' Note: Requires the `sclfenm` mutation model to be meaningful.
 #'
-#' @return A vector \code{(dmsf_n)} of size \code{nmodes}, the MSF change in mode n.
+#' @inheritParams mutenm-params
+#' @return a vector of size nmodes
+#'
+#' @family mutation-effect functions
 #'
 #' @export
-#'
 Dmsfn <- function(wt, mut) {
   stopifnot(wt$node$pdb_site == mut$node$pdb_site) # no indels
   msf_wt <- msfn(wt)
@@ -88,54 +87,60 @@ Dmsfn <- function(wt, mut) {
 
 # Energy ------------------------------------------------------------------
 
-#' Calculate energy differences between two proteins
+#' Change in Minimum Energy
 #'
-#' @param wt A protein object
-#' @param mut A second protein
+#' Calculates the change in minimum (stress) energy between wild-type and mutant.
 #'
-#' @return A (scalar) energy difference between mutant and wild type.
+#' @inheritParams mutenm-params
+#' @return a scalar energy difference
 #'
-#' @name delta_energy
-#'
-NULL
-
-#' @rdname delta_energy
-#'
-#' @details `Dv_min` calculates the minimum-energy difference between \code{mut} and \code{wt}
+#' @family mutation-effect functions
 #'
 #' @export
-#'
 Dv_min <- function(wt, mut)
   v_min(mut) - v_min(wt)
 
-#' @rdname delta_energy
+#' Change in Entropic Free Energy
 #'
-#' @details `Dg_ent` calculates the entropic free energy difference between \code{mut} and \code{wt}
+#' Calculates the change in entropic free energy between wild-type and mutant.
+#'
+#' @inheritParams mutenm-params
+#' @return a scalar energy difference
+#'
+#' @family mutation-effect functions
 #'
 #' @export
-#'
 Dg_ent <- function(wt, mut, beta = beta_boltzmann())
   g_ent(mut, beta) - g_ent(wt, beta)
 
 
-#' @rdname delta_energy
+#' Change in Activation Energy (Internal)
 #'
-#' @details `Ddv_act` calculates the energy contribution to the change in activation energy between \code{mut} and \code{wt}
+#' Calculates the change in internal energy contribution to activation between
+#' wild-type and mutant.
+#'
+#' @inheritParams mutenm-params
+#' @return a scalar energy difference (NA if pdb_site_active is NA)
+#'
+#' @family mutation-effect functions
 #'
 #' @export
-#'
 Ddv_act <- function(wt, mut, ideal = wt, pdb_site_active = NA) {
   result <- dv_act(mut, ideal, pdb_site_active) - dv_act(wt, ideal, pdb_site_active)
   result
 }
 
-
-#' @rdname delta_energy
+#' Change in Activation Energy (Entropic)
 #'
-#' @details `Ddg_ent_act` calculates the entropy contribution to the change in activation energy between \code{mut} and \code{wt}
+#' Calculates the change in entropic contribution to activation energy between
+#' wild-type and mutant.
+#'
+#' @inheritParams mutenm-params
+#' @return a scalar energy difference (NA if pdb_site_active is NA)
+#'
+#' @family mutation-effect functions
 #'
 #' @export
-#'
 Ddg_ent_act <- function(wt, mut, ideal = wt, pdb_site_active = NA, beta = beta_boltzmann()) {
   result <- dg_ent_act(mut, ideal, pdb_site_active) - dg_ent_act(wt, ideal, pdb_site_active)
   result

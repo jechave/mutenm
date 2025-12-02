@@ -2,18 +2,30 @@
 % Please edit documentation in R/pair_comparison.R
 \name{Dr2n}
 \alias{Dr2n}
-\title{Calculate mode-dependent structural difference between two proteins}
+\title{Squared Displacement per Mode}
 \usage{
 Dr2n(wt, mut)
 }
 \arguments{
-\item{wt}{A protein object with \code{xyz} and \code{enm} defined}
+\item{wt}{Wild-type protein object created by [enm()]}
 
-\item{mut}{A second protein object with \code{xyz} defined}
+\item{mut}{Mutant protein object created by [mutenm()]}
 }
 \value{
-A vector \code{(dr2_n)} of size \code{nmodes}, the squared displacement in mode n.
+a vector of size nmodes with squared displacements
 }
 \description{
-This version works only for wt and mut with no indels
+Calculates the squared displacement projected onto each normal mode of the
+wild-type.
 }
+\seealso{
+Other mutation-effect functions: 
+\code{\link{Ddg_ent_act}()},
+\code{\link{Ddv_act}()},
+\code{\link{Dg_ent}()},
+\code{\link{Dmsfi}()},
+\code{\link{Dmsfn}()},
+\code{\link{Dr2i}()},
+\code{\link{Dv_min}()}
+}
+\concept{mutation-effect functions}

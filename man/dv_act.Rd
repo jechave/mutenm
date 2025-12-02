@@ -2,17 +2,33 @@
 % Please edit documentation in R/single_protein.R
 \name{dv_act}
 \alias{dv_act}
-\title{Activation free energy, internal energy contribution}
+\title{Activation Energy (Internal)}
 \usage{
 dv_act(prot, ideal, pdb_site_active = NA)
 }
+\arguments{
+\item{prot}{A protein object created by [enm()]}
+
+\item{ideal}{Reference protein for ideal active site conformation}
+
+\item{pdb_site_active}{Vector of PDB residue numbers defining the active site}
+}
+\value{
+a scalar energy value (NA if pdb_site_active is NA)
+}
 \description{
-Activation free energy, internal energy contribution
+Calculates the internal energy contribution to activation - the cost to
+deform the active site to the ideal conformation.
 }
 \seealso{
-Other enm_energy: 
+Other single-protein functions: 
+\code{\link{cn}()},
+\code{\link{dactive}()},
 \code{\link{dg_ent_act}()},
 \code{\link{g_ent}()},
-\code{\link{v_min}()}
+\code{\link{msfi}()},
+\code{\link{msfn}()},
+\code{\link{v_min}()},
+\code{\link{wcn}()}
 }
-\concept{enm_energy}
+\concept{single-protein functions}

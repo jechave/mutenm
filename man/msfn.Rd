@@ -2,17 +2,29 @@
 % Please edit documentation in R/single_protein.R
 \name{msfn}
 \alias{msfn}
-\title{Calculate MSF mode-dependent profile}
+\title{Mean-Square Fluctuation per Mode}
 \usage{
 msfn(prot)
 }
 \arguments{
-\item{prot}{is a protein object obtained using enm()}
+\item{prot}{A protein object created by [enm()]}
 }
 \value{
-a vector of size nsites with msf values for each mode
+a vector of size nmodes with msf values for each mode
 }
 \description{
-Calculates the mean-square-fluctuation in the direction of each normal mode
+Calculates the mean-square fluctuation contribution from each normal mode
+(1/eigenvalue).
 }
-\concept{mode profiles}
+\seealso{
+Other single-protein functions: 
+\code{\link{cn}()},
+\code{\link{dactive}()},
+\code{\link{dg_ent_act}()},
+\code{\link{dv_act}()},
+\code{\link{g_ent}()},
+\code{\link{msfi}()},
+\code{\link{v_min}()},
+\code{\link{wcn}()}
+}
+\concept{single-protein functions}

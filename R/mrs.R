@@ -1,14 +1,34 @@
 #' Mutation Response Scanning
 #'
-#' Calculate mutation response matrices using process-and-discard approach.
-#' Memory efficient: generates one mutant at a time, calculates responses, discards.
+#' Systematically scans all sites, simulating mutations and calculating response
+#' properties for each.
 #'
-#' @param wt Wild-type protein object from enm()
+#' @details
+#' Mutation Response Scanning (MRS) applies \code{\link{mutenm}} to every site
+#' in the protein, generating \code{nmut} random mutations per site and averaging
+#' the responses. This produces response tibbles that characterize how mutations
+#' at each site affect the protein's structure, dynamics, and energetics.
+#'
+#' \subsection{Why multiple mutations per site?}{
+#' Each call to \code{mutenm} generates random perturbations to spring lengths.
+#' By simulating \code{nmut} independent mutations at each site and averaging,
+#' we obtain more robust estimates of the typical mutation response at that site.
+#' }
+#'
+#' \subsection{Memory efficiency}{
+#' Uses a process-and-discard approach: each mutant is generated, analyzed, then
+#' discarded before creating the next. This keeps memory usage constant regardless
+#' of protein size.
+#' }
+#'
+#' @inheritParams mutenm-params
 #' @param nmut Number of mutations per site
 #' @param mut_model Mutation model: "lfenm" (fast) or "sclfenm" (recalculates ENM)
 #' @param mut_dl_sigma Sigma of normal distribution for bond length perturbations
 #' @param mut_sd_min Minimum sequence distance of contacts to perturb
 #' @param seed Random seed for reproducibility
+#'
+#' @family core functions
 #'
 #' @return List with response tibbles and params:
 #'   \itemize{

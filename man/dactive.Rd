@@ -2,25 +2,30 @@
 % Please edit documentation in R/single_protein.R
 \name{dactive}
 \alias{dactive}
-\title{Calculate distance to active site}
+\title{Distance to Active Site}
 \usage{
 dactive(prot, pdb_site_active)
 }
 \arguments{
-\item{prot}{is a protein object obtained using enm()}
+\item{prot}{A protein object created by [enm()]}
 
-\item{pdb_site_active}{is a vector of pdb resno of active residues.}
+\item{pdb_site_active}{Vector of PDB residue numbers defining the active site}
 }
 \value{
 a vector of size nsites with dactive values for each site
 }
 \description{
-Calculates the distance from each site to the closest active residue
+Calculates the distance from each site to the closest active site residue.
 }
 \seealso{
-Other site profiles: 
+Other single-protein functions: 
 \code{\link{cn}()},
+\code{\link{dg_ent_act}()},
+\code{\link{dv_act}()},
+\code{\link{g_ent}()},
 \code{\link{msfi}()},
+\code{\link{msfn}()},
+\code{\link{v_min}()},
 \code{\link{wcn}()}
 }
-\concept{site profiles}
+\concept{single-protein functions}

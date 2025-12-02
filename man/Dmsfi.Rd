@@ -2,18 +2,33 @@
 % Please edit documentation in R/pair_comparison.R
 \name{Dmsfi}
 \alias{Dmsfi}
-\title{Calculate site-dependent motion difference between two proteins}
+\title{Change in Mean-Square Fluctuation per Site}
 \usage{
 Dmsfi(wt, mut)
 }
 \arguments{
-\item{wt}{A protein object with \code{enm} defined}
+\item{wt}{Wild-type protein object created by [enm()]}
 
-\item{mut}{A second protein object with \code{enm} defined}
+\item{mut}{Mutant protein object created by [mutenm()]}
 }
 \value{
-A vector \code{(dmsf_i)} of size \code{nsites}, the MSF change at site i.
+a vector of size nsites
 }
 \description{
-This version works only for wt and mut with no indels
+Calculates the change in mean-square fluctuation at each site between
+wild-type and mutant.
 }
+\details{
+Note: Requires the `sclfenm` mutation model to be meaningful.
+}
+\seealso{
+Other mutation-effect functions: 
+\code{\link{Ddg_ent_act}()},
+\code{\link{Ddv_act}()},
+\code{\link{Dg_ent}()},
+\code{\link{Dmsfn}()},
+\code{\link{Dr2i}()},
+\code{\link{Dr2n}()},
+\code{\link{Dv_min}()}
+}
+\concept{mutation-effect functions}

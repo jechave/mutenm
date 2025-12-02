@@ -2,23 +2,29 @@
 % Please edit documentation in R/single_protein.R
 \name{wcn}
 \alias{wcn}
-\title{Calculate WCN site-dependent profile}
+\title{Weighted Contact Number}
 \usage{
 wcn(prot)
 }
 \arguments{
-\item{prot}{is a protein object obtained using enm()}
+\item{prot}{A protein object created by [enm()]}
 }
 \value{
 a vector of size nsites with wcn values for each site
 }
 \description{
-Calculates the Weighted Contact Number (WCN) of each site
+Calculates the Weighted Contact Number (WCN) of each site - the sum of 1/d²
+for all pairs.
 }
 \seealso{
-Other site profiles: 
+Other single-protein functions: 
 \code{\link{cn}()},
 \code{\link{dactive}()},
-\code{\link{msfi}()}
+\code{\link{dg_ent_act}()},
+\code{\link{dv_act}()},
+\code{\link{g_ent}()},
+\code{\link{msfi}()},
+\code{\link{msfn}()},
+\code{\link{v_min}()}
 }
-\concept{site profiles}
+\concept{single-protein functions}

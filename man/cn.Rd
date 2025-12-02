@@ -2,23 +2,29 @@
 % Please edit documentation in R/single_protein.R
 \name{cn}
 \alias{cn}
-\title{Calculate CN site-dependent profile}
+\title{Contact Number}
 \usage{
 cn(prot)
 }
 \arguments{
-\item{prot}{is a protein object obtained using enm()}
+\item{prot}{A protein object created by [enm()]}
 }
 \value{
 a vector of size nsites with cn values for each site
 }
 \description{
-Calculates the Contact Number (CN) of each site
+Calculates the Contact Number (CN) of each site - the number of neighbors
+within the cutoff distance.
 }
 \seealso{
-Other site profiles: 
+Other single-protein functions: 
 \code{\link{dactive}()},
+\code{\link{dg_ent_act}()},
+\code{\link{dv_act}()},
+\code{\link{g_ent}()},
 \code{\link{msfi}()},
+\code{\link{msfn}()},
+\code{\link{v_min}()},
 \code{\link{wcn}()}
 }
-\concept{site profiles}
+\concept{single-protein functions}

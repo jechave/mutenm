@@ -2,22 +2,30 @@
 % Please edit documentation in R/single_protein.R
 \name{g_ent}
 \alias{g_ent}
-\title{Calculate entropic total free energy of prot object}
+\title{Entropic Free Energy}
 \usage{
-g_ent(prot, beta)
+g_ent(prot, beta = beta_boltzmann())
 }
 \arguments{
-\item{prot}{is a prot object with known eigenvalues of enm model}
+\item{prot}{A protein object created by [enm()]}
 
-\item{beta}{is 1 / kT}
+\item{beta}{Inverse temperature (1/kT). Default: beta_boltzmann()}
+}
+\value{
+a scalar energy value
 }
 \description{
-Calculate entropic total free energy of prot object
+Calculates the entropic free energy contribution from vibrational modes.
 }
 \seealso{
-Other enm_energy: 
+Other single-protein functions: 
+\code{\link{cn}()},
+\code{\link{dactive}()},
 \code{\link{dg_ent_act}()},
 \code{\link{dv_act}()},
-\code{\link{v_min}()}
+\code{\link{msfi}()},
+\code{\link{msfn}()},
+\code{\link{v_min}()},
+\code{\link{wcn}()}
 }
-\concept{enm_energy}
+\concept{single-protein functions}

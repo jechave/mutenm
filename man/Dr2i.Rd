@@ -2,18 +2,29 @@
 % Please edit documentation in R/pair_comparison.R
 \name{Dr2i}
 \alias{Dr2i}
-\title{Calculate site-dependent structural difference between two proteins}
+\title{Squared Displacement per Site}
 \usage{
 Dr2i(wt, mut)
 }
 \arguments{
-\item{wt}{A protein object with \code{xyz} defined}
+\item{wt}{Wild-type protein object created by [enm()]}
 
-\item{mut}{A second protein object  with \code{xyz} defined}
+\item{mut}{Mutant protein object created by [mutenm()]}
 }
 \value{
-A vector \code{(dr2_i)} of size \code{nsites}, the squared displacement at site i.
+a vector of size nsites with squared displacements
 }
 \description{
-This version works only for wt and mut with no indels
+Calculates the squared displacement at each site between wild-type and mutant.
 }
+\seealso{
+Other mutation-effect functions: 
+\code{\link{Ddg_ent_act}()},
+\code{\link{Ddv_act}()},
+\code{\link{Dg_ent}()},
+\code{\link{Dmsfi}()},
+\code{\link{Dmsfn}()},
+\code{\link{Dr2n}()},
+\code{\link{Dv_min}()}
+}
+\concept{mutation-effect functions}

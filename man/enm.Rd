@@ -19,7 +19,43 @@ enm(pdb, node, model, d_max)
 an object of class `prot`, which is a list `lst(param, node, graph, eij, kmat, nma)`
 }
 \description{
-`enm` creates a `prot` object containing information on ENM structure, parameters, and normal modes
+Creates a `prot` object containing information on ENM structure, parameters,
+and normal modes.
+}
+\details{
+An Elastic Network Model (ENM) represents a protein as a network of nodes
+connected by harmonic springs. The network's vibrational modes capture the
+protein's intrinsic flexibility and are used to predict mutation effects.
+
+\subsection{Node types}{
+\itemize{
+  \item \code{"ca"}: Alpha carbons only (one node per residue)
+  \item \code{"cb"}: Beta carbons (alpha for glycine)
+  \item \code{"sc"}: Side chain centroids (includes more structural detail)
+}
+}
+
+\subsection{Models}{
+\itemize{
+  \item \code{"anm"}: Anisotropic Network Model - uniform spring constants
+  \item \code{"ming_wall"}: Distance-dependent spring constants (k ~ 1/d^2)
+  \item \code{"pfanm"}: Parameter-free ANM
+  \item \code{"hnm"}, \code{"hnm0"}: Hinsen Network Models
+  \item \code{"reach"}: REACH model
+}
+}
+
+\subsection{The prot object}{
+The returned \code{prot} object is a list containing:
+\itemize{
+  \item \code{param}: ENM parameters (node type, model, cutoff)
+  \item \code{nodes}: Node information (xyz coordinates, residue info)
+  \item \code{graph}: Network edges with spring constants and distances
+  \item \code{eij}: Unit vectors along edges
+  \item \code{kmat}: Hessian matrix (3N x 3N)
+  \item \code{nma}: Normal mode analysis results (eigenvalues and eigenvectors)
+}
+}
 }
 \examples{
 \dontrun{
@@ -29,3 +65,9 @@ enm(pdb, node = "sc", model = "anm", d_max = 12.5)
 enm(pdb, node = "cb", model = "anm", d_max = 12.0)
 }
 }
+\seealso{
+Other core functions: 
+\code{\link{mrs}()},
+\code{\link{mutenm}()}
+}
+\concept{core functions}
