@@ -1,0 +1,301 @@
+---
+title: "Mutation Response Scanning"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mutation Response Scanning}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+This vignette covers Mutation Response Scanning (MRS) - a systematic approach to characterize how mutations at every site affect the protein.
+
+```{r message=FALSE, warning=FALSE}
+library(mutenm)
+library(ggplot2)
+
+# Build the ENM
+pdb <- bio3d::read.pdb(system.file("extdata", "2acy.pdb", package = "mutenm"))
+wt <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+sites <- wt$nodes$pdb_site
+nsites <- length(sites)
+```
+
+## What is Mutation Response Scanning?
+
+MRS systematically scans all sites, simulating multiple mutations at each site and averaging the responses. This produces:
+
+- **Response matrices** showing how mutations at each site affect every other site
+- **Response profiles** summarizing the sensitivity of each site to mutation
+
+## The `mrs()` Function
+
+```{r eval=FALSE}
+mrs(wt, nmut, mut_model = "lfenm", mut_dl_sigma = 0.3,
+    mut_sd_min = 2, seed = NULL)
+```
+
+### Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `wt` | Wild-type protein object | (required) |
+| `nmut` | Number of mutations to average per site | (required) |
+| `mut_model` | Mutation model: `"lfenm"` or `"sclfenm"` | `"lfenm"` |
+| `mut_dl_sigma` | Standard deviation of perturbations | 0.3 |
+| `mut_sd_min` | Minimum sequence distance for perturbation | 2 |
+| `seed` | Random seed for reproducibility | NULL |
+
+### Running MRS
+
+```{r}
+# Scan all sites with 3 mutations each
+# (Using few mutations for speed; use 10-20 for publication)
+responses <- mrs(wt, nmut = 3, seed = 42)
+```
+
+Note: This produces a warning because `lfenm` doesn't calculate dynamics changes. Use `mut_model = "sclfenm"` if you need those.
+
+### Output Structure
+
+```{r}
+names(responses)
+```
+
+The output is a list of tibbles:
+
+| Tibble | Dimensions | Description |
+|--------|------------|-------------|
+| `Dr2i` | nsites × nsites | Structural displacement at site i from mutation at j |
+| `Dmsfi` | nsites × nsites | MSF change at site i from mutation at j |
+| `Dr2n` | nmodes × nsites | Mode n displacement from mutation at j |
+| `Dmsfn` | nmodes × nsites | Mode n MSF change from mutation at j |
+| `Dv_min` | nsites | Energy change from mutation at j |
+| `Dg_ent` | nsites | Entropic energy change from mutation at j |
+| `Ddv_act` | nsites | Activation energy change from mutation at j |
+| `Ddg_ent_act` | nsites | Activation entropy change from mutation at j |
+| `params` | - | Parameters used for the scan |
+
+## Analyzing Response Matrices
+
+### The Dr2i Matrix (Structure)
+
+`Dr2i[i, j]` = structural displacement at site i caused by mutation at site j.
+
+```{r}
+head(responses$Dr2i)
+```
+
+#### Visualizing as a Heatmap
+
+```{r dr2i-heatmap, fig.cap="Dr2i response matrix. Diagonal shows self-response; off-diagonal shows propagation."}
+dr2i_df <- responses$Dr2i
+
+ggplot(dr2i_df, aes(x = j, y = i, fill = log10(Dr2i + 1e-6))) +
+  geom_tile() +
+  scale_fill_viridis_c(name = "log10(Dr2i)", option = "plasma") +
+  coord_fixed() +
+  labs(x = "Mutation Site (j)", y = "Response Site (i)",
+       title = "Structural Response Matrix") +
+  theme_minimal() +
+  theme(axis.text = element_text(size = 6))
+```
+
+**Interpretation:**
+
+- Diagonal (i = j): How much a mutation displaces its own site
+- Off-diagonal: How mutations propagate through the structure
+- Bright regions: Strong structural coupling
+
+### Row and Column Profiles
+
+#### Column sum: Total effect of mutating site j
+
+```{r column-sums, fig.cap="Total structural displacement caused by mutations at each site."}
+# Sum over response sites (rows)
+total_effect <- aggregate(Dr2i ~ j, data = dr2i_df, FUN = sum)
+
+ggplot(total_effect, aes(x = sites[j], y = Dr2i)) +
+  geom_line(color = "darkred") +
+  labs(x = "Mutation Site", y = "Total Displacement (Σᵢ Dr2i)",
+       title = "Structural Impact of Mutations",
+       subtitle = "Sites where mutations cause large global changes") +
+  theme_minimal()
+```
+
+#### Row sum: Sensitivity of site i to any mutation
+
+```{r row-sums, fig.cap="Sensitivity of each site to mutations elsewhere."}
+# Sum over mutation sites (columns)
+sensitivity <- aggregate(Dr2i ~ i, data = dr2i_df, FUN = sum)
+
+ggplot(sensitivity, aes(x = sites[i], y = Dr2i)) +
+  geom_line(color = "steelblue") +
+  labs(x = "Site", y = "Total Sensitivity (Σⱼ Dr2i)",
+       title = "Structural Sensitivity to Mutations",
+       subtitle = "Sites that respond to mutations anywhere") +
+  theme_minimal()
+```
+
+## Energy Profiles
+
+### Stress Energy Change (`Dv_min`)
+
+How much stress energy each mutation introduces:
+
+```{r energy-profile, fig.cap="Energy cost of mutations at each site."}
+energy_df <- responses$Dv_min
+
+ggplot(energy_df, aes(x = sites[j], y = Dv_min)) +
+  geom_line(color = "darkgreen") +
+  labs(x = "Mutation Site", y = "ΔVmin",
+       title = "Energy Cost of Mutations") +
+  theme_minimal()
+```
+
+**Interpretation:**
+
+- High ΔVmin: Mutations are energetically costly (destabilizing)
+- Low ΔVmin: Site tolerates mutations better
+
+## Identifying Key Sites
+
+### Mutation "Hotspots"
+
+Sites where mutations have the largest effects:
+
+```{r hotspots}
+# Combine metrics
+site_summary <- data.frame(
+  site = sites,
+  total_displacement = total_effect$Dr2i,
+  energy_cost = energy_df$Dv_min
+)
+
+# Top 10 most impactful sites
+top_sites <- site_summary[order(-site_summary$total_displacement), ][1:10, ]
+print(top_sites)
+```
+
+### Correlation with Structure
+
+```{r structure-correlation, fig.cap="Buried sites (high WCN) tend to have larger mutation effects."}
+site_summary$wcn <- wcn(wt)
+
+ggplot(site_summary, aes(x = wcn, y = total_displacement)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "darkred") +
+  labs(x = "Weighted Contact Number",
+       y = "Total Displacement from Mutation",
+       title = "Packing vs. Mutation Impact",
+       subtitle = "Well-packed sites cause larger structural changes when mutated") +
+  theme_minimal()
+```
+
+## Mode-Resolved Analysis
+
+### Which modes are most affected?
+
+```{r mode-analysis, fig.cap="Low-frequency modes are most affected by mutations."}
+dr2n_df <- responses$Dr2n
+
+# Sum over mutation sites
+mode_response <- aggregate(Dr2n ~ n, data = dr2n_df, FUN = sum)
+
+# Plot first 30 modes
+ggplot(mode_response[1:30, ], aes(x = n, y = Dr2n)) +
+  geom_col(fill = "steelblue", alpha = 0.7) +
+  labs(x = "Mode", y = "Total Displacement (Σⱼ Dr2n)",
+       title = "Mode Sensitivity to Mutations",
+       subtitle = "First 30 modes shown") +
+  theme_minimal()
+```
+
+## Using sclfenm for Dynamics
+
+To calculate dynamics changes, use `mut_model = "sclfenm"`:
+```{r sclfenm-scan, eval=FALSE}
+# This is slower but captures dynamics changes
+responses_sc <- mrs(wt, nmut = 3, mut_model = "sclfenm", seed = 42)
+
+# Now Dmsfi and Dg_ent will have non-zero values
+```
+
+## Performance Considerations
+
+### Computational Cost
+
+| Model | Time per site | Use case |
+|-------|---------------|----------|
+| lfenm | Fast | Structure and energy only |
+| sclfenm | ~10× slower | Need dynamics changes |
+
+For a 100-residue protein with `nmut = 10`:
+
+- lfenm: ~seconds
+- sclfenm: ~minutes
+
+### Memory Efficiency
+
+MRS uses a "process-and-discard" approach:
+
+1. Generate mutant
+2. Calculate responses
+3. Discard mutant
+4. Repeat
+
+This keeps memory usage constant regardless of protein size.
+
+### Recommended Settings
+
+| Parameter | Quick scan | Publication |
+|-----------|------------|-------------|
+| `nmut` | 3-5 | 10-20 |
+| `mut_model` | lfenm | sclfenm (if dynamics needed) |
+
+## Typical Workflow
+
+```{r workflow-summary, eval=FALSE}
+# 1. Build ENM
+pdb <- bio3d::read.pdb("your_protein.pdb")
+wt <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+
+# 2. Run MRS
+responses <- mrs(wt, nmut = 10, seed = 42)
+
+# 3. Analyze
+# - Dr2i matrix for structural coupling
+# - Dv_min profile for energetic effects
+# - Column sums for mutation impact
+# - Row sums for site sensitivity
+
+# 4. Identify key sites
+# - High-impact mutation sites (large column sums)
+# - Sensitive regions (large row sums)
+# - Energetically important sites (high Dv_min)
+```
+
+## Summary
+
+| Output | What it tells you |
+|--------|-------------------|
+| `Dr2i[i,j]` | How mutation at j affects structure at i |
+| `Σᵢ Dr2i[i,j]` | Total structural impact of mutating site j |
+| `Σⱼ Dr2i[i,j]` | How sensitive site i is to mutations |
+| `Dv_min[j]` | Energy cost of mutating site j |
+| `Dr2n[n,j]` | How mutation at j excites mode n |
+
+**Key insights from MRS:**
+
+- Identifies mutation hotspots (high-impact sites)
+- Reveals structural communication pathways
+- Correlates with protein packing and function
+- Predicts sites important for stability and function

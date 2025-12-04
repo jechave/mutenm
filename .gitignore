@@ -60,3 +60,7 @@ CLAUDE.md
 # End of https://www.gitignore.io/api/r
 
 
+/doc/
+/Meta/
+paper_mrs_results.rds
+paper.pdf

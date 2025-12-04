@@ -1,0 +1,301 @@
+---
+title: "Simulating Mutations"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Simulating Mutations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+This vignette explains how mutations are simulated in `mutenm`, the different mutation models, and how to analyze the effects of mutations.
+
+```{r message=FALSE}
+library(mutenm)
+library(ggplot2)
+
+# Build the ENM
+pdb <- bio3d::read.pdb(system.file("extdata", "2acy.pdb", package = "mutenm"))
+wt <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+sites <- wt$nodes$pdb_site
+```
+
+## How Mutations Are Simulated
+
+### The Physical Model
+
+In `mutenm`, a mutation is modeled as a perturbation to the equilibrium lengths of springs connected to the mutated site:
+
+1. **Select edges:** Identify all springs connected to the mutated site
+2. **Perturb lengths:** Add random displacements to the equilibrium lengths: $l_{ij}' = l_{ij} + \delta l_{ij}$
+3. **Calculate response:** Use linear response theory to find the new equilibrium structure
+
+### The Mathematics
+
+When spring lengths are perturbed, they exert forces on the network. The structural response is:
+
+$$\delta\mathbf{r} = \mathbf{C} \times \mathbf{f}$$
+
+where:
+
+- $\delta\mathbf{r}$ is the displacement vector (3N dimensional)
+- $\mathbf{C}$ is the covariance matrix (captures how the network responds)
+- $\mathbf{f}$ is the force vector from perturbed springs
+
+## The `mutenm()` Function
+
+```{r eval=FALSE}
+mutenm(wt, site_mut, mutation, mut_model = "lfenm",
+       mut_dl_sigma = 0.3, mut_sd_min = 2, seed = 241956)
+```
+
+### Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `wt` | Wild-type protein object | (required) |
+| `site_mut` | Site index to mutate (1-based) | (required) |
+| `mutation` | Mutation index (for reproducibility) | (required) |
+| `mut_model` | Mutation model: `"lfenm"` or `"sclfenm"` | `"lfenm"` |
+| `mut_dl_sigma` | Standard deviation of length perturbations | 0.3 |
+| `mut_sd_min` | Minimum sequence distance for perturbed contacts | 2 |
+| `seed` | Random seed for reproducibility | 241956 |
+
+### Basic Example
+
+```{r}
+# Mutate site 50
+mut <- mutenm(wt, site_mut = 50, mutation = 1, seed = 123)
+```
+
+## Mutation Models
+
+### LFENM (`mut_model = "lfenm"`)
+
+**Linear Force ENM** - The fast approximation.
+
+- Calculates the structural displacement using linear response
+- Does NOT recalculate the normal modes
+- Dynamics-related properties (`Dmsfi`, `Dmsfn`, `Dg_ent`) will be zero
+
+```{r}
+mut_lf <- mutenm(wt, site_mut = 50, mutation = 1, mut_model = "lfenm", seed = 123)
+```
+
+**Use when:** You only need structural changes or energy differences.
+
+### SCLFENM (`mut_model = "sclfenm"`)
+
+**Self-Consistent LFENM** - The accurate (but slower) model.
+
+- First calculates structural displacement (like LFENM)
+- Then rebuilds the ENM with the new coordinates
+- Recalculates normal modes and covariance matrix
+
+```{r}
+mut_sc <- mutenm(wt, site_mut = 50, mutation = 1, mut_model = "sclfenm", seed = 123)
+```
+
+**Use when:** You need changes in dynamics or entropy.
+
+### Comparing Models
+
+```{r model-effects, fig.cap="Both models give the same structural displacement."}
+dr2_lf <- Dr2i(wt, mut_lf)
+dr2_sc <- Dr2i(wt, mut_sc)
+
+df <- data.frame(
+  site = rep(sites, 2),
+  dr2 = c(dr2_lf, dr2_sc),
+  model = rep(c("lfenm", "sclfenm"), each = length(sites))
+)
+
+ggplot(df, aes(x = site, y = dr2, color = model)) +
+  geom_line() +
+  labs(x = "Residue", y = "Squared Displacement",
+       title = "Structural Response: LFENM vs SCLFENM",
+       color = "Model") +
+  scale_color_manual(values = c("lfenm" = "steelblue", "sclfenm" = "darkred")) +
+  theme_minimal()
+```
+
+The structural changes are identical. The difference is in dynamics:
+
+```{r}
+# Dynamics changes
+dmsf_lf <- sum(abs(Dmsfi(wt, mut_lf)))  # Will be 0 for lfenm
+dmsf_sc <- sum(abs(Dmsfi(wt, mut_sc)))  # Non-zero for sclfenm
+
+cat("Total |Dmsfi| with lfenm:", round(dmsf_lf, 4), "\n")
+cat("Total |Dmsfi| with sclfenm:", round(dmsf_sc, 4), "\n")
+```
+
+## Mutation Parameters
+
+### Perturbation Magnitude (`mut_dl_sigma`)
+
+Controls how much the spring lengths are perturbed:
+
+```{r perturbation-magnitude, fig.cap="Larger perturbations cause larger structural changes."}
+sigmas <- c(0.1, 0.3, 0.5, 1.0)
+results <- lapply(sigmas, function(s) {
+  mut <- mutenm(wt, site_mut = 50, mutation = 1, mut_dl_sigma = s, seed = 123)
+  data.frame(site = sites, dr2 = Dr2i(wt, mut), sigma = s)
+})
+df <- do.call(rbind, results)
+df$sigma <- factor(df$sigma)
+
+ggplot(df, aes(x = site, y = dr2, color = sigma)) +
+  geom_line(alpha = 0.8) +
+  labs(x = "Residue", y = "Squared Displacement",
+       title = "Effect of Perturbation Magnitude",
+       color = "σ") +
+  theme_minimal()
+```
+
+### Sequence Distance Filter (`mut_sd_min`)
+
+Only contacts with sequence distance ≥ `mut_sd_min` are perturbed:
+
+- `mut_sd_min = 2` (default): Excludes backbone contacts (i, i+1)
+- `mut_sd_min = 1`: Perturbs all contacts including backbone
+
+The rationale: backbone contacts (i, i±1) depend on phi/psi angles, not side chains, so they shouldn't change much with side chain mutations.
+
+### Reproducibility with `seed`
+
+The random seed ensures reproducibility:
+
+```{r}
+mut1 <- mutenm(wt, site_mut = 50, mutation = 1, seed = 123)
+mut2 <- mutenm(wt, site_mut = 50, mutation = 1, seed = 123)
+
+# These are identical
+all.equal(Dr2i(wt, mut1), Dr2i(wt, mut2))
+```
+
+The actual seed used is `seed + site_mut × mutation`, so different mutation indices at the same site give different (but reproducible) perturbations.
+
+## Analyzing Mutation Effects
+
+### Structural Changes
+
+#### Per-Site Displacement (`Dr2i`)
+
+The squared displacement at each site:
+
+```{r dr2i-profile, fig.cap="Squared displacement showing the mutation propagating through the structure."}
+mut <- mutenm(wt, site_mut = 50, mutation = 1, seed = 123)
+dr2 <- Dr2i(wt, mut)
+
+df <- data.frame(site = sites, dr2 = dr2)
+ggplot(df, aes(x = site, y = dr2)) +
+  geom_line(color = "darkred") +
+  geom_vline(xintercept = sites[50], linetype = "dashed", alpha = 0.5) +
+  labs(x = "Residue", y = "Squared Displacement",
+       title = "Structural Response to Mutation at Site 50") +
+  theme_minimal()
+```
+
+#### Per-Mode Displacement (`Dr2n`)
+
+How much each normal mode is excited by the mutation:
+
+```{r dr2n-profile, fig.cap="Mode contributions to displacement. Low-frequency modes are most affected."}
+dr2n <- Dr2n(wt, mut)
+modes <- seq_along(dr2n)
+
+df <- data.frame(mode = modes[1:30], dr2n = dr2n[1:30])
+ggplot(df, aes(x = mode, y = dr2n)) +
+  geom_col(fill = "steelblue", alpha = 0.7) +
+  labs(x = "Mode", y = "Squared Displacement",
+       title = "Mode-Resolved Structural Response",
+       subtitle = "First 30 modes shown") +
+  theme_minimal()
+```
+
+### Energy Changes
+
+```{r}
+# Stress energy change
+dv <- Dv_min(wt, mut)
+cat("Energy change (ΔVmin):", round(dv, 3), "\n")
+```
+
+### Dynamics Changes (sclfenm only)
+
+```{r dynamics-changes, fig.cap="Change in flexibility per site (sclfenm model only)."}
+mut_sc <- mutenm(wt, site_mut = 50, mutation = 1, mut_model = "sclfenm", seed = 123)
+dmsf <- Dmsfi(wt, mut_sc)
+
+df <- data.frame(site = sites, dmsf = dmsf)
+ggplot(df, aes(x = site, y = dmsf)) +
+  geom_line(color = "darkgreen") +
+  geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.5) +
+  geom_vline(xintercept = sites[50], linetype = "dashed", alpha = 0.5, color = "red") +
+  labs(x = "Residue", y = "ΔMSF",
+       title = "Change in Flexibility (sclfenm)",
+       subtitle = "Positive = more flexible, Negative = more rigid") +
+  theme_minimal()
+```
+
+## Multiple Mutations at One Site
+
+To get a robust estimate of mutation effects, average over multiple random perturbations:
+
+```{r multiple-mutations, fig.cap="Averaging over multiple mutations reduces noise in the response."}
+nmut <- 5
+results <- lapply(1:nmut, function(m) {
+  mut <- mutenm(wt, site_mut = 50, mutation = m, seed = 42)
+  Dr2i(wt, mut)
+})
+
+# Average
+dr2_mean <- Reduce(`+`, results) / nmut
+
+# Individual mutations
+df_indiv <- data.frame(
+  site = rep(sites, nmut),
+  dr2 = unlist(results),
+  mutation = rep(1:nmut, each = length(sites))
+)
+
+# Plot
+ggplot() +
+  geom_line(data = df_indiv, aes(x = site, y = dr2, group = mutation),
+            alpha = 0.3, color = "gray") +
+  geom_line(data = data.frame(site = sites, dr2 = dr2_mean),
+            aes(x = site, y = dr2), color = "darkred", linewidth = 1) +
+  labs(x = "Residue", y = "Squared Displacement",
+       title = "Individual Mutations (gray) vs. Average (red)") +
+  theme_minimal()
+```
+
+This is exactly what `mrs()` does automatically.
+
+## Summary
+
+| Function | Description |
+|----------|-------------|
+| `mutenm(wt, site_mut, ...)` | Create a mutant |
+| `Dr2i(wt, mut)` | Squared displacement per site |
+| `Dr2n(wt, mut)` | Squared displacement per mode |
+| `Dmsfi(wt, mut)` | Change in MSF per site (sclfenm only) |
+| `Dmsfn(wt, mut)` | Change in MSF per mode (sclfenm only) |
+| `Dv_min(wt, mut)` | Change in stress energy |
+| `Dg_ent(wt, mut)` | Change in entropic free energy (sclfenm only) |
+
+**Key points:**
+
+- Use `lfenm` for speed (structure and energy only)
+- Use `sclfenm` when you need dynamics changes
+- Average over multiple mutations for robust estimates
+- The `mrs()` function automates scanning all sites

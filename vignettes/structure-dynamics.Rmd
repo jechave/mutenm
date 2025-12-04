@@ -1,0 +1,276 @@
+---
+title: "Protein Structure and Dynamics Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Protein Structure and Dynamics Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+This vignette covers the single-protein analysis functions in `mutenm` for characterizing protein structure, dynamics, and energetics.
+
+```{r message=FALSE}
+library(mutenm)
+library(ggplot2)
+
+# Build the ENM
+pdb <- bio3d::read.pdb(system.file("extdata", "2acy.pdb", package = "mutenm"))
+prot <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+sites <- prot$nodes$pdb_site
+```
+
+## Structural Properties
+
+### Contact Number (`cn`)
+
+The contact number counts how many neighbors each residue has within the cutoff distance:
+$$\text{CN}_i = \sum_{j \neq i} \theta(d_{max} - d_{ij})$$
+
+```{r contact-number, fig.cap="Contact number profile showing buried (high CN) and exposed (low CN) residues."}
+contacts <- cn(prot)
+
+df <- data.frame(site = sites, cn = contacts)
+ggplot(df, aes(x = site, y = cn)) +
+  geom_line(color = "steelblue") +
+  geom_hline(yintercept = mean(contacts), linetype = "dashed", alpha = 0.5) +
+  labs(x = "Residue", y = "Contact Number",
+       title = "Contact Number Profile",
+       subtitle = "Dashed line shows mean") +
+  theme_minimal()
+```
+
+**Interpretation:**
+
+- High CN: Well-packed, buried residues (protein core)
+- Low CN: Exposed residues (surface, loops)
+
+### Weighted Contact Number (`wcn`)
+
+The weighted contact number gives more weight to closer neighbors:
+$$\text{WCN}_i = \sum_{j \neq i} \frac{1}{d_{ij}^2}$$
+
+```{r wcn-profile, fig.cap="Weighted contact number gives higher weight to close contacts."}
+weighted_contacts <- wcn(prot)
+
+df <- data.frame(site = sites, wcn = weighted_contacts)
+ggplot(df, aes(x = site, y = wcn)) +
+  geom_line(color = "darkgreen") +
+  labs(x = "Residue", y = "Weighted Contact Number",
+       title = "Weighted Contact Number Profile") +
+  theme_minimal()
+```
+
+**When to use WCN:**
+
+- WCN correlates better with evolutionary conservation
+- WCN captures packing density more accurately than CN
+
+### Distance to Active Site (`dactive`)
+
+Calculates the distance from each residue to the nearest active site residue:
+
+```{r dactive-profile, fig.cap="Distance from each residue to the active site (residues 23 and 41)."}
+# 2ACY active site residues
+active_sites <- c(23, 41)
+dist_to_active <- dactive(prot, pdb_site_active = active_sites)
+
+df <- data.frame(site = sites, dactive = dist_to_active)
+ggplot(df, aes(x = site, y = dactive)) +
+  geom_line(color = "darkred") +
+  geom_vline(xintercept = active_sites, linetype = "dashed", alpha = 0.5) +
+  labs(x = "Residue", y = "Distance to Active Site (Å)",
+       title = "Distance to Active Site",
+       subtitle = "Dashed lines mark active site residues") +
+  theme_minimal()
+```
+
+## Dynamic Properties
+
+### Mean-Square Fluctuation per Site (`msfi`)
+
+The MSF measures how much each residue fluctuates thermally. It's calculated from the diagonal of the reduced covariance matrix:
+
+$$\text{MSF}_i = \langle (\mathbf{r}_i - \langle\mathbf{r}_i\rangle)^2 \rangle = \text{trace}(C_{ii})$$
+
+```{r msfi-profile, fig.cap="Mean-square fluctuation profile identifying flexible regions (peaks)."}
+msf <- msfi(prot)
+
+df <- data.frame(site = sites, msf = msf)
+ggplot(df, aes(x = site, y = msf)) +
+  geom_line(color = "steelblue") +
+  labs(x = "Residue", y = "Mean-Square Fluctuation",
+       title = "Flexibility Profile") +
+  theme_minimal()
+```
+
+**Interpretation:**
+
+- Peaks: Flexible regions (loops, termini)
+- Valleys: Rigid regions (secondary structure core)
+
+### Comparing with Experimental B-factors
+
+The ENM-predicted MSF should correlate with experimental B-factors from X-ray crystallography:
+
+```{r bfactor-comparison, fig.cap="Correlation between ENM-predicted fluctuations and experimental B-factors."}
+bfactors <- prot$nodes$bfactor
+
+# Scale MSF to B-factor units: B = (8π²/3) × MSF
+msf_scaled <- msf / max(msf) * max(bfactors)
+
+df <- data.frame(
+  site = sites,
+  msf_scaled = msf_scaled,
+  bfactor = bfactors
+)
+
+# Correlation
+cor_val <- cor(msf_scaled, bfactors, use = "complete.obs")
+
+ggplot(df, aes(x = msf_scaled, y = bfactor)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "darkred") +
+  annotate("text", x = max(msf_scaled) * 0.7, y = max(bfactors) * 0.9,
+           label = paste("r =", round(cor_val, 2)), size = 5) +
+  labs(x = "ENM-Predicted Fluctuation (scaled)",
+       y = "Experimental B-factor",
+       title = "ENM vs. Experimental Flexibility") +
+  theme_minimal()
+```
+
+### Mean-Square Fluctuation per Mode (`msfn`)
+
+The contribution of each normal mode to the total fluctuation:
+
+$$\text{MSF}_n = \frac{1}{\lambda_n}$$
+
+where $\lambda_n$ is the eigenvalue (squared frequency) of mode n.
+
+```{r msfn-profile, fig.cap="Mode contributions to flexibility. Low-frequency modes (small n) contribute most."}
+msf_modes <- msfn(prot)
+modes <- seq_along(msf_modes)
+
+df <- data.frame(mode = modes, msf = msf_modes)
+ggplot(df[1:30, ], aes(x = mode, y = msf)) +
+  geom_col(fill = "steelblue", alpha = 0.7) +
+  labs(x = "Mode", y = "MSF Contribution",
+       title = "Mode Contributions to Flexibility",
+       subtitle = "First 30 modes shown") +
+  theme_minimal()
+```
+
+**Key insight:** The lowest-frequency modes dominate the protein's flexibility. Mode 1 (n = 1) is the slowest and contributes most.
+
+## Energy Functions
+
+### Minimum Energy (`v_min`)
+
+The stress energy measures how far the current structure is from equilibrium:
+
+$$V_{min} = \sum_{edges} \frac{1}{2} k_{ij} (d_{ij} - l_{ij})^2$$
+
+For the wild-type structure, this is typically close to zero:
+
+```{r}
+energy <- v_min(prot)
+cat("Minimum energy:", round(energy, 4), "\n")
+```
+
+This becomes meaningful when comparing wild-type and mutant structures.
+
+### Entropic Free Energy (`g_ent`)
+
+The entropic contribution to free energy from vibrational modes:
+
+$$G_{ent} = \sum_n \frac{1}{2\beta} \ln\left(\frac{\beta \lambda_n}{2\pi}\right)$$
+
+```{r}
+g <- g_ent(prot)
+cat("Entropic free energy:", round(g, 2), "\n")
+```
+
+### Activation Energies
+
+For enzymes, the energy cost to deform the active site to an "ideal" (transition state) conformation:
+
+```{r}
+# Using the wild-type as the "ideal" (no deformation)
+dv <- dv_act(prot, ideal = prot, pdb_site_active = c(23, 41))
+cat("Activation energy (internal):", round(dv, 4), "\n")
+```
+
+When comparing mutants, `dv_act` measures how much harder/easier it is to reach the transition state.
+
+## Combined Analysis
+
+### Flexibility vs. Packing
+
+There's a strong inverse relationship between packing (CN/WCN) and flexibility (MSF):
+
+```{r combined-analysis, fig.cap="Inverse relationship between local packing and flexibility."}
+df <- data.frame(
+  site = sites,
+  wcn = wcn(prot),
+  msf = msfi(prot)
+)
+
+ggplot(df, aes(x = wcn, y = msf)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "darkred") +
+  labs(x = "Weighted Contact Number",
+       y = "Mean-Square Fluctuation",
+       title = "Packing vs. Flexibility",
+       subtitle = "Well-packed residues are more rigid") +
+  theme_minimal()
+
+cat("Correlation:", round(cor(df$wcn, df$msf), 3), "\n")
+```
+
+### Active Site Analysis
+
+Residues near the active site are often more constrained:
+
+```{r active-site-analysis, fig.cap="Flexibility as a function of distance to active site."}
+df <- data.frame(
+  site = sites,
+  dactive = dactive(prot, pdb_site_active = c(23, 41)),
+  msf = msfi(prot)
+)
+
+ggplot(df, aes(x = dactive, y = msf)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "loess", se = TRUE, color = "darkred", alpha = 0.2) +
+  labs(x = "Distance to Active Site (Å)",
+       y = "Mean-Square Fluctuation",
+       title = "Active Site Proximity vs. Flexibility") +
+  theme_minimal()
+```
+
+## Summary
+
+| Function | Returns | Description |
+|----------|---------|-------------|
+| `cn(prot)` | vector[nsites] | Contact number per site |
+| `wcn(prot)` | vector[nsites] | Weighted contact number |
+| `dactive(prot, sites)` | vector[nsites] | Distance to active site |
+| `msfi(prot)` | vector[nsites] | Mean-square fluctuation per site |
+| `msfn(prot)` | vector[nmodes] | MSF contribution per mode |
+| `v_min(prot)` | scalar | Minimum (stress) energy |
+| `g_ent(prot)` | scalar | Entropic free energy |
+| `dv_act(prot, ideal, sites)` | scalar | Activation energy (internal) |
+| `dg_ent_act(prot, ideal, sites)` | scalar | Activation energy (entropic) |
+
+**Key relationships:**
+
+- High CN/WCN → Low MSF (packed residues are rigid)
+- Low-frequency modes dominate fluctuations
+- ENM MSF correlates with experimental B-factors

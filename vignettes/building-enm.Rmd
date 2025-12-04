@@ -1,0 +1,285 @@
+---
+title: "Building Elastic Network Models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Building Elastic Network Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 4
+)
+```
+
+This vignette explains how to build Elastic Network Models with `mutenm`, covering the different node types, model variants, and how to explore the resulting `prot` object.
+
+```{r message=FALSE}
+library(mutenm)
+library(ggplot2)
+```
+
+## The `enm()` Function
+
+The `enm()` function builds an ENM from a PDB structure:
+
+```{r eval=FALSE}
+enm(pdb, node, model, d_max)
+```
+
+**Arguments:**
+
+- `pdb`: A PDB object from `bio3d::read.pdb()`
+- `node`: How to represent residues (`"ca"`, `"cb"`, or `"sc"`)
+- `model`: Spring constant model (`"ming_wall"`, `"anm"`, `"pfanm"`, etc.)
+- `d_max`: Distance cutoff for contacts (in Angstroms)
+
+## Node Types
+
+The `node` parameter determines how each residue is represented in the network:
+
+### Alpha Carbons (`node = "ca"`)
+
+The simplest and most common choice. Each residue is represented by its Cα atom position.
+
+```{r}
+pdb <- bio3d::read.pdb(system.file("extdata", "2acy.pdb", package = "mutenm"))
+enm_ca <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+```
+
+**Advantages:** Fast, well-established, good for backbone motions.
+
+### Beta Carbons (`node = "cb"`)
+
+Each residue is represented by its Cβ atom (Cα for glycine). This captures some information about side chain orientation.
+
+```{r}
+enm_cb <- enm(pdb, node = "cb", model = "ming_wall", d_max = 10.5)
+```
+
+**Advantages:** Better representation of side chain contacts.
+
+### Side Chain Centroids (`node = "sc"`)
+
+Each residue is represented by the center of mass of its side chain atoms.
+
+```{r}
+enm_sc <- enm(pdb, node = "sc", model = "ming_wall", d_max = 10.5)
+```
+
+**Advantages:** Most detailed representation, includes side chain bulk.
+
+### Comparing Node Types
+
+Let's compare the flexibility profiles from different node representations:
+
+```{r node-comparison, fig.cap="Mean-square fluctuation profiles from different node representations."}
+sites <- enm_ca$nodes$pdb_site
+
+df <- data.frame(
+  site = rep(sites, 3),
+  msf = c(msfi(enm_ca), msfi(enm_cb), msfi(enm_sc)),
+  node = rep(c("ca", "cb", "sc"), each = length(sites))
+)
+
+ggplot(df, aes(x = site, y = msf, color = node)) +
+  geom_line(alpha = 0.8) +
+  labs(x = "Residue", y = "Mean-Square Fluctuation",
+       title = "Flexibility Profiles by Node Type",
+       color = "Node") +
+  scale_color_manual(values = c("ca" = "steelblue", "cb" = "darkred", "sc" = "darkgreen")) +
+  theme_minimal()
+```
+
+The profiles are similar in shape but differ in magnitude. The `sc` representation typically shows larger fluctuations because side chain centroids are further from the backbone.
+
+## Model Types
+
+The `model` parameter determines how spring constants are assigned:
+
+### Ming-Wall Model (`model = "ming_wall"`)
+
+The recommended default. Uses uniform spring constants but applies a higher stiffness (42×) to backbone contacts (i, i+1).
+
+```{r}
+enm_mw <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+```
+
+**When to use:** General-purpose modeling. Good balance of simplicity and accuracy.
+
+### Anisotropic Network Model (`model = "anm"`)
+
+The simplest model. All springs have the same constant (k = 1).
+
+```{r}
+enm_anm <- enm(pdb, node = "ca", model = "anm", d_max = 10.5)
+```
+
+**When to use:** When you want the most basic model, or for comparison with literature.
+
+### Parameter-Free ANM (`model = "pfanm"`)
+
+Spring constants depend on distance: k ∝ 1/d².
+
+```{r}
+enm_pf <- enm(pdb, node = "ca", model = "pfanm", d_max = 15)
+```
+
+**When to use:** When you want to avoid arbitrary parameters. Note: requires larger cutoff.
+
+### Hinsen Models (`model = "hnm"` or `"hnm0"`)
+
+More sophisticated distance-dependent spring constants based on physical models.
+
+```{r}
+enm_hnm <- enm(pdb, node = "ca", model = "hnm0", d_max = 15)
+```
+
+**When to use:** When accurate dynamics predictions are important.
+
+### Comparing Models
+
+```{r model-comparison, fig.cap="Mean-square fluctuation profiles from different ENM models."}
+df <- data.frame(
+  site = rep(sites, 4),
+  msf = c(msfi(enm_mw), msfi(enm_anm), msfi(enm_pf), msfi(enm_hnm)),
+  model = rep(c("ming_wall", "anm", "pfanm", "hnm0"), each = length(sites))
+)
+
+ggplot(df, aes(x = site, y = msf, color = model)) +
+  geom_line(alpha = 0.8) +
+  labs(x = "Residue", y = "Mean-Square Fluctuation",
+       title = "Flexibility Profiles by Model Type",
+       color = "Model") +
+  theme_minimal()
+```
+
+## The `prot` Object
+
+The `enm()` function returns a `prot` object, which is a list containing all the ENM information:
+
+```{r}
+wt <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+names(wt)
+```
+
+### Parameters (`$param`)
+
+Stores the ENM construction parameters:
+
+```{r}
+wt$param
+```
+
+### Node Information (`$nodes`)
+
+Contains information about each node (residue):
+
+```{r}
+str(wt$nodes)
+```
+
+- `nsites`: Number of residues
+- `site`: Sequential site index (1, 2, 3, ...)
+- `pdb_site`: PDB residue numbers
+- `bfactor`: Experimental B-factors from PDB
+- `xyz`: Atomic coordinates (3 × nsites vector)
+
+### Network Graph (`$graph`)
+
+The graph representation of the network as a tibble:
+
+```{r}
+head(wt$graph)
+```
+
+- `edge`: Edge label ("i-j")
+- `i`, `j`: Connected sites
+- `sdij`: Sequence distance (|j - i|)
+- `lij`: Equilibrium (rest) length
+- `kij`: Spring constant
+- `dij`: Current distance
+
+### Normal Mode Analysis (`$nma`)
+
+Results from diagonalizing the Hessian matrix:
+
+```{r}
+str(wt$nma, max.level = 1)
+```
+
+- `mode`: Mode indices
+- `evalue`: Eigenvalues (squared frequencies)
+- `umat`: Eigenvectors (3N × nmodes matrix)
+- `cmat`: Covariance matrix (3N × 3N)
+
+### Quick Statistics
+
+```{r}
+cat("Number of residues:", wt$nodes$nsites, "\n")
+cat("Number of edges:", nrow(wt$graph), "\n")
+cat("Number of modes:", length(wt$nma$mode), "\n")
+cat("Lowest eigenvalue:", round(min(wt$nma$evalue), 4), "\n")
+```
+
+## Choosing Parameters
+
+### Distance Cutoff (`d_max`)
+
+The cutoff determines which residues are connected:
+
+- **Too small:** Network is sparse, may have disconnected regions
+- **Too large:** Network is dense, computationally expensive
+
+**Recommended values:**
+
+| Node Type | Typical d_max |
+|-----------|---------------|
+| ca | 10-12 Å |
+| cb | 10-12 Å |
+| sc | 12-15 Å |
+
+### Model + Cutoff Combinations
+
+Some common combinations from the literature:
+
+| Model | Node | d_max | Reference |
+|-------|------|-------|-----------|
+| ming_wall | ca | 10.5 | Ming & Wall 2005 |
+| anm | ca | 15 | Atilgan et al. 2001 |
+| pfanm | ca | 15 | Yang et al. 2009 |
+
+## Example: Full Workflow
+
+```{r full-workflow, fig.cap="Contact number vs. mean-square fluctuation showing the inverse relationship between packing and flexibility."}
+# Build ENM
+pdb <- bio3d::read.pdb(system.file("extdata", "2acy.pdb", package = "mutenm"))
+prot <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+
+# Calculate properties
+df <- data.frame(
+  site = prot$nodes$pdb_site,
+  cn = cn(prot),
+  msf = msfi(prot)
+)
+
+# Visualize inverse relationship between packing and flexibility
+ggplot(df, aes(x = cn, y = msf)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "lm", se = FALSE, color = "darkred") +
+  labs(x = "Contact Number", y = "Mean-Square Fluctuation",
+       title = "Packing vs. Flexibility",
+       subtitle = "Well-packed residues are less flexible") +
+  theme_minimal()
+```
+
+## Summary
+
+- Use `node = "ca"` for most applications
+- Use `model = "ming_wall"` as the default
+- Start with `d_max = 10.5` for ca/cb, `d_max = 12.5` for sc
+- The `prot` object contains all the information you need for analysis
