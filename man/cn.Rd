@@ -18,9 +18,6 @@ within the cutoff distance.
 }
 \seealso{
 Other single-protein functions: 
-\code{\link{g_ent}()},
-\code{\link{msfi}()},
-\code{\link{msfn}()},
 \code{\link{v_min}()},
 \code{\link{wcn}()}
 }

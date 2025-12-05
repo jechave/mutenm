@@ -19,9 +19,6 @@ conformation.
 \seealso{
 Other single-protein functions: 
 \code{\link{cn}()},
-\code{\link{g_ent}()},
-\code{\link{msfi}()},
-\code{\link{msfn}()},
 \code{\link{wcn}()}
 }
 \concept{single-protein functions}
