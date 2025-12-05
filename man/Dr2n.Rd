@@ -20,8 +20,6 @@ wild-type.
 }
 \seealso{
 Other mutation-effect functions: 
-\code{\link{Ddg_ent_act}()},
-\code{\link{Ddv_act}()},
 \code{\link{Dg_ent}()},
 \code{\link{Dmsfi}()},
 \code{\link{Dmsfn}()},

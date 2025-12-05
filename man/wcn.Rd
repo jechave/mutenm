@@ -19,9 +19,6 @@ for all pairs.
 \seealso{
 Other single-protein functions: 
 \code{\link{cn}()},
-\code{\link{dactive}()},
-\code{\link{dg_ent_act}()},
-\code{\link{dv_act}()},
 \code{\link{g_ent}()},
 \code{\link{msfi}()},
 \code{\link{msfn}()},

@@ -8,19 +8,3 @@ test_that("v_min returns correct value", {
 test_that("g_ent returns correct value", {
   expect_equal(g_ent(wt, beta = 1.0), ref_enm_g_entropy)
 })
-
-test_that("dv_act returns NA when no active site", {
-  expect_true(is.na(dv_act(wt, wt, pdb_site_active = NA)))
-})
-
-test_that("dv_act returns correct value with active site", {
-  expect_equal(dv_act(wt, wt, pdb_site_active), ref_dgact_dv)
-})
-
-test_that("dg_ent_act returns NA when no active site", {
-  expect_true(is.na(dg_ent_act(wt, wt, pdb_site_active = NA)))
-})
-
-test_that("dg_ent_act returns correct value with active site", {
-  expect_equal(dg_ent_act(wt, wt, pdb_site_active), ref_dgact_tds)
-})

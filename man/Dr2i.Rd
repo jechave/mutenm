@@ -19,8 +19,6 @@ Calculates the squared displacement at each site between wild-type and mutant.
 }
 \seealso{
 Other mutation-effect functions: 
-\code{\link{Ddg_ent_act}()},
-\code{\link{Ddv_act}()},
 \code{\link{Dg_ent}()},
 \code{\link{Dmsfi}()},
 \code{\link{Dmsfn}()},

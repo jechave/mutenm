@@ -30,25 +30,6 @@ cn <- function(prot) cn_xyz(get_xyz(prot), get_d_max(prot))
 #' @export
 wcn <- function(prot) wcn_xyz(get_xyz(prot))
 
-#' Distance to Active Site
-#'
-#' Calculates the distance from each site to the closest active site residue.
-#'
-#' @inheritParams mutenm-params
-#' @returns a vector of size nsites with dactive values for each site
-#'
-#' @family single-protein functions
-#'
-#' @export
-dactive <- function(prot, pdb_site_active) {
-  xyz <- get_xyz(prot)
-  asite <- active_site_indexes(prot, pdb_site_active)
-  site_active <- asite$site_active
-  result <- dactive.xyz(xyz, site_active)
-  result
-}
-
-
 # Dynamics ----------------------------------------------------------------
 
 #' Mean-Square Fluctuation per Site
@@ -118,57 +99,6 @@ g_ent <- function(prot, beta = beta_boltzmann()) {
 }
 
 
-#' Activation Energy (Internal)
-#'
-#' Calculates the internal energy contribution to activation - the cost to
-#' deform the active site to the ideal conformation.
-#'
-#' @inheritParams mutenm-params
-#' @return a scalar energy value (NA if pdb_site_active is NA)
-#'
-#' @family single-protein functions
-#'
-#' @export
-dv_act <- function(prot, ideal, pdb_site_active = NA) {
-  if (anyNA(pdb_site_active)) {
-    result <- NA
-  } else {
-    kmat_asite <- kmat_asite(prot, pdb_site_active)
-    dxyz_asite <- dxyz_asite(prot, ideal, pdb_site_active)
-    result <- .5 * my_quad_form(dxyz_asite, kmat_asite, dxyz_asite)
-  }
-  result
-}
-
-#' Activation Energy (Entropic)
-#'
-#' Calculates the entropic contribution to activation energy.
-#'
-#' @inheritParams mutenm-params
-#' @return a scalar energy value (NA if pdb_site_active is NA)
-#'
-#' @family single-protein functions
-#'
-#' @export
-dg_ent_act <- function(prot, ideal, pdb_site_active = NA, beta = beta_boltzmann()) {
-  # Calculate entropic contribution to dg_activation
-  if (anyNA(pdb_site_active)) {
-    result <- NA
-  } else {
-    # prot, with its active site in a "relaxed" state
-    kmat_asite <- kmat_asite(prot, pdb_site_active)
-    eig <- eigen(kmat_asite, symmetric = TRUE, only.values = TRUE)
-    evalue <- eig$values
-    gact_prot <- sum(g_ent_mode(evalue, beta))
-    # prot, with its active site in the ideal conformation
-    gact_ideal <- 0 # assume in the TS the active-site is rigid
-
-    result <- gact_ideal - gact_prot
-  }
-  result
-}
-
-
 # Internal helpers --------------------------------------------------------
 
 #' Calculate reduced covariance matrix
@@ -202,47 +132,3 @@ g_ent_mode <- function(energy, beta) {
 }
 
 
-#' Active site indexes
-#'
-#' @noRd
-#'
-active_site_indexes <- function(prot, pdb_site_active) {
-  pdb_site_active <- pdb_site_active  # active sites in pdb numbering
-  site <- get_site(prot)
-  pdb_site <- get_pdb_site(prot)
-  site_active <- site[pdb_site %in% pdb_site_active] # active site in protein numbering
-  ind_active <- xyz_indices_site(site_active) # indices of xyz coordinates of active sites
-  lst(pdb_site_active, site_active, ind_active)
-}
-
-
-#' Caculate effective K matrix of active site
-#'
-#' @noRd
-#'
-kmat_asite <- function(prot, pdb_site_active) {
-  asite <- active_site_indexes(prot, pdb_site_active)
-  cmat <- get_cmat(prot)
-  cmat_asite <- cmat[asite$ind_active, asite$ind_active]
-  kmat_asite <- solve(cmat_asite)
-  kmat_asite
-}
-
-
-#' Activation energy, internal energy term
-#'
-#' @noRd
-#'
-dxyz_asite <- function(prot, ideal, pdb_site_active = NA) {
-  if (anyNA(pdb_site_active)) {
-    result <- NA
-  } else {
-    asite <- active_site_indexes(prot, pdb_site_active)
-
-    dxyz <- get_xyz(prot) - get_xyz(ideal)
-    site_active <- asite$site_active
-    dxyz <- my_as_xyz(dxyz)
-    result <- as.vector(dxyz[, site_active])
-  }
-  result
-}

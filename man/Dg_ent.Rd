@@ -21,8 +21,6 @@ Calculates the change in entropic free energy between wild-type and mutant.
 }
 \seealso{
 Other mutation-effect functions: 
-\code{\link{Ddg_ent_act}()},
-\code{\link{Ddv_act}()},
 \code{\link{Dmsfi}()},
 \code{\link{Dmsfn}()},
 \code{\link{Dr2i}()},

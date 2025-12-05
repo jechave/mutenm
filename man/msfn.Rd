@@ -19,9 +19,6 @@ Calculates the mean-square fluctuation contribution from each normal mode
 \seealso{
 Other single-protein functions: 
 \code{\link{cn}()},
-\code{\link{dactive}()},
-\code{\link{dg_ent_act}()},
-\code{\link{dv_act}()},
 \code{\link{g_ent}()},
 \code{\link{msfi}()},
 \code{\link{v_min}()},

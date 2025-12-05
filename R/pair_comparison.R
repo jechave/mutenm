@@ -114,34 +114,3 @@ Dg_ent <- function(wt, mut, beta = beta_boltzmann())
   g_ent(mut, beta) - g_ent(wt, beta)
 
 
-#' Change in Activation Energy (Internal)
-#'
-#' Calculates the change in internal energy contribution to activation between
-#' wild-type and mutant.
-#'
-#' @inheritParams mutenm-params
-#' @return a scalar energy difference (NA if pdb_site_active is NA)
-#'
-#' @family mutation-effect functions
-#'
-#' @export
-Ddv_act <- function(wt, mut, ideal = wt, pdb_site_active = NA) {
-  result <- dv_act(mut, ideal, pdb_site_active) - dv_act(wt, ideal, pdb_site_active)
-  result
-}
-
-#' Change in Activation Energy (Entropic)
-#'
-#' Calculates the change in entropic contribution to activation energy between
-#' wild-type and mutant.
-#'
-#' @inheritParams mutenm-params
-#' @return a scalar energy difference (NA if pdb_site_active is NA)
-#'
-#' @family mutation-effect functions
-#'
-#' @export
-Ddg_ent_act <- function(wt, mut, ideal = wt, pdb_site_active = NA, beta = beta_boltzmann()) {
-  result <- dg_ent_act(mut, ideal, pdb_site_active) - dg_ent_act(wt, ideal, pdb_site_active)
-  result
-}

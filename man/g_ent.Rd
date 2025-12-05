@@ -20,9 +20,6 @@ Calculates the entropic free energy contribution from vibrational modes.
 \seealso{
 Other single-protein functions: 
 \code{\link{cn}()},
-\code{\link{dactive}()},
-\code{\link{dg_ent_act}()},
-\code{\link{dv_act}()},
 \code{\link{msfi}()},
 \code{\link{msfn}()},
 \code{\link{v_min}()},

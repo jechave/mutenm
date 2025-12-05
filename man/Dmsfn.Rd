@@ -22,8 +22,6 @@ Note: Requires the `sclfenm` mutation model to be meaningful.
 }
 \seealso{
 Other mutation-effect functions: 
-\code{\link{Ddg_ent_act}()},
-\code{\link{Ddv_act}()},
 \code{\link{Dg_ent}()},
 \code{\link{Dmsfi}()},
 \code{\link{Dr2i}()},
