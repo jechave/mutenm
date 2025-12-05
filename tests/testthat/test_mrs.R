@@ -1,53 +1,47 @@
 # Test mrs() function
 
-test_that("mrs produces expected output", {
-  # Load reference data
-  load(test_path("..", "data", "mrs_all_output.rda"))
+test_that("mrs returns correct structure", {
+  pdb_file <- system.file("extdata", "2acy.pdb", package = "mutenm")
+  pdb <- bio3d::read.pdb(pdb_file)
 
-  # Load wt
-  load(test_path("..", "data", "prot_2acy_A_ming_wall_ca.rda"))
-  wt <- prot_2acy_A_ming_wall_ca
+  result <- mrs(pdb, nmut = 1, seed = 42)
 
-  # Generate mrs output with same parameters
-  result <- mrs(wt, nmut = 2, mut_model = "sclfenm", seed = 42)
+  # Check return structure
+  expect_type(result, "list")
+  expect_named(result, c("dr2ij", "influence", "sensitivity", "params"))
 
-  # Compare site responses
-  expect_equal(
-    arrange(result$Dr2i, i, j)$Dr2i,
-    arrange(mrs_all_output$Dr2i, i, j)$Dr2i,
-    tolerance = 1e-10
-  )
-  expect_equal(
-    arrange(result$Dmsfi, i, j)$Dmsfi,
-    arrange(mrs_all_output$Dmsfi, i, j)$Dmsfi,
-    tolerance = 1e-10
-  )
+  # Check dimensions
+  nsites <- result$params$nsites
+  expect_equal(dim(result$dr2ij), c(nsites, nsites))
+  expect_length(result$influence, nsites)
+  expect_length(result$sensitivity, nsites)
 
-  # Compare mode responses
-  expect_equal(
-    arrange(result$Dr2n, n, j)$Dr2n,
-    arrange(mrs_all_output$Dr2n, n, j)$Dr2n,
-    tolerance = 1e-10
-  )
-  expect_equal(
-    arrange(result$Dmsfn, n, j)$Dmsfn,
-    arrange(mrs_all_output$Dmsfn, n, j)$Dmsfn,
-    tolerance = 1e-10
-  )
-
-  # Compare scalar responses
-  expect_equal(result$Dv_min$Dv_min, mrs_all_output$Dv_min$Dv_min, tolerance = 1e-10)
-  expect_equal(result$Dg_ent$Dg_ent, mrs_all_output$Dg_ent$Dg_ent, tolerance = 1e-10)
-  expect_equal(result$Ddv_act$Ddv_act, mrs_all_output$Ddv_act$Ddv_act, tolerance = 1e-10)
-  expect_equal(result$Ddg_ent_act$Ddg_ent_act, mrs_all_output$Ddg_ent_act$Ddg_ent_act, tolerance = 1e-10)
+  # Check that influence and sensitivity are column/row means
+  expect_equal(result$influence, colMeans(result$dr2ij))
+  expect_equal(result$sensitivity, rowMeans(result$dr2ij))
 })
 
-test_that("mrs with lfenm produces warning", {
-  load(test_path("..", "data", "prot_2acy_A_ming_wall_ca.rda"))
-  wt <- prot_2acy_A_ming_wall_ca
+test_that("mrs with different parameters works", {
+  pdb_file <- system.file("extdata", "2acy.pdb", package = "mutenm")
+  pdb <- bio3d::read.pdb(pdb_file)
 
-  expect_warning(
-    mrs(wt, nmut = 1, mut_model = "lfenm", seed = 42),
-    "lfenm: dynamics unchanged"
-  )
+  # Test with different node type
+  result_cb <- mrs(pdb, node = "cb", nmut = 1, seed = 42)
+  expect_type(result_cb, "list")
+  expect_equal(result_cb$params$node, "cb")
+
+  # Test with different model
+  result_mw <- mrs(pdb, model = "ming_wall", nmut = 1, seed = 42)
+  expect_type(result_mw, "list")
+  expect_equal(result_mw$params$model, "ming_wall")
+})
+
+test_that("mrs is reproducible with seed", {
+  pdb_file <- system.file("extdata", "2acy.pdb", package = "mutenm")
+  pdb <- bio3d::read.pdb(pdb_file)
+
+  result1 <- mrs(pdb, nmut = 1, seed = 123)
+  result2 <- mrs(pdb, nmut = 1, seed = 123)
+
+  expect_equal(result1$dr2ij, result2$dr2ij)
 })

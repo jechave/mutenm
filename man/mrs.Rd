@@ -5,64 +5,89 @@
 \title{Mutation Response Scanning}
 \usage{
 mrs(
-  wt,
-  nmut,
+  pdb,
+  node = "ca",
+  model = "anm",
+  d_max = 10.5,
   mut_model = "lfenm",
+  nmut = 1,
   mut_dl_sigma = 0.3,
   mut_sd_min = 2,
   seed = NULL
 )
 }
 \arguments{
-\item{wt}{Wild-type protein object created by [enm()]}
+\item{pdb}{A pdb object from \code{bio3d::read.pdb()}}
 
-\item{nmut}{Number of mutations per site}
+\item{node}{Node representation: "ca" (C-alpha), "cb" (C-beta), or "sc" (side-chain centroid)}
+
+\item{model}{ENM model: "anm", "ming_wall", "pfanm", "reach", "hnm", or "hnm0"}
+
+\item{d_max}{Distance cutoff for contacts (Angstroms)}
 
 \item{mut_model}{Mutation model: "lfenm" (fast) or "sclfenm" (recalculates ENM)}
 
-\item{mut_dl_sigma}{Sigma of normal distribution for bond length perturbations}
+\item{nmut}{Number of mutations to simulate per site}
+
+\item{mut_dl_sigma}{Standard deviation for bond length perturbations}
 
 \item{mut_sd_min}{Minimum sequence distance of contacts to perturb}
 
 \item{seed}{Random seed for reproducibility}
 }
 \value{
-List with response tibbles and params:
-  \itemize{
-    \item Dr2i: tibble (i, j, Dr2i) - structural change at site i due to mutation at site j
-    \item Dmsfi: tibble (i, j, Dmsfi) - dynamics change at site i due to mutation at site j
-    \item Dr2n: tibble (n, j, Dr2n) - structural change in mode n due to mutation at site j
-    \item Dmsfn: tibble (n, j, Dmsfn) - dynamics change in mode n due to mutation at site j
-    \item Dv_min: tibble (j, Dv_min) - minimum energy change due to mutation at site j
-    \item Dg_ent: tibble (j, Dg_ent) - entropic free energy change due to mutation at site j
-    \item Ddv_act: tibble (j, Ddv_act) - activation energy change due to mutation at site j
-    \item Ddg_ent_act: tibble (j, Ddg_ent_act) - activation entropy change due to mutation at site j
-    \item params: list with enm_param and mut_param
+A list with components:
+  \describe{
+    \item{dr2ij}{Response matrix (nsites x nsites). Element [i,j] is the mean
+          squared displacement at site i due to mutation at site j.}
+    \item{influence}{Vector of length nsites. Column means of dr2ij —
+          the average effect of mutating each site.}
+    \item{sensitivity}{Vector of length nsites. Row means of dr2ij —
+          the average response of each site to mutations.}
+    \item{params}{List of parameters used (for reproducibility and plotting).}
   }
 }
 \description{
-Systematically scans all sites, simulating mutations and calculating response
-properties for each.
+One-stop function for mutation response analysis. Takes a PDB structure,
+builds an ENM, scans all sites with mutations, and returns the response
+matrix along with influence and sensitivity profiles.
 }
 \details{
-Mutation Response Scanning (MRS) applies \code{\link{mutenm}} to every site
-in the protein, generating \code{nmut} random mutations per site and averaging
-the responses. This produces response tibbles that characterize how mutations
-at each site affect the protein's structure, dynamics, and energetics.
-
-\subsection{Why multiple mutations per site?}{
-Each call to \code{mutenm} generates random perturbations to spring lengths.
-By simulating \code{nmut} independent mutations at each site and averaging,
-we obtain more robust estimates of the typical mutation response at that site.
+Mutation Response Scanning (MRS) provides a complete workflow:
+\enumerate{
+  \item Build an Elastic Network Model from the PDB structure
+  \item For each site, simulate \code{nmut} random mutations
+  \item Calculate the squared displacement at every site for each mutation
+  \item Average over mutations to get the response matrix
+  \item Compute influence (column means) and sensitivity (row means) profiles
 }
 
-\subsection{Memory efficiency}{
-Uses a process-and-discard approach: each mutant is generated, analyzed, then
-discarded before creating the next. This keeps memory usage constant regardless
-of protein size.
+The response matrix \code{dr2ij[i,j]} represents the mean squared displacement
+at site \code{i} caused by mutations at site \code{j}.
+
+\subsection{Influence and Sensitivity}{
+\itemize{
+  \item \strong{Influence}: How much does mutating site j affect the whole protein?
+        (column means of dr2ij)
+  \item \strong{Sensitivity}: How much does site i respond to mutations anywhere?
+        (row means of dr2ij)
 }
+}
+}
+\examples{
+\dontrun{
+pdb <- bio3d::read.pdb("2acy")
+result <- mrs(pdb)
+# View response matrix
+image(log10(result$dr2ij))
+# Plot profiles
+plot(result$influence, type = "l")
+}
+
 }
 \seealso{
+\code{\link{enm}}, \code{\link{mutenm}}, \code{\link{plot_mrs}}
+
 Other core functions: 
 \code{\link{enm}()},
 \code{\link{mutenm}()}
