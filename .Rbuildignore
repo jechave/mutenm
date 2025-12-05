@@ -17,5 +17,6 @@
 ^paper\.pdf$
 ^paper_figure\.R$
 ^paper_figure\.png$
+^paper_figure\.pdf$
 ^paper_mrs_results\.rds$
 ^README\.html$

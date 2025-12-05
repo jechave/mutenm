@@ -1,5 +1,5 @@
 ---
-title: 'mutenm: An R package for simulating mutation effects on protein structure and dynamics using elastic network models'
+title: 'mutenm: An R package for simulating mutation effects on protein structure using elastic network models'
 tags:
   - R
   - proteins
@@ -26,27 +26,29 @@ bibliography: paper.bib
 
 `mutenm` is an R package for building elastic network models (ENMs) of proteins and simulating the effects of mutations using linear response theory. An ENM represents a protein as a network of nodes (typically one per residue) connected by harmonic springs. Despite their simplicity, ENMs capture the functionally relevant low-frequency collective motions of proteins through normal mode analysis.
 
-Given a protein structure, `mutenm` constructs an ENM and provides tools for analyzing both the wild-type protein and the effects of mutations. For wild-type analysis, it calculates structural descriptors such as local packing density, dynamic properties including thermal fluctuations per residue and per normal mode, and thermodynamic quantities such as conformational entropy and activation energies. For mutation analysis, the package simulates how amino acid substitutions perturb the elastic network and quantifies the resulting structural displacements, flexibility changes, and energetic costs.
+Given a protein structure, `mutenm` constructs an ENM and calculates how mutations at each site propagate structural effects throughout the protein. The package provides Mutation Response Scanning (MRS), which systematically simulates mutations at every site and quantifies the resulting structural displacements, producing response matrices and profiles that reveal structural communication pathways within the protein.
 
 # Statement of Need
 
 Understanding how mutations affect protein structure and function is central to protein evolution, disease genetics, and protein engineering. Experimental approaches like deep mutational scanning generate large datasets, but computational methods are needed to interpret these results and predict effects of unstudied mutations.
 
-Elastic network models provide a computationally efficient way to capture protein flexibility and have been widely used to study protein dynamics. However, most ENM software focuses on analyzing wild-type proteins rather than predicting mutation effects. The Perturbation Response Scanning (PRS) method in ProDy [@bakan2011; @zhang2021] is a related approach, but it applies external forces to residues rather than perturbing the ENM Hamiltonian itself. Importantly, PRS only predicts structural displacements—it cannot capture how mutations affect protein dynamics.
+Elastic network models provide a computationally efficient way to capture protein flexibility and have been widely used to study protein dynamics. However, most ENM software focuses on analyzing wild-type proteins rather than predicting mutation effects. The Perturbation Response Scanning (PRS) method in ProDy [@bakan2011; @zhang2021] is a related approach, but it applies external forces to residues rather than perturbing the ENM Hamiltonian itself.
 
-The `mutenm` package implements the Linearly Forced ENM (LFENM) approach [@echave2008; @echave2010], which models mutations as perturbations to spring equilibrium lengths—a more physically realistic representation of how amino acid substitutions alter local interactions. The package also implements the self-consistent LFENM (scLFENM) [@echave2012], which recalculates normal modes after structural relaxation, enabling prediction of mutation effects on protein dynamics and entropy—quantities inaccessible to PRS. These methods have been applied to study how mutation and selection shape protein structural divergence [@marcos2020; @echave2025].
+The `mutenm` package implements the Linearly Forced ENM (LFENM) approach [@echave2008; @echave2010], which models mutations as perturbations to spring equilibrium lengths—a more physically realistic representation of how amino acid substitutions alter local interactions. These methods have been applied to study how mutation and selection shape protein structural divergence [@marcos2020; @echave2025].
 
 # Functionality
 
-The package implements a complete workflow for mutation analysis through three core functions:
+The package implements a complete workflow for mutation analysis through four functions:
 
-**Building the model.** The `enm()` function constructs an elastic network model from a PDB structure. The resulting model can be analyzed to obtain structural properties (contact number, weighted contact number, distance to active site), dynamic properties (mean-square fluctuations per residue and per mode), and energetic quantities (stress energy, conformational entropy, activation energies). Figure 1A shows the wild-type fluctuation profile for acylphosphatase.
+**Building the model.** The `enm()` function constructs an elastic network model from a PDB structure. It supports multiple node representations (Cα, Cβ, side-chain centroid) and several ENM variants (ANM, Ming-Wall, parameter-free ANM, and others). The resulting model contains the network topology, spring constants, and normal mode analysis results including the covariance matrix used for linear response calculations.
 
-**Simulating single mutations.** The `mutenm()` function simulates a mutation at a specified site by perturbing spring equilibrium lengths. Two models are available: LFENM (fast, structure only) and scLFENM (slower, recalculates dynamics). Functions quantify changes between wild-type and mutant in structure (`Dr2i`, `Dr2n`), dynamics (`Dmsfi`, `Dmsfn`), and energy (`Dv_min`, `Dg_ent`, `Ddv_act`, `Ddg_ent_act`). Figure 1B shows the change in fluctuations caused by a mutation at site 16.
+**Simulating single mutations.** The `mutenm()` function simulates a mutation at a specified site by perturbing spring equilibrium lengths around the mutated residue. The structural response is calculated using linear response theory: δr = C × f, where C is the covariance matrix and f is the force arising from the perturbed springs. This provides the displacement at every site caused by the mutation.
 
-**Mutation response scanning.** The `mrs()` function systematically applies `mutenm()` to every site, averaging over multiple random perturbations per site to obtain robust estimates. The output includes response matrices showing how mutations at each site affect structure and dynamics at every other site (Figure 1C). From these matrices, two informative profiles can be derived: the sensitivity profile (how much each site's dynamics change when mutations occur elsewhere) and the influence profile (how much mutations at each site affect dynamics globally). Sites with high sensitivity or influence tend to evolve more slowly, as mutations there have larger functional consequences (Figure 1D).
+**Mutation response scanning.** The `mrs()` function systematically applies `mutenm()` to every site, averaging over multiple random perturbations per site to obtain robust estimates. The output includes a response matrix dr2ij[i,j] representing the mean squared displacement at site i caused by mutations at site j (Figure 1, left panel). From this matrix, two informative profiles are derived: the influence profile (column means—how much mutations at each site affect the protein globally) and the sensitivity profile (row means—how much each site responds to mutations anywhere).
 
-![Mutation effects on protein dynamics for acylphosphatase (PDB: 2ACY). A) Wild-type fluctuation profile from `enm()`. B) Change in fluctuations from a mutation at site 16 (dashed line) using `mutenm()`. C) Dynamics response matrix from `mrs()` showing flexibility change at each site (y-axis) caused by mutations at each site (x-axis). D) Sensitivity and influence profiles derived from the response matrix.](paper_figure.png){width=100%}
+**Visualization.** The `plot_mrs()` function creates publication-ready figures showing the response matrix as a heatmap alongside the influence and sensitivity profiles (Figure 1). Sites with high influence are structurally important—mutations there cause large displacements throughout the protein. Sites with high sensitivity are structurally responsive—they move substantially regardless of where the mutation occurs. These profiles correlate with evolutionary conservation, as sites with high influence or sensitivity tend to evolve more slowly [@echave2025].
+
+![Mutation response analysis of acylphosphatase (PDB: 2ACY) using `mrs()` and `plot_mrs()`. Left: Response matrix showing mean squared displacement at each site (y-axis) caused by mutations at each site (x-axis), with log10 color scale. Right: Influence profile (top) showing the effect of mutating each site, and sensitivity profile (bottom) showing how each site responds to mutations elsewhere.](paper_figure.png){width=100%}
 
 # Acknowledgements
 
