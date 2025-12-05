@@ -22,25 +22,6 @@ Dr2i <- function(wt, mut) {
   dr2i
 }
 
-#' Squared Displacement per Mode
-#'
-#' Calculates the squared displacement projected onto each normal mode of the
-#' wild-type.
-#'
-#' @inheritParams mutenm-params
-#' @return a vector of size nmodes with squared displacements
-#'
-#' @family mutation-effect functions
-#'
-#' @export
-Dr2n <- function(wt, mut) {
-  stopifnot(wt$node$pdb_site == mut$node$pdb_site) # no indels
-  dr <- as.vector(get_xyz(mut) - get_xyz(wt))
-  drn <- as.vector(crossprod(get_umat(wt), dr))
-  stopifnot(length(wt$nma$mode) == length(drn))
-  dr2n <- drn^2
-  as.vector(dr2n)
-}
 
 
 

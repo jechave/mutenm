@@ -17,8 +17,4 @@ a vector of size nsites with squared displacements
 \description{
 Calculates the squared displacement at each site between wild-type and mutant.
 }
-\seealso{
-Other mutation-effect functions: 
-\code{\link{Dr2n}()}
-}
 \concept{mutation-effect functions}
