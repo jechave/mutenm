@@ -1,4 +1,7 @@
 
+# Suppress R CMD check notes for tidyverse non-standard evaluation
+utils::globalVariables(c("dij", "sdij", "edge", "v0ij", "lij", "kij", "i", "j"))
+
 # Create and set prot object ----------------------------------------------
 
 

@@ -11,30 +11,12 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width = 6,
+  fig.width = 7,
   fig.height = 4
 )
 ```
 
-The `mutenm` package builds Elastic Network Models (ENMs) of proteins and simulates mutation effects using linear response theory. This vignette provides a quick introduction to get you started.
-
-## What is an Elastic Network Model?
-
-An Elastic Network Model (ENM) represents a protein as a network of nodes connected by harmonic springs:
-
-- **Nodes** are typically placed at the positions of alpha carbons (Cα), one per residue
-- **Springs** connect nearby nodes (within a cutoff distance)
-- **Normal modes** describe the collective motions of the network
-
-The key insight is that the low-frequency normal modes of this simple model capture the large-scale, functionally relevant motions of proteins surprisingly well, despite ignoring most atomic detail.
-
-## Why simulate mutations?
-
-Mutations can alter protein structure, dynamics, and function. The `mutenm` package uses linear response theory to predict how mutations propagate structural effects through the protein network:
-
-1. A mutation is modeled as a perturbation to the spring lengths around the mutated site
-2. The structural response is calculated using: **δr = C × f** (displacement = covariance × force)
-3. This is much faster than full molecular dynamics while capturing the essential physics
+The `mutenm` package builds Elastic Network Models (ENMs) of proteins and simulates mutation effects using linear response theory.
 
 ## Installation
 
@@ -43,134 +25,127 @@ Mutations can alter protein structure, dynamics, and function. The `mutenm` pack
 devtools::install_github("jechave/mutenm")
 ```
 
-## Quick Start: The Three-Step Workflow
+## Quick Start
 
 ```{r message=FALSE}
 library(mutenm)
-library(ggplot2)
 ```
 
-### Step 1: Build the ENM
+### Step 1: Build an ENM
 
 Read a PDB structure and create the elastic network model:
 
 ```{r}
-# Read PDB file (2acy is acetylcholinesterase from Torpedo californica)
+# Read PDB file (2acy is acetylcholinesterase)
 pdb <- bio3d::read.pdb(system.file("extdata", "2acy.pdb", package = "mutenm"))
 
 # Build the ENM
-wt <- enm(pdb, node = "ca", model = "ming_wall", d_max = 10.5)
+wt <- enm(pdb, node = "ca", model = "anm", d_max = 10.5)
 ```
 
-The `wt` object (wild-type) now contains:
+The `enm()` function returns a protein object containing:
 
-- Network parameters (node type, model, cutoff)
-- Node information (coordinates, residue numbers)
-- The network graph (edges, spring constants)
+- Node coordinates and residue information
+- Network graph (edges and spring constants)
 - Normal mode analysis results (eigenvalues, eigenvectors, covariance matrix)
 
-### Step 2: Analyze the wild-type protein
-
-Calculate structural and dynamic properties:
-
-```{r}
-# Get residue numbers for plotting
-sites <- wt$nodes$pdb_site
-
-# Mean-square fluctuation per site (captures flexibility)
-msf <- msfi(wt)
-
-# Contact number per site (captures local packing)
-contacts <- cn(wt)
-```
-
-Visualize the flexibility profile:
-
-```{r msf-profile, fig.cap="Mean-square fluctuation profile showing flexible (peaks) and rigid (valleys) regions."}
-df <- data.frame(site = sites, msf = msf)
-ggplot(df, aes(x = site, y = msf)) +
-  geom_line(color = "steelblue") +
-  labs(x = "Residue", y = "Mean-Square Fluctuation",
-       title = "Flexibility Profile of 2ACY") +
-  theme_minimal()
-```
-
-### Step 3: Simulate a mutation
+### Step 2: Simulate a Single Mutation
 
 Create a mutant by perturbing the contacts around a specific site:
 
 ```{r}
 # Mutate site 50
 mut <- mutenm(wt, site_mut = 50, mutation = 1, mut_model = "lfenm", seed = 123)
-
-# Calculate structural displacement at each site
-dr2 <- Dr2i(wt, mut)
-
-# Calculate energy change
-dv <- Dv_min(wt, mut)
-cat("Energy change (stress):", round(dv, 3), "\n")
 ```
 
-Visualize where the structure moves:
+The mutation is modeled as random perturbations to spring lengths around the mutated site. The structural response is calculated using linear response theory.
 
-```{r displacement-profile, fig.cap="Structural displacement caused by mutation at site 50. The mutation site (dashed line) shows the largest displacement."}
-df <- data.frame(site = sites, dr2 = dr2)
-ggplot(df, aes(x = site, y = dr2)) +
-  geom_line(color = "darkred") +
-  geom_vline(xintercept = sites[50], linetype = "dashed", alpha = 0.5) +
-  labs(x = "Residue", y = "Squared Displacement",
-       title = "Structural Response to Mutation at Site 50") +
-  theme_minimal()
+You can calculate the displacement between wild-type and mutant:
+
+```{r}
+# Displacement at each site
+dxyz <- mut$nodes$xyz - wt$nodes$xyz
+dr2 <- rowSums(matrix(dxyz^2, ncol = 3, byrow = TRUE))
+
+# Plot displacement profile
+plot(dr2, type = "l", xlab = "Site", ylab = "Squared displacement",
+     main = "Response to mutation at site 50")
+abline(v = 50, lty = 2, col = "red")
 ```
 
-## Function Overview
+### Step 3: Mutation Response Scanning
 
-The package provides 20 exported functions organized into three categories:
+For a systematic analysis, use `mrs()` to scan all sites:
 
-### Core Functions
+```{r}
+# Scan all sites (using nmut=1 for speed; use 10+ for production)
+result <- mrs(pdb, pdb_id = "2ACY", nmut = 1, seed = 42)
+```
+
+The `mrs()` function returns:
+
+- `dr2ij`: Response matrix (nsites x nsites) - displacement at site i from mutation at j
+- `influence`: Column means - effect of mutating each site
+- `sensitivity`: Row means - response of each site to mutations anywhere
+- `params`: Parameters used
+
+### Step 4: Visualize Results
+
+Use `plot_mrs()` to create a publication-ready figure:
+
+```{r fig.width=8, fig.height=5}
+plot_mrs(result)
+```
+
+The plot shows:
+
+- **Response matrix**: How mutations propagate through the structure
+- **Influence profile**: Sites where mutations cause large effects (high influence)
+- **Sensitivity profile**: Sites that respond strongly to mutations anywhere (high sensitivity)
+
+### Saving the Figure
+
+For publications, save as PDF:
+
+```{r eval=FALSE}
+p <- plot_mrs(result)
+ggplot2::ggsave("mrs_figure.pdf", p, width = 8, height = 5)
+```
+
+## Function Reference
 
 | Function | Description |
 |----------|-------------|
 | `enm()` | Build an ENM from a PDB structure |
 | `mutenm()` | Simulate a mutation at a specific site |
-| `mrs()` | Mutation Response Scanning - scan all sites systematically |
+| `mrs()` | Mutation Response Scanning - scan all sites |
+| `plot_mrs()` | Visualize MRS results |
 
-### Single-Protein Properties
+## Key Parameters
 
-Functions that analyze one protein structure:
+### ENM Parameters (`enm()`)
 
-| Function | Description |
-|----------|-------------|
-| `cn()` | Contact number per site |
-| `wcn()` | Weighted contact number per site |
-| `dactive()` | Distance to active site |
-| `msfi()` | Mean-square fluctuation per site |
-| `msfn()` | Mean-square fluctuation per mode |
-| `v_min()` | Minimum (stress) energy |
-| `g_ent()` | Entropic free energy |
-| `dv_act()` | Activation energy (internal) |
-| `dg_ent_act()` | Activation energy (entropic) |
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `node` | Node type: "ca", "cb", or "sc" | "ca" |
+| `model` | ENM model: "anm", "ming_wall", etc. | "anm" |
+| `d_max` | Distance cutoff (Angstroms) | 10.5 |
 
-### Mutation Effect Functions
+### Mutation Parameters (`mrs()`, `mutenm()`)
 
-Functions that compare wild-type and mutant:
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `mut_model` | "lfenm" (fast) or "sclfenm" | "lfenm" |
+| `nmut` | Mutations per site (mrs only) | 1 |
+| `mut_dl_sigma` | Perturbation magnitude | 0.3 |
+| `seed` | Random seed for reproducibility | NULL |
 
-| Function | Description |
-|----------|-------------|
-| `Dr2i()` | Squared displacement per site |
-| `Dr2n()` | Squared displacement per mode |
-| `Dmsfi()` | Change in MSF per site |
-| `Dmsfn()` | Change in MSF per mode |
-| `Dv_min()` | Change in minimum energy |
-| `Dg_ent()` | Change in entropic free energy |
-| `Ddv_act()` | Change in activation energy |
-| `Ddg_ent_act()` | Change in activation entropy |
+## Interpretation
 
-## Next Steps
+- **High influence sites**: Mutations here cause large structural changes throughout the protein. Often buried, well-connected residues.
 
-To learn more, explore the other vignettes:
+- **High sensitivity sites**: These regions respond to mutations anywhere. May indicate functionally important or structurally coupled regions.
 
-- **Building Elastic Network Models**: Deep dive into ENM construction, node types, and model variants
-- **Protein Structure and Dynamics**: Analyzing single proteins with contact numbers and fluctuations
-- **Simulating Mutations**: Understanding the mutation models and parameters
-- **Mutation Response Scanning**: Systematic analysis of all mutation sites
+- **Diagonal of response matrix**: Self-response (how much the mutated site itself moves).
+
+- **Off-diagonal patterns**: Reveal structural communication pathways and allosteric coupling.

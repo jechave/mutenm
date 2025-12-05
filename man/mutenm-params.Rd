@@ -9,12 +9,6 @@
 \item{wt}{Wild-type protein object created by [enm()]}
 
 \item{mut}{Mutant protein object created by [mutenm()]}
-
-\item{beta}{Inverse temperature (1/kT). Default: beta_boltzmann()}
-
-\item{pdb_site_active}{Vector of PDB residue numbers defining the active site}
-
-\item{ideal}{Reference protein for ideal active site conformation}
 }
 \description{
 Common parameters for mutenm functions

@@ -68,6 +68,7 @@ enm(pdb, node = "cb", model = "anm", d_max = 12.0)
 \seealso{
 Other core functions: 
 \code{\link{mrs}()},
-\code{\link{mutenm}()}
+\code{\link{mutenm}()},
+\code{\link{plot_mrs}()}
 }
 \concept{core functions}

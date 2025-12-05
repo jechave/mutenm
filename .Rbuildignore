@@ -10,3 +10,12 @@
 ^Rmd$
 ^images$
 ^Meta$
+^\.claude$
+^CLAUDE\.md$
+^paper\.md$
+^paper\.bib$
+^paper\.pdf$
+^paper_figure\.R$
+^paper_figure\.png$
+^paper_mrs_results\.rds$
+^README\.html$

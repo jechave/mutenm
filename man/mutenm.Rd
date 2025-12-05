@@ -76,6 +76,7 @@ mut <- mutenm(wt, site_mut = 11, mutation = 1, mut_model = "lfenm", seed = 1024)
 \seealso{
 Other core functions: 
 \code{\link{enm}()},
-\code{\link{mrs}()}
+\code{\link{mrs}()},
+\code{\link{plot_mrs}()}
 }
 \concept{core functions}

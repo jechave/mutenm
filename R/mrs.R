@@ -27,6 +27,7 @@
 #' }
 #'
 #' @param pdb A pdb object from \code{bio3d::read.pdb()}
+#' @param pdb_id PDB identifier for labeling plots (default: "unknown")
 #' @param node Node representation: "ca" (C-alpha), "cb" (C-beta), or "sc" (side-chain centroid)
 #' @param model ENM model: "anm", "ming_wall", "pfanm", "reach", "hnm", or "hnm0"
 #' @param d_max Distance cutoff for contacts (Angstroms)
@@ -62,6 +63,7 @@
 #'
 #' @export
 mrs <- function(pdb,
+                pdb_id = "unknown",
                 node = "ca",
                 model = "anm",
                 d_max = 10.5,
@@ -119,6 +121,7 @@ mrs <- function(pdb,
     influence = influence,
     sensitivity = sensitivity,
     params = list(
+      pdb_id = pdb_id,
       node = node,
       model = model,
       d_max = d_max,

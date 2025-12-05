@@ -6,6 +6,7 @@
 \usage{
 mrs(
   pdb,
+  pdb_id = "unknown",
   node = "ca",
   model = "anm",
   d_max = 10.5,
@@ -18,6 +19,8 @@ mrs(
 }
 \arguments{
 \item{pdb}{A pdb object from \code{bio3d::read.pdb()}}
+
+\item{pdb_id}{PDB identifier for labeling plots (default: "unknown")}
 
 \item{node}{Node representation: "ca" (C-alpha), "cb" (C-beta), or "sc" (side-chain centroid)}
 
@@ -90,6 +93,7 @@ plot(result$influence, type = "l")
 
 Other core functions: 
 \code{\link{enm}()},
-\code{\link{mutenm}()}
+\code{\link{mutenm}()},
+\code{\link{plot_mrs}()}
 }
 \concept{core functions}
