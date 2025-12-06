@@ -2,12 +2,15 @@ Package: mutenm
 Type: Package
 Title: Mutate Elastic Network Models of Proteins
 Version: 0.1.0
-Author: Julian Echave
-Maintainer: Julian Echave <jechave@unsam.edu.ar>
-Description: Build elastic network models (ENMs) of proteins and calculate
-    mutation-response matrices using the linear-force ENM (LFENM) perturbation
-    model. Provides tools for analyzing how mutations propagate structural
-    effects through proteins.
+Authors@R: person("Julian", "Echave",
+                  email = "jechave@unsam.edu.ar",
+                  role = c("aut", "cre"),
+                  comment = c(ORCID = "0000-0003-0678-5593"))
+Description: Build elastic network models (ENMs) of proteins and simulate
+    mutation effects using linear response theory. Given a wild-type ENM,
+    generate mutant ENMs to study how mutations affect protein structure and
+    dynamics. Perform mutation response scanning (MRS) across all sites to
+    identify structurally important and sensitive residues.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

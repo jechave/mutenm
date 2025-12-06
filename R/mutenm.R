@@ -10,13 +10,13 @@
 #'
 #' \subsection{Mutation models}{
 #' \itemize{
-#'   \item \code{"lfenm"} (Linear Force ENM): Fast approximation. Calculates the
-#'     new equilibrium structure using linear response theory, but keeps the
-#'     original normal modes. Dynamics-related properties (Dmsfi, Dmsfn, Dg_ent)
-#'     will be zero.
-#'   \item \code{"sclfenm"} (Self-Consistent LFENM): After calculating the new
-#'     structure, rebuilds the ENM and recalculates normal modes. Slower but
-#'     captures changes in dynamics.
+#'   \item \code{"lfenm"} (Linear Force ENM; Echave, 2008; Echave & Fernandez, 2010):
+#'     Fast approximation. Calculates the new equilibrium structure using linear
+#'     response theory, but keeps the original normal modes. Dynamics-related
+#'     properties (Dmsfi, Dmsfn, Dg_ent) will be zero.
+#'   \item \code{"sclfenm"} (Self-Consistent LFENM; Echave, 2012): After calculating
+#'     the new structure, rebuilds the ENM and recalculates normal modes. Slower
+#'     but captures changes in dynamics.
 #' }
 #' }
 #'
@@ -32,15 +32,25 @@
 #' side chain mutations.
 #' }
 #'
-#' @inheritParams mutenm-params
-#' @param site_mut The site to mutate (not the pdb_site, but sequential)
+#' @param wt Wild-type protein object created by \code{\link{enm}}
+#' @param site_mut The site to mutate (sequential index, not pdb residue number)
 #' @param mutation An integer (required). If 0, returns \code{wt} unchanged (with warning). Used with seed to generate reproducible random perturbations.
 #' @param mut_model A string specifying mutational model ("lfenm" or "sclfenm")
 #' @param mut_dl_sigma The standard deviation of a normal distribution from which edge-length perturbation is picked.
 #' @param mut_sd_min An integer, only edges with \code{sdij >= mut_sd_min} are mutated
 #' @param seed An integer, the seed for set.seed before picking perturbations
 #'
-#' @return A mutated protein object
+#' @return A \code{prot} object for the mutant protein.
+#'
+#' @references
+#' Echave J (2008). Evolutionary divergence of protein structure: The linearly forced elastic network model.
+#' \emph{Chemical Physics Letters}, 457:413-416. \doi{10.1016/j.cplett.2008.04.042}
+#'
+#' Echave J, Fernandez FM (2010). A perturbative view of protein structural variation.
+#' \emph{Proteins}, 78:173-180. \doi{10.1002/prot.22553}
+#'
+#' Echave J (2012). Why are the low-energy protein normal modes evolutionarily conserved?
+#' \emph{Pure and Applied Chemistry}, 84:1931-1937. \doi{10.1351/PAC-CON-12-02-15}
 #'
 #' @family core functions
 #'

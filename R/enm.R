@@ -17,41 +17,90 @@ utils::globalVariables(c("dij", "sdij", "edge", "v0ij", "lij", "kij", "i", "j"))
 #' protein's intrinsic flexibility and are used to predict mutation effects.
 #'
 #' \subsection{Node types}{
+#' One node per residue, placed at:
 #' \itemize{
-#'   \item \code{"ca"}: Alpha carbons only (one node per residue)
-#'   \item \code{"cb"}: Beta carbons (alpha for glycine)
-#'   \item \code{"sc"}: Side chain centroids (includes more structural detail)
+#'   \item \code{"ca"}: Calpha coordinates
+#'   \item \code{"cb"}: Cbeta coordinates
+#'   \item \code{"sc"}: Side-chain centroid coordinates
 #' }
 #' }
 #'
 #' \subsection{Models}{
 #' \itemize{
-#'   \item \code{"anm"}: Anisotropic Network Model - uniform spring constants
-#'   \item \code{"ming_wall"}: Distance-dependent spring constants (k ~ 1/d^2)
-#'   \item \code{"pfanm"}: Parameter-free ANM
-#'   \item \code{"hnm"}, \code{"hnm0"}: Hinsen Network Models
-#'   \item \code{"reach"}: REACH model
+#'   \item \code{"anm"}: Anisotropic Network Model (Atilgan et al., 2001) - uniform spring constants (k=1 for d <= d_max)
+#'   \item \code{"ming_wall"}: Ming-Wall model (Ming & Wall, 2005) - uniform k with strengthened backbone (k_backbone = 42k)
+#'   \item \code{"pfanm"}: Parameter-free ANM (Yang et al., 2009) - distance-dependent springs (k ~ 1/d^2)
+#'   \item \code{"hnm"}: Hinsen model (Hinsen, 1998) - piecewise function: linear for d <= 4A, decays as 1/d^6 otherwise
+#'   \item \code{"hnm0"}: Hinsen exponential model (Hinsen et al., 2000) - Gaussian decay exp(-(d/c)^2)
+#'   \item \code{"reach"}: REACH model (Moritsugu & Smith, 2007) - sequence-distance dependent with exponential decay
 #' }
 #' }
 #'
 #' \subsection{The prot object}{
-#' The returned \code{prot} object is a list containing:
-#' \itemize{
-#'   \item \code{param}: ENM parameters (node type, model, cutoff)
-#'   \item \code{nodes}: Node information (xyz coordinates, residue info)
-#'   \item \code{graph}: Network edges with spring constants and distances
-#'   \item \code{eij}: Unit vectors along edges
-#'   \item \code{kmat}: Hessian matrix (3N x 3N)
-#'   \item \code{nma}: Normal mode analysis results (eigenvalues and eigenvectors)
+#' The returned \code{prot} object is a list of class "prot" containing:
+#' \describe{
+#'   \item{\code{param}}{List of ENM parameters: \code{node}, \code{model}, \code{d_max}}
+#'   \item{\code{nodes}}{List with node information:
+#'     \itemize{
+#'       \item \code{nsites}: number of residues/nodes
+#'       \item \code{site}: sequential site indices (1 to nsites)
+#'       \item \code{pdb_site}: residue numbers from PDB file
+#'       \item \code{bfactor}: crystallographic B-factors
+#'       \item \code{xyz}: 3 x nsites matrix of node coordinates
+#'     }
+#'   }
+#'   \item{\code{graph}}{Tibble with network edges (one row per spring):
+#'     \itemize{
+#'       \item \code{edge}: edge label "i-j"
+#'       \item \code{i}, \code{j}: connected node indices
+#'       \item \code{sdij}: sequence distance |j-i|
+#'       \item \code{dij}: spatial distance (Angstroms)
+#'       \item \code{lij}: equilibrium spring length (= dij for wild-type)
+#'       \item \code{kij}: spring constant
+#'       \item \code{v0ij}: spring potential energy offset (0 for wild-type)
+#'     }
+#'   }
+#'   \item{\code{eij}}{Matrix (n_edges x 3) of unit vectors along each spring}
+#'   \item{\code{kmat}}{Hessian matrix (3N x 3N) of second derivatives of potential energy}
+#'   \item{\code{nma}}{Normal mode analysis results:
+#'     \itemize{
+#'       \item \code{mode}: mode indices
+#'       \item \code{evalue}: eigenvalues (squared frequencies)
+#'       \item \code{umat}: eigenvectors (normal modes), 3N x n_modes matrix
+#'       \item \code{cmat}: covariance matrix (3N x 3N), used for linear response
+#'     }
+#'   }
 #' }
 #' }
 #'
 #' @param pdb   pdb object obtained using bio3d::read.pdb
-#' @param node  parameter specifying how network nodes should be built: "sc" (side chains), "ca" (alpha carbons), or "cb" (beta carbons)
-#' @param model parameter specifying model type: "anm", "ming_wall", "hnm", "hnm0", "pfanm", "reach"
-#' @param d_max distance cutoff used to define enm contacts
+#' @param node  node type: "ca", "cb", or "sc" (default: "ca")
+#' @param model ENM model: "anm", "ming_wall", "pfanm", "hnm", "hnm0", or "reach" (default: "anm")
+#' @param d_max distance cutoff in Angstroms (default: 10.5)
 #'
 #' @returns an object of class `prot`, which is a list `lst(param, node, graph, eij, kmat, nma)`
+#'
+#' @references
+#' Atilgan AR, Durell SR, Jernigan RL, Demirel MC, Keskin O, Bahar I (2001).
+#' Anisotropy of fluctuation dynamics of proteins with an elastic network model.
+#' \emph{Biophysical Journal}, 80:505-515. \doi{10.1016/S0006-3495(01)76033-X}
+#'
+#' Hinsen K (1998). Analysis of domain motions by approximate normal mode calculations.
+#' \emph{Proteins}, 33:417-429. \doi{10.1002/(SICI)1097-0134(19981115)33:3<417::AID-PROT10>3.0.CO;2-8}
+#'
+#' Hinsen K, Petrescu AJ, Dellerue S, Bellissent-Funel MC, Kneller GR (2000).
+#' Harmonicity in slow protein dynamics.
+#' \emph{Chemical Physics}, 261:25-37. \doi{10.1016/S0301-0104(00)00222-6}
+#'
+#' Ming D, Wall ME (2005). Allostery in a coarse-grained model of protein dynamics.
+#' \emph{Physical Review Letters}, 95:198103. \doi{10.1103/PhysRevLett.95.198103}
+#'
+#' Moritsugu K, Smith JC (2007). Coarse-grained biomolecular simulation with REACH:
+#' Realistic extension algorithm via covariance Hessian.
+#' \emph{Biophysical Journal}, 93:3460-3469. \doi{10.1529/biophysj.107.111898}
+#'
+#' Yang L, Song G, Jernigan RL (2009). Protein elastic network models and the ranges of cooperativity.
+#' \emph{PNAS}, 106:12347-12352. \doi{10.1073/pnas.0902159106}
 #'
 #' @family core functions
 #'
@@ -64,7 +113,7 @@ utils::globalVariables(c("dij", "sdij", "edge", "v0ij", "lij", "kij", "i", "j"))
 #' enm(pdb, node = "sc", model = "anm", d_max = 12.5)
 #' enm(pdb, node = "cb", model = "anm", d_max = 12.0)
 #' }
-enm <- function(pdb, node, model, d_max) {
+enm <- function(pdb, node = "ca", model = "anm", d_max = 10.5) {
 
   prot <- create_enm() %>%
     set_enm_param(node = node, model = model, d_max = d_max) %>%

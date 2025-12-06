@@ -17,14 +17,6 @@ affiliations:
 bibliography: paper.bib
 ---
 
-\begin{center}
-\textbf{Julian Echave}
-
-Instituto de Ciencias Físicas (ICIFI-CONICET), Universidad Nacional de San Martín, Martín de Irigoyen 3100, 1650 San Martín, Buenos Aires, Argentina
-
-jechave@unsam.edu.ar
-\end{center}
-
 # Summary
 
 `mutenm` is an R package for modeling mutations within the elastic network model (ENM) framework. An ENM represents a protein as a network of nodes connected by harmonic springs; despite their simplicity, ENMs capture functionally relevant collective motions through normal mode analysis.
@@ -41,7 +33,7 @@ This approach has been used to study protein evolution—the divergence of struc
 
 # Functionality
 
-**Building the ENM.** The `enm()` function constructs an elastic network model from a PDB structure. Multiple node representations are supported (Cα, Cβ, side-chain centroid); the optimal choice depends on the application [@marcos2015; @echave2024]. Several force fields are available [@atilgan2001; @yang2009; @ming2005; @hinsen1998; @hinsen2000]; results are generally robust across models.
+**Building the ENM.** The `enm()` function constructs an elastic network model from a PDB structure. Multiple node representations are supported (Cα, Cβ, side-chain centroid); the optimal choice depends on the application [@marcos2015; @echave2024]. Several force fields are available [@atilgan2001; @yang2009; @ming2005; @hinsen1998; @hinsen2000; @moritsugu2007]; results are generally robust across models.
 
 **Mutating the ENM.** The `mutenm()` function takes a wild-type ENM and generates a mutant ENM by perturbing spring equilibrium lengths around the mutation site. Two mutation models are available: LFENM perturbs the structure while keeping the Hessian fixed; scLFENM recalculates the Hessian after relaxation, capturing changes in dynamics. The mutant ENM can be analyzed like any ENM—comparing normal modes, covariance matrices, or flexibility between wild-type and mutant. By iterating `mutenm()`, users can simulate evolutionary trajectories.
 

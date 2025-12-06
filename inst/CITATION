@@ -1,0 +1,15 @@
+citHeader("To cite mutenm in publications use:")
+
+bibentry(
+  bibtype  = "Article",
+  title    = "mutenm: An R package to mutate elastic network models of proteins",
+  author   = person("Julian", "Echave"),
+  journal  = "Journal of Open Source Software",
+  year     = "2025",
+  note     = "Submitted",
+  textVersion = paste(
+    "Echave, J. (2025).",
+    "mutenm: An R package to mutate elastic network models of proteins.",
+    "Journal of Open Source Software (submitted)."
+  )
+)

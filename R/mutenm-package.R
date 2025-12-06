@@ -1,3 +1,5 @@
+#' mutenm: Mutate Elastic Network Models
+#'
 #' @description
 #' Build elastic network models (ENMs) of proteins and simulate mutation effects
 #' using linear response theory.
@@ -22,15 +24,6 @@
 #' }
 #' }
 #'
-#' @aliases NULL
+#' @name mutenm-package
+#' @aliases mutenm-package
 "_PACKAGE"
-
-#' Common parameters for mutenm functions
-#'
-#' @param prot A protein object created by [enm()]
-#' @param wt Wild-type protein object created by [enm()]
-#' @param mut Mutant protein object created by [mutenm()]
-#'
-#' @name mutenm-params
-#' @keywords internal
-NULL

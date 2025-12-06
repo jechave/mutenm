@@ -2,7 +2,9 @@
 % Please edit documentation in R/mutenm-package.R
 \docType{package}
 \name{mutenm-package}
-\title{mutenm: Mutate Elastic Network Models of Proteins}
+\alias{mutenm-package}
+\alias{_PACKAGE}
+\title{mutenm: Mutate Elastic Network Models}
 \description{
 Build elastic network models (ENMs) of proteins and simulate mutation effects
 using linear response theory.
@@ -26,4 +28,8 @@ A typical analysis has three steps:
   \item \code{\link{plot_mrs}}: Visualize MRS results
 }
 }
+}
+\author{
+\strong{Maintainer}: Julian Echave \email{jechave@unsam.edu.ar} (\href{https://orcid.org/0000-0003-0678-5593}{ORCID})
+
 }
