@@ -64,4 +64,5 @@ CLAUDE.md
 /Meta/
 paper_mrs_results.rds
 paper.pdf
+paper/submission_notes.txt
 vignettes/*_files/
