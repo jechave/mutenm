@@ -3,8 +3,8 @@ load(test_path("..", "data", "prot_2acy_A_ming_wall_ca.rda"))
 
 
 test_that("enm gets prot equal to prot_2acy_A", {
-  expect_equal(enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5),
-               prot_2acy_A_ming_wall_ca)
+  result <- enm(pdb_2acy_A, node = "ca", model = "ming_wall", d_max = 10.5)
+  expect_prot_equal(result, prot_2acy_A_ming_wall_ca)
 })
 
 test_that("enm works with beta carbon nodes", {
