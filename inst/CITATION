@@ -4,12 +4,13 @@ bibentry(
   bibtype  = "Article",
   title    = "mutenm: An R package to mutate elastic network models of proteins",
   author   = person("Julian", "Echave"),
-  journal  = "Journal of Open Source Software",
+  journal  = "Zenodo",
   year     = "2025",
-  note     = "Submitted",
+  doi      = "10.5281/zenodo.17989557",
+  url      = "https://doi.org/10.5281/zenodo.17989557",
   textVersion = paste(
     "Echave, J. (2025).",
     "mutenm: An R package to mutate elastic network models of proteins.",
-    "Journal of Open Source Software (submitted)."
+    "Zenodo. https://doi.org/10.5281/zenodo.17989557"
   )
 )

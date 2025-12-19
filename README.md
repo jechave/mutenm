@@ -99,3 +99,9 @@ See the package vignette for a detailed introduction:
 ``` r
 vignette("introduction", package = "mutenm")
 ```
+
+## Citation
+
+If you use `mutenm` in your research, please cite:
+
+> Echave, J. (2025). mutenm: An R package to mutate elastic network models of proteins. *Zenodo*. https://doi.org/10.5281/zenodo.17989557
